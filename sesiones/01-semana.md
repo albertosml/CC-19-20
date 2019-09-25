@@ -39,6 +39,7 @@ la
 * Sistema operativo de referencia en la asignatura: Linux (Ubuntu,
   Debian, Archlinux, Fedora, OpenSUSE, Linux Mint, Arch, Antergos, Manjaro).
 * Entender la cultura DevOps y cómo cambia la filosofía de trabajo.
+* Sobre los grupos de prácticas: si hay menos de 25 personas, grupo único el lunes.
 
 ## Material para la clase
 
