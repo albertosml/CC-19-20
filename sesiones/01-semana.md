@@ -1,18 +1,18 @@
-# Primera semana, comienza el 3 de octubre 2018
+# Primera semana, comienza el 3 de octubre 2019
 
 Agradeceré que contestes
 la
-[encuesta inicial]).
+[encuesta inicial](https://docs.google.com/forms/d/e/1FAIpQLScqSfPjScTEXKMNSi37L5Tvpbe-cqgdvYHWqqlvl0e005_1kw/viewform).
 
 ## Objetivos a cubrir en la primera semana
 
 1. Entender la metodología docente, de evaluación y de interacción de la asignatura.
 2. Darse de alta y comprender el funcionamiento básico
-   de [GitHub](https://github.com) y el grupo de Telegram de la
-   asignatura; conocer el resto de los recursos de la asignatura. 
+   de git y [GitHub](https://github.com) y el grupo de Telegram de la
+   asignatura; conocer y entender el resto de los recursos de la asignatura. 
 2. Entender el concepto de software libre y su aplicación práctica en clase.
 3. Vernos las caras.
-4. Comenzar a usar `git` desde línea de órdenes y comprender su papel como sistema para trabajo colaborativo y despliegue de aplicaciones.
+4. Comenzar a usar `git` desde línea de órdenes y comprender su papel como sistema para trabajo colaborativo y despliegue de aplicaciones. Un buen conocimiento de git es fundamental para trabajar en esta asignatura.
 5. Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
 6. Entender en qué consiste el proyecto de la asignatura y comenzar a trabajar en el mismo.
 
@@ -28,7 +28,7 @@ la
 
 ## Contenidos 
 
-* Presentación del profesor y los recursos de la asignatura: [web](http://jj.github.io/CC) y [Twitter `@iv_gii`](http://twitter.com/iv_gii).
+* Presentación del profesor y los recursos de la asignatura: [web](http://jj.github.io/CC).
 * [Visión general de la asignatura](http://masteres.ugr.es/ing-informatica/pages/info_academica/guias/guiasdocentes).
 * Metodología docente: [Clase inversa](https://es.wikipedia.org/wiki/Aula_invertida), incluyendo eliminación de la distinción teoría/prácticas y consecuencias que trae.
 * [Metodología y criterios de evaluación](../Metodología_y_criterios_de_evaluación.md).
@@ -39,7 +39,7 @@ la
 * Sistema operativo de referencia en la asignatura: Linux (Ubuntu,
   Debian, Archlinux, Fedora, OpenSUSE, Linux Mint, Arch, Antergos, Manjaro).
 * Entender la cultura DevOps y cómo cambia la filosofía de trabajo.
-* Sobre los grupos de prácticas: si hay menos de 25 personas, grupo único el lunes.
+* Sobre los grupos de prácticas.
 
 ## Material para la clase
 
@@ -49,7 +49,7 @@ Comienza por esta
 y con
 el
 [hito 0 del proyecto](http://jj.github.io/CC/documentos/proyecto/0.Repositorio),
-cuyo plazo de entrega de este primer hito terminará el **10 de octubre a las 7:30 de la tarde**. 
+cuyo plazo de entrega de este primer hito terminará el **10 de octubre a las 7:30 de la tarde**. Entender bien git es un prerrequisito para esta asignatura. Se puede seguir cualquier tutorial en Internet para entenderlo.
 
 ## Siguiente semana
 
