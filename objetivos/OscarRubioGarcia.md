@@ -25,8 +25,7 @@ Entrega de fichero de objetivos
 * [x] Generacion de archivo .gitignore y selección de licencia.
 * [x] Realizar las actividades del Tema 1.
 * [x] Realizar la entrega del fichero de objetivos.
-  
+
 ## Descripción de la entrega
 
 Primera entrega de objetivos del hito 0
-
