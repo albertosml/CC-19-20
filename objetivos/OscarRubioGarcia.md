@@ -20,7 +20,6 @@ Entrega de fichero de objetivos
 * [x] Entender en qué consiste el proyecto de la asignatura.
 * [x] Configurar las claves SSH de git y vincularla en GitHub.
 * [x] Realizar el Setup del entorno del proyecto.
-* [x] Generacion de hito 0.
 * [x] Configurar la informacion mostrada en mi cuenta de GitHub.
 * [x] Configuración correcta del nombre y correo electrónico para que aparezca en los commits.
 * [x] Generacion de archivo .gitignore y selección de licencia.
