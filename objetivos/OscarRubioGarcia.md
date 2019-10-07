@@ -1,10 +1,10 @@
 # Entrega de objetivos de Cloud Computing
 
-Entrega de fichero de objetivos 
+Entrega de fichero de objetivos .
 
 ## Primero y más importante
 
-* [x] Prometo no cerrar *nunca* un PR
+* [x] Prometo no cerrar *nunca* un PR.
 
 ## Enlace a fichero de objetivos 
 
@@ -28,4 +28,4 @@ Entrega de fichero de objetivos
 
 ## Descripción de la entrega
 
-Primera entrega de objetivos del hito 0
+Primera entrega de objetivos del hito 0.
