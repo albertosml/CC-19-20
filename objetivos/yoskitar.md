@@ -42,4 +42,4 @@
   - [X] Configurar la línea de órdenes para presentar información de
     repos.
   - [X] Conocer permisos y cuales usar en cada momento.
--[X] Entender lo necesario para entregar el hito 0 del proyecto.
+- [X] Entender lo necesario para entregar el hito 0 del proyecto.
