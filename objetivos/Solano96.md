@@ -1,5 +1,7 @@
 ## Objetivos de la primera semana
 
+Enlace al [repositorio de ejercicios](https://github.com/Solano96/CC-Exercises) de Cloud Computing.
+
 - [x] Entender la metodología docente, de evaluación y de interacción de la asignatura.
 - [x] Darse de alta y comprender el funcionamiento básico
    de git y [GitHub](https://github.com) y el grupo de Telegram de la
@@ -12,8 +14,8 @@
 - [x] Usar los métodos de entrega de los objetivos propuestos para la asignatura [usando GitHub](../objetivos/README.md).
 - [x] Manejar de forma básica la línea de órdenes de Linux.
 - [x] Aprender a instalar software libre en Linux.
-- [ ] Entregar el fichero de objetivos y los primeros ejercicios usando
+- [x] Entregar el fichero de objetivos y los primeros ejercicios usando
   GitHub.
-- [ ] Conocer dónde se pueden obtener recursos cloud gratuitos para usar
+- [x] Conocer dónde se pueden obtener recursos cloud gratuitos para usar
   en la asignatura.
-- [ ] Terminar el hito 0.
+- [x] Terminar el hito 0.
