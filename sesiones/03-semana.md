@@ -1,4 +1,4 @@
-# Tercera semana, 14 de octubre de 2019
+# Tercera semana, 14 de octubre
 
 
 ## Objetivos a cubrir en esta semana
@@ -7,6 +7,13 @@
 2. Entender las características de las aplicaciones que se despliegan en la nube.
 
 ## Otros objetivos
+
+* Entender los errores cometidos en el hito
+  * Entender cómo se hace desarrollo colaborativo en git: resolver conflictos, sincronizar versiones...
+  * Entender por qué no se hace `git pull` sino `git pull --rebase` y
+  como arreglarlo en ese caso
+  usando un squash commits con 
+  [`git rebase -i`](https://stackoverflow.com/questions/5189560/squash-my-last-x-commits-together-using-git).
 
 * Manejar con soltura los diferentes recursos de línea de órdenes,
   especialmente en Linux.
@@ -24,8 +31,8 @@
 y comenzar
 con
 [hito 1 del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura),
-que se entrega el 22 de octubre de 2018.
+que se entrega el 22 de octubre de 2019.
 
 ## Siguiente semana
 
-[Tercera semana, desde el 17 de octubre ](03-semana.md)
+[Tercera semana, desde el 21 de octubre ](04-semana.md)
