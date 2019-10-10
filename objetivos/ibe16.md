@@ -9,7 +9,8 @@
 - [x] Entender en qué consiste el proyecto de la asignatura y comenzar a trabajar en el mismo.
 - [x] Tener a punto una instalación Linux para llevar a cabo las actividades de la asignatura
 - [x] Entregar el fichero de objetivos 
-- [ ] Entregar los primeros ejercicios usando GitHub.
-- [ ] Entregar el hito 0
+- [X] Entregar los primeros ejercicios usando GitHub.
+- [X] Crear una página web para el proyecto
+- [X] Entregar el hito 0
 
 
