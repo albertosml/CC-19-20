@@ -19,6 +19,25 @@
   * Conocer permisos y cuales usar en cada momento.
 * Entender lo necesario para entregar el hito 0 del proyecto.
 
+## Objetivos tutoría 11-octubre-2019
+
+* Entender correctamente la dinámica de la asignatura.
+* Entender correctamente la enseñanza basada en proyecto y por objetivos.
+  * Entender correctamente qué significa *entender*.
+* Entender cómo se plantea un proyecto en informática.
+  * Requisitos funcionales y cómo especificarlos en un proyecto.
+  * A qué corresponde este proyecto en GitHub: hitos e *issues* y cómo buscar la correspondencia.
+* Entender la diferencia entre *frontend* y *backend* y cómo se pueden desarrollar de forma independiente.
+  * Entender también que muchas aplicaciones no necesitan un frontend.
+* Entender el concepto de *domain driven design*
+  * Hacer un ejemplo práctico.
+* Entender arquitecturas de paso de mensajes.
+* Ejemplo de arquitectura basada en eventos: [cliente Slack y Celery](https://github.com/JJ/slack-bot-platzi/blob/master/cliente-con-celery.py) + [servidor de tareas](https://github.com/JJ/slack-bot-platzi/blob/master/PlatziTareas.py).
+  * Ejemplo adicional [Gateway](https://github.com/JJ/microservices-broker/blob/master/github-server/server-with-bunny.rb) + [worker](https://github.com/JJ/microservices-broker/blob/master/github-server/worker.go) + [procesador](https://github.com/JJ/microservices-broker/blob/master/github-server/procesa.py) + [store](https://github.com/JJ/microservices-broker/blob/master/github-server/store.p6).
+* Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales.
+  * Configuración remota
+  * Log
+  * Almacén de datos.
 
 ## Material para la clase
 
