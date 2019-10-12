@@ -1,4 +1,4 @@
-Repositorio de ejercicios: [Ejercicios CC]()
+Repositorio de ejercicios: [Ejercicios CC](https://github.com/iMiguel10/Ejercicios-CC)
 
 # Objetivos hito 0
 
@@ -6,12 +6,13 @@ Repositorio de ejercicios: [Ejercicios CC]()
 - [x] Configurar perfil de github tanto correo, nombre ..
 - [x] Realizado el fork al repositorio del profesor.
 - [x] Actualizar hoja de calculo con mis datos
-- [ ] Crear repositorio para proyecto y entregarlo
-- [ ] Añadir licencias y .gitignore
+- [x] Crear repositorio para proyecto y entregarlo
+- [x] Añadir licencias y .gitignore
 - [x] Configurar la clave pública y privada con SSH
 - [X] Entregar el fichero de objetivos
 - [X] Entregar los primeros ejercicios usando GitHub.
-- [ ] Conocer dónde se pueden obtener recursos cloud gratuitos para usar en la asignatura.
+- [x] Conocer dónde se pueden obtener recursos cloud gratuitos para usar en la asignatura.
+
 ---
 
 <!--
