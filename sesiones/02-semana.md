@@ -32,12 +32,6 @@
 * Entender el concepto de *domain driven design*
   * Hacer un ejemplo práctico.
 * Entender arquitecturas de paso de mensajes.
-* Ejemplo de arquitectura basada en eventos: [cliente Slack y Celery](https://github.com/JJ/slack-bot-platzi/blob/master/cliente-con-celery.py) + [servidor de tareas](https://github.com/JJ/slack-bot-platzi/blob/master/PlatziTareas.py).
-  * Ejemplo adicional [Gateway](https://github.com/JJ/microservices-broker/blob/master/github-server/server-with-bunny.rb) + [worker](https://github.com/JJ/microservices-broker/blob/master/github-server/worker.go) + [procesador](https://github.com/JJ/microservices-broker/blob/master/github-server/procesa.py) + [store](https://github.com/JJ/microservices-broker/blob/master/github-server/store.p6).
-* Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales.
-  * Configuración remota
-  * Log
-  * Almacén de datos.
 
 ## Material para la clase
 

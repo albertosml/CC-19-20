@@ -22,9 +22,8 @@
 
 * *Teoría*: [Material de este tema](https://jj.github.io/CC/documentos/temas/PaaS)
 
-* *Práctica*:
-  [Hito correspondiente](https://jj.github.io/CC/documentos/proyecto/2.PaaS). *Fecha
-  de entrega*: **15 de noviembre**.
+* * Comprender el [primer hito del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura).
+
 
 
 ## Siguiente semana
