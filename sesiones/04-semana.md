@@ -22,7 +22,6 @@ con
 [hito 1 del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura),
 que se entrega el 28 de octubre de 2019.
 
-
 ## Siguiente semana
 
 [Quinta semana](05-semana.md)

@@ -1,4 +1,4 @@
-# Cuarta semana, 21 de octubre
+# Quinta semana, 28 de octubre
 
 ## Objetivos a cubrir en esta semana
 
@@ -16,7 +16,6 @@
 * Darse de alta en servicios PaaS como zeit.co y Heroku.
 
 
-
 ## Material para la clase
 
 
@@ -24,9 +23,10 @@
 
 * *Práctica*:
   [Hito correspondiente](https://jj.github.io/CC/documentos/proyecto/2.PaaS). *Fecha
-  de entrega*: **15 de noviembre**.
+  de entrega*: **11 de noviembre**.
 
 
 ## Siguiente semana
 
-[Quinta semana](05-semana.md)
+[Sexta semana](06-semana.md)
+
