@@ -23,15 +23,10 @@
   * Conocer permisos y cuales usar en cada momento.
 * Haber entregado el hito 0 del proyecto y entender qué se buscaba con
   el mismo.
-* Comprender el [primer hito del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura).
 
 ## Material para la clase
 
-[Material de este primer tema](http://jj.github.io/CC/documentos/temas/Desarrollo_basado_en_pruebas)
-y comenzar
-con
-[hito 1 del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura),
-que se entrega el 22 de octubre de 2019.
+Continuamos con el tema e hito anterior.
 
 ## Siguiente semana
 

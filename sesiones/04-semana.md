@@ -2,29 +2,25 @@
 
 ## Objetivos a cubrir en esta semana
 
-1. Entender las arquitecturas de software en la nube de uso en la
-   actualidad.
+1. Entender las claves del desarrollo basado en pruebas.
 3. Comprender el paper fundamental de la infraestructura virtual en
    este proceso.
-4. Entender en qué consiste los [servicios web y cómo desplegarlos en la nube](https://jj.github.io/CC/documentos/temas/PaaS)
+4. Entender el concepto de "infraestructura como código" e "infraestructura virtual" para ponerlo en práctica en el hito número 1.
 
 ## Otros objetivos
+
+* Comprender el [primer hito del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura).
 
 * Tener manejo básico de los lenguajes usados en herramientas de
   provisionamiento, Python y Ruby.
 
-* Darse de alta en servicios PaaS como zeit.co y Heroku.
-
-
-
 ## Material para la clase
 
-
-* *Teoría*: [Material de este tema](https://jj.github.io/CC/documentos/temas/PaaS)
-
-* *Práctica*:
-  [Hito correspondiente](https://jj.github.io/CC/documentos/proyecto/2.PaaS). *Fecha
-  de entrega*: **15 de noviembre**.
+[Material de este primer tema](http://jj.github.io/CC/documentos/temas/Desarrollo_basado_en_pruebas)
+y comenzar
+con
+[hito 1 del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura),
+que se entrega el 28 de octubre de 2019.
 
 
 ## Siguiente semana
