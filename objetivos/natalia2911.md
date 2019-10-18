@@ -23,10 +23,9 @@
 ## Segunda semana
 
 - [x] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
-
 - [x] Entender las características de las aplicaciones que se despliegan en la nube.
 
-### En relacion con el hito 0
+### En relación con el hito 0
 
 - [x] Crear un repositorio individual para el proyecto de la asignatura.
 - [x] Crear un repositorio individual para los ejercicios de la asignatura.
@@ -35,3 +34,13 @@
 - [x] Hemos comprobado que en nuestro repositorio están todos los ficheros necesarios, con la configuración de usuario correspondiente al mismo.
 - [x] Hemos creado los correspondientes issues colgadas de sus correspondientes milestones.
 - [x] Hemos entregado el fichero de objetivos.
+
+### En relación con la tutoría
+
+- [x] Entender correctamente la dinámica de la asignatura.
+- [x] Entender correctamente la enseñanza basada en proyecto y por objetivos.
+- [x] Entender cómo se plantea un proyecto en informática.
+- [x] Entender la diferencia entre frontend y backend y cómo se pueden desarrollar de forma independiente.
+- [x] Entender el concepto de domain driven design
+- [x] Entender arquitecturas de paso de mensajes.
+- [x] Entendidos los errores respecto al hito 0.
