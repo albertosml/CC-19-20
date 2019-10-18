@@ -11,5 +11,11 @@
 - [X] Comenzar a usar git desde línea de órdenes y comprender su papel como sistema para trabajo colaborativo y despliegue de aplicaciones. Un buen conocimiento de git es fundamental para trabajar en esta asignatura.
 - [X] Crear el repositorio de ejercicios de la asignatura.
 - [X] Crear el fichero de objetivos.
-- [ ] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
-- [ ] Entender en qué consiste el proyecto de la asignatura y comenzar a trabajar en el mismo.
+- [X] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
+- [X] Entender en qué consiste el proyecto de la asignatura y comenzar a trabajar en el mismo.
+- [X] Entender las características de las aplicaciones que se despliegan en la nube.
+- [X] Entender la diferencia entre frontend y backend y cómo se pueden desarrollar de forma independiente.
+- [X] Entender el concepto de domain driven design.
+- [X] Entender arquitecturas de paso de mensajes. 
+- [X] Entender lo necesario para entregar el hito 0 del proyecto.
+- [X] Entender los errores cometidos en el hito.
