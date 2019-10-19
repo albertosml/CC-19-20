@@ -1,6 +1,6 @@
 [Enlace a mi repositorio de ejercicios](https://github.com/Varrrro/EjerciciosCC-19-20).
 
-## Objetivos del hito 0
+## Semana 1
 
 - [X] Entrar al grupo de Telegram y actualizar la hoja de cálculo con mis datos.
 - [X] Configurar correctamente mi perfil de GitHub (avatar, email, ciudad, ...).
@@ -16,3 +16,17 @@
 - [X] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en la nube.
 - [X] Entender en qué consiste el proyecto de la asignatura y comenzar a trabajar en el mismo.
 
+## Semana 2
+
+- [X] Entender correctamente la dinámica de la asignatura.
+- [X] Entender lo necesario para entregar el hito 0 del proyecto.
+- [X] Entender cómo se plantea un proyecto en informática.
+- [X] Entender el concepto de *Domain Driven Design*.
+- [X] Entender arquitecturas de paso de mensajes.
+
+## Semana 3
+
+- [X] Entender los errores cometidos en el hito 0.
+- [X] Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales.
+- [X] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en la nube.
+- [X] Entender las características de las aplicaciones que se despliegan en la nube.
