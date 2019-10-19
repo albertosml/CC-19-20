@@ -17,3 +17,11 @@ Vernos las caras.
 - [x] Manejar de forma básica la línea de órdenes de Linux.
 - [x] Entregar el fichero de objetivos y los primeros ejercicios usando GitHub.
 - [x] Conocer dónde se pueden obtener recursos cloud gratuitos para usar en la asignatura.
+
+- [x] Entender las características de las aplicaciones que se despliegan en la nube.
+- [x] Entender correctamente la dinámica de la asignatura.
+- [x] Entender correctamente la enseñanza basada en proyecto y por objetivos. 
+- [x] Entender cómo se plantea un proyecto en informática. 
+- [x] Entender la diferencia entre frontend y backend y cómo se pueden desarrollar de forma independiente. 
+- [x] Entender el concepto de domain driven design
+- [x] Entender arquitecturas de paso de mensajes.
