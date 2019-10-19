@@ -12,6 +12,7 @@ Repositorio de ejercicios: [Ejercicios CC](https://github.com/iMiguel10/Ejercici
 - [X] Entregar el fichero de objetivos
 - [X] Entregar los primeros ejercicios usando GitHub.
 - [x] Conocer dónde se pueden obtener recursos cloud gratuitos para usar en la asignatura.
+- [x] Corregir proyecto
 
 ---
 
