@@ -18,4 +18,9 @@
 - [x] Crear la página del repositorio del proyecto en GitHub Pages.
 - [x] Crear el repositorio para la realización de los ejercicios de la asignatura.
 - [x] Enlazar el repositorio de los ejercicios con el fichero de objetivos.
+- [x] Realizar una descripción detallada de las funcionalidades de la aplicación.
+- [x] Diseño de la arquitectura del proyecto, exponiendo la unión entre cada uno de los componentes y así como las
+tecnologías a usar en su desarrollo.
+- [x] Comprender lo que es arquitectura basada en microservicios.
+ 
 
