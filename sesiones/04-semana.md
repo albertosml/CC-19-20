@@ -9,6 +9,12 @@
 
 ## Otros objetivos
 
+* Recomendación a los recién llegados: [comenzar con los objetivos de
+  la asignatura, empezando por los de la primera semana](01-semana.md).
+* Recomendación especial de entregas
+  * Alberto Montes, por incluir los servicios imprescindibles en toda
+    aplicación basada en microservicios.
+    
 * Comprender el [primer hito del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura).
 
 * Tener manejo básico de los lenguajes usados en herramientas de
