@@ -11,10 +11,24 @@
 
 * Recomendación a los recién llegados: [comenzar con los objetivos de
   la asignatura, empezando por los de la primera semana](01-semana.md).
+* El aprendizaje memorístico y el síndrome "qué hay que poner aquí".
+* Repasar ejercicios de autoevaluación:
+  * Ver bloque 2 de ejercicios de
+  [primer tema](http://jj.github.io/CC/documentos/temas/Arquitecturas_para_la_nube) 
+      * Por ejemplo, el de [antmordhar](https://github.com/antmordhar/EjerciciosCC/blob/master/ejerciciosTema1.md).
 * Recomendación especial de entregas
   * Alberto Montes, por incluir los servicios imprescindibles en toda
     aplicación basada en microservicios.
     
+* Errores comunes en el segundo envío del proyecto
+  * Los diagramas de arquitectura incluyen qué se comunica entre
+    diferentes microservicios, no cómo se comunica
+  * Sigue incluyendo interfaces de usuario.
+  * Siguen sin incluir ni logs ni configuración distribuida
+    * Y los que lo hacen siempre ponen etcd. (Otras
+      alternativas:
+      [zookeper](https://sysgears.com/articles/managing-configuration-of-distributed-system-with-apache-zookeeper/) (síndrome
+      "qué hay que poner aquí")
 * Comprender el [primer hito del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura).
 
 * Tener manejo básico de los lenguajes usados en herramientas de
