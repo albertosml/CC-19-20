@@ -34,4 +34,4 @@ Entrega de fichero de objetivos .
 
 ## Descripción de la entrega
 
-Primera entrega de objetivos del hito 0.
+Entrega revisada de objetivos del hito 0, de las semanas 1-3.
