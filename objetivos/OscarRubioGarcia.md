@@ -25,6 +25,12 @@ Entrega de fichero de objetivos .
 * [x] Generacion de archivo .gitignore y selección de licencia.
 * [x] Realizar las actividades del Tema 1.
 * [x] Realizar la entrega del fichero de objetivos.
+* [x] Entender las características de las aplicaciones que se despliegan en la nube.
+* [x] Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales. (Configuración remota, log, alamcén de datos)
+* [x] Entender correctamente la dinámica de la asignatura.
+* [x] Entender cómo se plantea un proyecto en informática.
+* [x] Entender la diferencia entre frontend y backend. (Entender que a veces no es necesario frontend)
+* [x] Entender arquitecturas de paso de mensajes.
 
 ## Descripción de la entrega
 
