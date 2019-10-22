@@ -1,0 +1,21 @@
+name: "PR Greeter"
+on: [pull_request]
+
+jobs:
+  pr-greeter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Greeter"
+        uses: JJ/pr-greeting-action@releases/v0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: >
+            :smiley: Hola, **#**, y bienvenido/a al repositorio de Cloud Computing.
+
+            Tu PR va a pasar ahora una serie de pruebas.
+
+            :x: Si se trata de un fichero de objetivos, comprueba que no hayas enviado otros ficheros por error.
+
+            :x: Si es un hito, cuando corrijas el error indicado cambia la versión en el fichero de entrega.
+
+            Recuerda que las comprobaciones están ahí para ayudarte a mejorar tu entrega antes de de la corrección.
