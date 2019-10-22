@@ -31,6 +31,8 @@
       "qué hay que poner aquí")
 * Comprender el [primer hito del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura).
 
+* Entender qué son los brokers de mensajería y cómo se usan.
+
 * Tener manejo básico de los lenguajes usados en herramientas de
   provisionamiento, Python y Ruby.
 
