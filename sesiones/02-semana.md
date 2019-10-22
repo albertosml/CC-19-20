@@ -36,7 +36,7 @@
 ## Material para la clase
 
 [Material de este primer tema](http://jj.github.io/CC/documentos/temas/Arquitecturas_para_la_nube))
-y entretar el 
+y entregar el 
 [hito 0 del proyecto](http://jj.github.io/CC/documentos/proyecto/0.Repositorio),
 antes del 10 de octubre a las 7:30 de la tarde.
 
