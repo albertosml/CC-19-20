@@ -33,6 +33,8 @@
 
 * Entender qué son los brokers de mensajería y cómo se usan.
 
+* Hacer un ejercicio práctico de domain driven design.
+
 * Tener manejo básico de los lenguajes usados en herramientas de
   provisionamiento, Python y Ruby.
 
