@@ -44,3 +44,22 @@
 - [x] Entender el concepto de domain driven design
 - [x] Entender arquitecturas de paso de mensajes.
 - [x] Entendidos los errores respecto al hito 0.
+
+## Tercera semana
+
+- [x] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
+
+- [x] Entender las características de las aplicaciones que se despliegan en la nube.
+
+### En relación con el hito 1
+
+- [x] El aprendizaje memorístico y el síndrome "qué hay que poner aquí"
+- [x] Repasar ejercicios de autoevaluación:
+   - [x]  Ver bloque 2 de ejercicios de [primer tema](http://jj.github.io/CC/documentos/temas/Arquitecturas_para_la_nube)
+    - [x] [ejemplo](https://github.com/antmordhar/EjerciciosCC/blob/master/ejerciciosTema1.md)
+- [x] Entender que os diagramas de arquitectura incluyen qué se comunica entre diferentes microservicios, no cómo se comunica.
+- [x] Entender que sigue incluyendo interfaces de usuario.
+- [x] Entender que iguen sin incluir ni logs ni configuración distribuida. [zookeper](https://sysgears.com/articles/managing-configuration-of-distributed-system-with-apache-zookeeper/)
+- [x] Entender qué son los brokers de mensajería y cómo se usan.
+- [x] Hacer un ejercicio práctico de domain driven design.
+- [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
