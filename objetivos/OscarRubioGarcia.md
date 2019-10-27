@@ -28,7 +28,7 @@
 * [x] Usar herramientas para gestión de los ciclos de desarrollo de una aplicación y entender cuales son estos.
 * [x] Aprender a usar integración continua en cualquier aplicación.
 * [x] Entender qué es lo que se despliega en la nube (la parte que se va a colocar en diferentes servidores).
-* [x] Realización de ejercicios 1,2,3 y 5 de Desarrollo basado en pruebas.
+* [x] Realización de ejercicios 1,2,3 y 5 de Desarrollo basado en pruebas. [Ejercicios](https://github.com/OscarRubioGarcia/CC/blob/master/EjerciciosDesarrolloBasadoEnPruebas.md)
 * [ ] Realización de ejercicio 4 de Desarrollo basado en pruebas.
 * [ ] Traducción de historias de usuario a issues en el proyecto.
 * [ ] Documentar la arquitectura del proyecto elegido, las razones por la que se ha hecho y los pasos que se van a dar en el mismo.
