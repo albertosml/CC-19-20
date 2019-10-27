@@ -1,7 +1,8 @@
 ## Fichero de objetivos de la asignatura.
 
 ### Ejercicios: 
-[Enlace al repositorio con los ejercicios de la asignatura](https://github.com/carlos-el/Ejercicios-CC)
+[Tema1](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema1-Arquitecturas_para_la_nube.md)
+[Tema2](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema2-Desarrollo_basado_en_pruebas.md)
 
 ### Objetivos del hito 0:
 
@@ -25,3 +26,28 @@ Vernos las caras.
 - [x] Entender la diferencia entre frontend y backend y cómo se pueden desarrollar de forma independiente. 
 - [x] Entender el concepto de domain driven design
 - [x] Entender arquitecturas de paso de mensajes.
+
+### Objetivos del hito 1:
+
+- [x] Entender las claves del desarrollo basado en pruebas.
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+- [x] Entender el concepto de "infraestructura como código" e "infraestructura virtual" para ponerlo en práctica en el hito número 1.
+
+- [x] Revisar y entender recomendación especial de entregas
+  * Alberto Montes, por incluir los servicios imprescindibles en toda
+    aplicación basada en microservicios.
+    
+- [x] Solventar los errores comunes en el segundo envío del proyecto
+  * Los diagramas de arquitectura incluyen qué se comunica entre
+    diferentes microservicios, no cómo se comunica
+  * Sigue incluyendo interfaces de usuario.
+  * Siguen sin incluir ni logs ni configuración distribuida
+    * Y los que lo hacen siempre ponen etcd. (Otras
+      alternativas:
+      [zookeper](https://sysgears.com/articles/managing-configuration-of-distributed-system-with-apache-zookeeper/) (síndrome
+      "qué hay que poner aquí")
+- [x] Comprender el [primer hito del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura).
+- [x] Entender qué son los brokers de mensajería y cómo se usan.
+- [x] Hacer un ejercicio práctico de domain driven design.
+- [x] Tener manejo básico de los lenguajes usados en herramientas de
+  provisionamiento, Python y Ruby.
