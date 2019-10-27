@@ -21,8 +21,8 @@
 - [X] Entender las características de las aplicaciones que se despliegan en la nube.
 
 ### Semana 2
-1. Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
-2. Entender las características de las aplicaciones que se despliegan en la nube.
+- [X] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
+- [X] Entender las características de las aplicaciones que se despliegan en la nube.
 
 ## Otros objetivos del hito 0
 
@@ -84,3 +84,32 @@
   - [X] Conocer permisos y cuales usar en cada momento.
 - [X] Haber entregado el hito 0 del proyecto y entender qué se buscaba con
   el mismo.
+
+## Objetivos del hito 1
+### Semana 3
+- [X] Entender las claves del desarrollo basado en pruebas.
+- [X] Comprender el papel fundamental de la infraestructura virtual en
+   este proceso.
+
+## Otros objetivos del hito 1
+- [X] El aprendizaje memorístico y el síndrome "qué hay que poner aquí".
+- [X] Repasar ejercicios de autoevaluación:
+  - [X] Ver bloque 2 de ejercicios de
+  [primer tema](http://jj.github.io/CC/documentos/temas/Arquitecturas_para_la_nube)
+      - [X] Por ejemplo, el de [antmordhar](https://github.com/antmordhar/EjerciciosCC/blob/master/ejerciciosTema1.md).
+- [X] Recomendación especial de entregas
+  - [X] Alberto Montes, por incluir los servicios imprescindibles en toda
+    aplicación basada en microservicios.
+- [X] Errores comunes en el segundo envío del proyecto
+  - [X] Los diagramas de arquitectura incluyen qué se comunica entre
+    diferentes microservicios, no cómo se comunica
+  - [X] Sigue incluyendo interfaces de usuario.
+  - [X] Siguen sin incluir ni logs ni configuración distribuida
+    - [X] Y los que lo hacen siempre ponen etcd. (Otras
+      alternativas:
+      [zookeper](https://sysgears.com/articles/managing-configuration-of-distributed-system-with-apache-zookeeper/) (síndrome
+      "qué hay que poner aquí")
+- [X] Comprender el [primer hito del proyecto](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura).
+- [X] Entender qué son los brokers de mensajería y cómo se usan.
+- [X] Tener manejo básico de los lenguajes usados en herramientas de
+  provisionamiento, Python y Ruby.

@@ -12,12 +12,14 @@
 
 ## Objetivos del hito 1
 
-- [] Haber entregado el hito 0 del proyecto y entender qué se buscaba con el mismo.
-- [] Comprender el primer hito del proyecto.
-- [] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
-- [] Entender las características de las aplicaciones que se despliegan en la nube.
-- [] Entender el concepto de DevOps.
-- [] Usar herramientas para gestión de los ciclos de desarrollo de una aplicación y entender cuales son estos.
-- [] Aprender a usar integración continua en cualquier aplicación.
-- [ ] Realizar los ejercicios del tema "Desarrollo basado en pruebas"
-- [ ] Avanzar en el proyecto.
+[Enlace a los ejercicios del hito 1](https://github.com/mati3/Ejercicios-CC/blob/master/Desarrollo_basado_en_pruebas.md)
+
+- [x] Haber entregado el hito 0 del proyecto y entender qué se buscaba con el mismo.
+- [x] Comprender el primer hito del proyecto.
+- [x] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
+- [x] Entender las características de las aplicaciones que se despliegan en la nube.
+- [x] Entender el concepto de DevOps.
+- [x] Usar herramientas para gestión de los ciclos de desarrollo de una aplicación y entender cuales son estos.
+- [x] Aprender a usar integración continua en cualquier aplicación.
+- [x] Realizar los ejercicios del tema "Desarrollo basado en pruebas"
+- [] Avanzar en el proyecto.
