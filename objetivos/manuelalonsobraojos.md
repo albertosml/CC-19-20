@@ -21,3 +21,37 @@
 * [x] 14.Entregar archivo de objetivos.
 * [x] 15.Crear repositorio de ejercicios y realización de los ejercicios del tema 1.
 * [x] 16.Creación de repositorio del proyecto.
+
+### Segunda semana, del 7 de octubre de 2019
+**Objetivos a cubrir en esta semana**
+* [x] 1.Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
+* [x] 2.Entender las características de las aplicaciones que se despliegan en la nube.
+
+**Otros objetivos**
+* [x] Remarcar lo necesario para alcanzar el primer hito del proyecto de la asignatura.
+* [x] Manejar con soltura los diferentes recursos de línea de órdenes, especialmente en Linux.
+* [x] Entender lo necesario para entregar el hito 0 del proyecto.
+
+### Tercera Semana, del 14 de octubre de 2019
+**Objetivos a cubrir en esta semana**
+* [x] 1.Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
+* [x] 2.Entender las características de las aplicaciones que se despliegan en la nube.
+
+**Otros Objetivos**
+* [x] Entender los errores cometidos en el hito.
+* [x] Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales.
+* [x] Manejar con soltura los diferentes recursos de línea de órdenes, especialmente en Linux.
+
+### Cuarta semana, del 21 de octubre de 2019
+[Enlace a ejercicios del tema 2](https://github.com/manuelalonsobraojos/cc-ejercicios/blob/master/Ejercicios-tema2/EjerciciosTema2.md)
+**Objetivos a cubrir en esta semana**
+* [x] 1.Entender las claves del desarrollo basado en pruebas.
+* [x] 2.Comprender el paper fundamental de la infraestructura virtual en este proceso.
+* [x] 3.Entender el concepto de "infraestructura como código" e "infraestructura virtual" para ponerlo en práctica en el hito número 1.
+
+**Otros Objetivos**
+* [x] Comprender el primer hito del proyecto.
+* [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+* [x] Repasar ejercicios de autoevaluación.
+
+
