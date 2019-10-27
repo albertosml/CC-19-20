@@ -25,3 +25,26 @@
 - [x] Comprender la función que desempeña un microservicio LOG y añadirlo a mi proyecto.
 - [x] Representar gráficamente la comunicación entre los microservicios de mi proyecto.
 - [x] Reenviar el hito 0.
+
+#### Tercera semana
+
+- [x] Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales de almacenamiento de datos, configuración remota y log.
+- [x] Seguir mejorando el hito 0.
+
+#### Cuarta semana
+
+- [x] Comprender el funcionamiento de una API Gateway y sus diversas formas de comunicarse con los microservicios.
+- [x] Comprender las características y los usos de diversas bases de datos como MongoDB, MariaDB, Cassandra, etc.
+- [x] Mejorar la arquitectura y su representación esquemática del hito 0.
+- [x] Comprender la diferencia entre microservicio y servicio y saber aplicarlo a mi proyecto.
+- [x] Reenviar por segunda vez el hito 0.
+
+## Objetivos del hito 1
+
+#### Cuarta semana
+
+- [x] Entender el papel fundamental de la infraestructura virtual
+- [x] Entender el concepto de infraestructura como código e infraestructura virtual.
+- [x] Comprender el primer hito del proyecto.
+- [x] Enviar el hito 1.
+- [ ] Hacer los ejercicios de autoevaluación del tema 2.
