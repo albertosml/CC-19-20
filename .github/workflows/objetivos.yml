@@ -2,7 +2,7 @@ name: "Los nuevos objetivos deben contener al menos un URL"
 on:
   pull_request:
     paths:
-      - 'objetivos/*.(md|org)'
+      - 'objetivos/*.md'
 
 jobs:
   obtain-repo:
