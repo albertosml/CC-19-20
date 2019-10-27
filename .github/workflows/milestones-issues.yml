@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - 'proyectos/[01234567].md'
-      - '!objetivos/*.(md|org)'
+      - '!objetivos/*.md'
 
 jobs:
   obtain-repo:
