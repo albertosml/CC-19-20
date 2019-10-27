@@ -36,3 +36,5 @@
 - [ ] Entender las claves del desarrollo basado en pruebas.
 - [ ] Entender el papel fundamental de la infraestructura virtual en este proceso.
 - [X] Entender el concepto de "infraestructura como código" e "infraestructura virtual".
+
+[X] Entender el error del comprobador de objetivos
