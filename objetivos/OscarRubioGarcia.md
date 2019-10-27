@@ -1,13 +1,4 @@
-# Entrega de objetivos de Cloud Computing
-
-Entrega de fichero de objetivos .
-
-## Primero y más importante
-
-* [x] Prometo no cerrar *nunca* un PR.
-
-## Enlace a fichero de objetivos 
-
+# Fichero de Objetivos
 [Repositorio de Ejercicios](https://github.com/OscarRubioGarcia/CC)
 
 ## Objetivos del hito 0
@@ -32,6 +23,12 @@ Entrega de fichero de objetivos .
 * [x] Entender la diferencia entre frontend y backend. (Entender que a veces no es necesario frontend)
 * [x] Entender arquitecturas de paso de mensajes.
 
-## Descripción de la entrega
-
-Entrega revisada de objetivos del hito 0, de las semanas 1-3.
+## Objetivos del hito 1
+* [x] Entender el concepto de DevOps.
+* [x] Usar herramientas para gestión de los ciclos de desarrollo de una aplicación y entender cuales son estos.
+* [x] Aprender a usar integración continua en cualquier aplicación.
+* [x] Entender qué es lo que se despliega en la nube (la parte que se va a colocar en diferentes servidores).
+* [x] Realización de ejercicios 1,2,3 y 5 de Desarrollo basado en pruebas. [Ejercicios](https://github.com/OscarRubioGarcia/CC/blob/master/EjerciciosDesarrolloBasadoEnPruebas.md)
+* [ ] Realización de ejercicio 4 de Desarrollo basado en pruebas.
+* [ ] Traducción de historias de usuario a issues en el proyecto.
+* [ ] Documentar la arquitectura del proyecto elegido, las razones por la que se ha hecho y los pasos que se van a dar en el mismo.
