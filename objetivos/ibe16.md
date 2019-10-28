@@ -1,7 +1,7 @@
 # Objetivos
 
-## Ejercicios
-[Enlace al git de mis ejercicios](https://github.com/ibe16/CC-19-20-Ejercicios.git).
+
+
 
 ## Objetivos del hito 0
 - [x] Entender la metodología docente, de evaluación y de interacción de la asignatura.
@@ -17,6 +17,10 @@
 - [X] Entregar el hito 0
 
 ## Objetivos del hito 1
+
+###  Ejercicios
+[Enlace al repositorio de mis ejercicios](https://github.com/ibe16/CC-19-20-Ejercicios.git).
+
 - [X] Enviar el hito 1.
 - [X] Entender qué es lo que se despliega en la nube.
 - [X] Entender las claves del desarrollo basado en pruebas.
