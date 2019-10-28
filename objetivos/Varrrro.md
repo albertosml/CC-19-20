@@ -4,7 +4,7 @@
 
 - [X] Entrar al grupo de Telegram y actualizar la hoja de cálculo con mis datos.
 - [X] Configurar correctamente mi perfil de GitHub (avatar, email, ciudad, ...).
-- [X] Instalar una distro Linux (Mint).
+- [X] Instalar una distro Linux (Ubuntu).
 - [X] Instalar y configurar Git.
 - [X] Generar las claves SSH y subir la clave pública a GitHub.
 - [X] Hacer fork del repositorio del profesor.
@@ -30,3 +30,11 @@
 - [X] Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales.
 - [X] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en la nube.
 - [X] Entender las características de las aplicaciones que se despliegan en la nube.
+
+## Semana 4
+
+[Ejercicios del tema 2](https://github.com/Varrrro/EjerciciosCC-19-20/blob/master/Ejercicios_Tema2.md)
+
+- [ ] Entender las claves del desarrollo basado en pruebas.
+- [ ] Entender el papel fundamental de la infraestructura virtual en este proceso.
+- [X] Entender el concepto de "infraestructura como código" e "infraestructura virtual".
