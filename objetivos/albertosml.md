@@ -2,7 +2,7 @@
 
 [Enlace al repositorio de ejercicios](https://github.com/albertosml/Ejercicios_CC)
 
-### Hito 0 (Semana del 3 de octubre del 2019)
+### Hito 0
 
 - [x] Crear un repositorio, en el cual se irá mostrando el avance del proyecto de la asignatura.
 - [x] Una vez creado ese repositorio, añadirle los diferentes ficheros solicitados, con la documentación necesaria para este hito.
@@ -21,6 +21,15 @@
 - [x] Realizar una descripción detallada de las funcionalidades de la aplicación.
 - [x] Diseño de la arquitectura del proyecto, exponiendo la unión entre cada uno de los componentes y así como las
 tecnologías a usar en su desarrollo.
-- [x] Comprender lo que es arquitectura basada en microservicios.
+- [x] Comprender lo que es arquitectura basada en microservicios, mediante la realización de los 
+[ejercicios del tema 1](https://github.com/albertosml/Ejercicios_CC/blob/master/Tema1/Tema1.md).
  
+### Hito 1
 
+- [x] Revisar los ejercicios del tema 1 de los compañeros y poner un issue en aquellos que se puedan mejorar (Realizado
+para el compañero @Varrrro).
+- [x] Ampliar la descripción de la arquitectura, justificando que tecnologías se van a usar para el desarrollo del 
+proyecto.
+- [x] Reflejar las historias de usuario en issues.
+- [x] Comprender el concepto de desarrollo basado en tests (TDD) mediante la realización de los 
+[ejercicios del tema 2](https://github.com/albertosml/Ejercicios_CC/blob/master/Tema2/Tema2.md).
