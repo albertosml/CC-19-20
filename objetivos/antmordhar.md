@@ -1,4 +1,4 @@
-## Objetivos a cubrir en la primera semana
+## Objetivos a cubrir en el hito 0
 
 - [X]    Darse de alta y comprender el funcionamiento básico de git y GitHub y el grupo de Telegram de la       asignatura; conocer y entender el resto de los recursos de la asignatura.
 - [X]    Comenzar a usar git desde línea de órdenes y
@@ -11,3 +11,15 @@
 - [X]    Entregar el fichero de objetivos usando GitHub.
 - [X]    Entregar los primeros ejercicios usando GitHub. [EjerciciosCC](https://github.com/antmordhar/EjerciciosCC/blob/master/ejerciciosTema1.md)
 - [X]    Entregar el primer hito usando GitHub.
+
+## Objetivos a cubrir en el hito 1
+
+- [X] Conocer los conceptos relacionados con el proceso de virtualización tanto de software como de hardware y ponerlos en práctica.
+- [X] Comprender que es y como se usa el Desarrollo Basado en pruebas
+- [X] Saber añadir integración continua nuestro proyecto.
+- [X] Conocer mas sobre las tecnologías que se van a usar.
+- [X] Explicar por que se han elegido unas tecnologías frente a otras.
+- [X] Comenzar con la impleentación del proyecto.
+- [X] Arreglar errores de los ejercicios del Hito Anterior.
+- [X] Tener las milestones e issues organizadas por historias de usuario.
+- [X] Realizar los Ejercicios del Tema 1 [EjerciciosTema 1](https://github.com/antmordhar/EjerciciosCC/blob/master/Hito1/Ejercicios.md)
