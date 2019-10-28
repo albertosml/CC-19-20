@@ -1,3 +1,6 @@
+# Repositorio de ejercicios
+[https://github.com/kcobos/Ejercicios-CC](https://github.com/kcobos/Ejercicios-CC)
+
 # Objetivos de la primera semana
 - [x] Entender la metodología docente, de evaluación y de interacción de la asignatura.
 - [x] Darse de alta y comprender el funcionamiento básico de git y GitHub y el grupo de Telegram de la asignatura; conocer y entender el resto de los recursos de la asignatura.
@@ -13,3 +16,15 @@
 - [x] Entregar el fichero de objetivos y los primeros ejercicios usando GitHub.
 - [ ] Conocer dónde se pueden obtener recursos cloud gratuitos para usar en la asignatura.
 
+# Objetivos de la segunda semana
+- [x] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
+- [x] Entender las características de las aplicaciones que se despliegan en la nube.
+- [x] Remarcar lo necesario para alcanzar el primer hito del proyecto de la asignatura.
+- [x] Manejar con soltura los diferentes recursos de línea de órdenes, especialmente en Linux.
+- [x] Entender lo necesario para entregar el hito 0 del proyecto.
+- [x] Entender correctamente la dinámica de la asignatura.
+- [x] Entender correctamente la enseñanza basada en proyecto y por objetivos. 
+- [x] Entender cómo se plantea un proyecto en informática. 
+- [x] Entender la diferencia entre frontend y backend y cómo se pueden desarrollar de forma independiente. 
+- [ ] Entender el concepto de domain driven design.
+- [x] Entender arquitecturas de paso de mensajes.
