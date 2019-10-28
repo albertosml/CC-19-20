@@ -33,6 +33,8 @@
 
 ## Semana 4
 
+[Ejercicios del tema 2](https://github.com/Varrrro/EjerciciosCC-19-20/blob/master/Ejercicios_Tema2.md)
+
 - [ ] Entender las claves del desarrollo basado en pruebas.
 - [ ] Entender el papel fundamental de la infraestructura virtual en este proceso.
 - [X] Entender el concepto de "infraestructura como código" e "infraestructura virtual".
