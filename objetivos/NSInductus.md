@@ -29,14 +29,16 @@ Algunos de estos objetivos se pueden ver el [fichero de documentación del hito 
 
 ## Objetivos 4 semana del curso (incluidos objetivos hito 1)
 
-- [ ] Revisar la ortografía del fichero README.md hasta el momento.
-- [ ] Comprender los ecosistemas de despliegue de aplicaciones modernos y su relación con la nube.
-- [ ] Entender las diferentes arquitecturas de software modernas y su relación con cloud computing.
+- [x] Revisar la ortografía del fichero README.md hasta el momento.
+- [x] Comprender los ecosistemas de despliegue de aplicaciones modernos y su relación con la nube.
+- [x] Entender las diferentes arquitecturas de software modernas y su relación con cloud computing.
 - [ ] Aprender diseños que se puedan usar más adelante en aplicaciones desplegables en la nube.
-- [ ] Realizar los ejercicios del tema 1.
+- [x] Realizar los ejercicios del tema 1. [Ejercicios tema 1](https://github.com/NSInductus/CC_Ejercicios/blob/master/arquitecturas_software_en_la_nube.md)
 - [x] Entender correctamente el guión de la práctica 1 (hito 1).
-- [ ] Pensar en el cliente virtual que será el que especifiquede qué va a ir el proyecto.
-- [ ] Crear los Issues correspondientes a las historias de usuario (con subtareas).
-- [ ] Investigar y documentarse sobre el despliegue y la infraestructura virtual.
-- [ ] Infraestructura del proyecto bien descrita y documentada, especificando las razones por las que se ha elegido cada una.
-- [ ] Entregar el hito 1.
+- [x] Pensar en el cliente virtual que será el que especifiquede qué va a ir el proyecto.
+- [x] Crear los Issues correspondientes a las historias de usuario (con subtareas).
+- [x] Investigar y documentarse sobre el despliegue y la infraestructura virtual.
+- [x] Infraestructura del proyecto bien descrita y documentada, especificando las razones por las que se ha elegido cada una.
+- [x] Entregar el hito 1.
+
+Las historias de usuario se pueden ver en el [fichero de documentación de historias del usuario](https://github.com/NSInductus/CC_Proyecto/blob/master/docs/historias_de_usuario.md)
