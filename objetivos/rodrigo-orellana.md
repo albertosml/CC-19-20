@@ -19,6 +19,8 @@
 
 # Objetivos del hito 1
 
+[Enlace a mis ejercicios](https://github.com/rodrigo-orellana/Ejercicios_CC).
+
 * [x] Tener una definición de infraestructura virtual de suficiente entidad.
 * [x] Aprender sobre despliegue en la nube. 
 * [x] Entender las características de las aplicaciones que se despliegan en la nube.
@@ -29,6 +31,8 @@
 
 
 # Objetivos del hito 2
+
+[Enlace a mis ejercicios](https://github.com/rodrigo-orellana/Ejercicios_CC).
 
 * [ ] Diseñar conjunto de clase de forma que se puedan testear, desligado de donde vienen los datos. High level design según las historias de usuario diseñadas
 * [ ] Entender y definir la infraestructura virtual, lo necesario para que se ejecute en la nube. 
