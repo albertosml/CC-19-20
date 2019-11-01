@@ -74,12 +74,11 @@ EOC
       is( travis_status($README), 'Passing', "Los tests deben pasar en Travis");
     }
 
-    my ($buildtool) = ($README =~ m{(?:buildtool:)[^\n]+(\S+)\s+});
+    my ($buildtool) = ($README =~ m{(?:buildtool:)\s+(\S+)\s+});
     isnt( grep( /$buildtool/, @repo_files), 0, "$buildtool presente" );
   }
   
   if ( $this_hito > 2 ) { # Despliegue en algún lado
-    $README =  read_text( "$repo_dir/README.md");
   SKIP: {
       skip "Ya en el hito siguiente", 2 unless $this_hito == 2;
 
@@ -172,6 +171,10 @@ done_testing();
 
 
 # ------------------------------- Subs -----------------------------------
+sub doing {
+  my $what = shift;
+  diag "\n\t✔ Comprobando $what\n";
+}
 
 sub fichero_objetivos {
   my $user = shift;
