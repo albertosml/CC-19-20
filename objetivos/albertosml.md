@@ -33,3 +33,5 @@ proyecto.
 - [x] Reflejar las historias de usuario en issues.
 - [x] Comprender el concepto de desarrollo basado en tests (TDD) mediante la realización de los 
 [ejercicios del tema 2](https://github.com/albertosml/Ejercicios_CC/blob/master/Tema2/Tema2.md).
+- [x] Entender el concepto de [historia de usuario](https://github.com/JJ/curso-qa-template/blob/master/.github/ISSUE_TEMPLATE/caso-de-uso.md).
+
