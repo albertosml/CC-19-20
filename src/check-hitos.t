@@ -12,7 +12,7 @@ use v5.14; # For say
 
 my $repo = Git->repository ( Directory => '.' );
 my $diff = $repo->command('diff','HEAD^1','HEAD');
-my $diff_regex = qr/a\/proyectos\/hito-(\d)\.md/;
+my $diff_regex = qr/a\/proyectos\/(\d)\.md/;
 my $github;
 
 SKIP: {
@@ -54,14 +54,31 @@ EOC
   my @repo_files = $student_repo->command("ls-files");
   say "Ficheros\n\t→", join( "\n\t→", @repo_files);
   isnt( grep(/proyectos\/0.md/, @repo_files), 1, "No es el repositorio de la asignatura");
-  for my $f (qw( README.md .gitignore LICENSE )) {
-    isnt( grep( /$f/, @repo_files), 0, "$f presente" );
+
+  # Necesitamos el README a partir de ahora.
+  my $README =  read_text( "$repo_dir/README.md");
+  unlike( $README, qr/[hH]ito/, "El README no debe incluir la palabra hito");
+
+  # Comprueba que se use el nombre correcto para los ficheros de requisitos si existen
+  my $with_pip = grep(/req\w+\.txt/, @repo_files);
+  if ($with_pip) {
+     ok( grep( /requirements.txt/, @repo_files), "Fichero de requisitos de Python con nombre correcto" );
+   }
+
+  if ( $this_hito > 1 ) { # Comprobar milestones y eso
+    doing("hito 2");
+    isnt( grep( /.travis.yml/, @repo_files), 0, ".travis.yml presente" );
+    my $travis_domain = travis_domain( $README, $user, $name );
+    ok( $travis_domain =~ /(com|org)/ , "Está presente el badge de Travis con enlace al repo correcto");
+    if ( $travis_domain =~ /(com|org)/ ) {
+      is( travis_status($README), 'Passing', "Los tests deben pasar en Travis");
+    }
+
+    my ($buildtool) = ($README =~ m{(?:buildtool:)\s+(\S+)\s+});
+    isnt( grep( /$buildtool/, @repo_files), 0, "$buildtool presente" );
   }
-
-  my $README;
-
-  if ( $this_hito > 1 ) { # Despliegue en algún lado
-    $README =  read_text( "$repo_dir/README.md");
+  
+  if ( $this_hito > 2 ) { # Despliegue en algún lado
   SKIP: {
       skip "Ya en el hito siguiente", 2 unless $this_hito == 2;
 
@@ -154,6 +171,10 @@ done_testing();
 
 
 # ------------------------------- Subs -----------------------------------
+sub doing {
+  my $what = shift;
+  diag "\n\t✔ Comprobando $what\n";
+}
 
 sub fichero_objetivos {
   my $user = shift;
@@ -169,6 +190,19 @@ sub check {
 
 sub fail_x {
   return BOLD.MAGENTA."✘".RESET.join(" ",@_);
+}
+
+sub travis_domain {
+  my ($README, $user, $name) = @_;
+  my ($domain) = ($README =~ /.Build Status..https:\/\/travis-ci.(\w+)\/$user\/$name\.svg.+$name\)/);
+  return $domain;
+}
+
+sub travis_status {
+  my $README = shift;
+  my ($build_status) = ($README =~ /Build Status..([^\)]+)\)/);
+  my $status_svg = `curl -L -s $build_status`;
+  return $status_svg =~ /passing/?"Passing":"Fail";
 }
 
 sub check_ip {
