@@ -59,7 +59,7 @@ EOC
   }
 
   # Necesitamos el README a partir de ahora.
-  my $README =  read_text( "$repo_dir/$readme_file");
+  my $README =  read_text( "$repo_dir/README.md");
   unlike( $README, qr/[hH]ito/, "El README no debe incluir la palabra hito");
 
   # Comprueba que se use el nombre correcto para los ficheros de requisitos si existen
