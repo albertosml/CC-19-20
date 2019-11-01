@@ -15,4 +15,25 @@
 - [x] Crear repositorio de ejercicios de CC
 - [x] Definir tipo de licencia para repositorio de ejercicios CC
 - [x] Creación de fichero .gitignore en repositorio de ejercicios CC
+
+# Objetivos del hito 1
+
+- [x] Tener una definición de infraestructura virtual de suficiente entidad.
+- [x] Aprender sobre despliegue en la nube. 
+- [x] Entender las características de las aplicaciones que se despliegan en la nube.
+- [x] Entender el concepto de DevOps (sobre unificar el desarrollo de software y la operación.
+- [x] Aprender a usar integración continua en cualquier aplicación.
+- [x] Realizar los ejercicios del tema Desarrollo basado en pruebas.
+- [x] Crear historias de usuario para el proyecto.
+
+
+# Objetivos del hito 2
+
+- Diseñar conjunto de clase de forma que se puedan testear, desligado de donde vienen los datos. High level design según las historias de usuario diseñadas
+- Entender y definir la infraestructura virtual, lo necesario para que se ejecute en la nube. 
+- Implementar test automaticos y aplicarlos al proyectos
+- Usar badge Travis en el readme para que profesor chequee si paso las pruebas bien.
+- Crear Documentación del proyecto
+- Incluir herramienta de construcción tipo make al proyecto
+
  ***
