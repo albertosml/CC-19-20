@@ -58,9 +58,30 @@ EOC
     isnt( grep( /$f/, @repo_files), 0, "$f presente" );
   }
 
-  my $README;
+  # Necesitamos el README a partir de ahora.
+  my $README =  read_text( "$repo_dir/$readme_file");
+  unlike( $README, qr/[hH]ito/, "El README no debe incluir la palabra hito");
 
-  if ( $this_hito > 1 ) { # Despliegue en algún lado
+  # Comprueba que se use el nombre correcto para los ficheros de requisitos si existen
+  my $with_pip = grep(/req\w+\.txt/, @repo_files);
+  if ($with_pip) {
+     ok( grep( /requirements.txt/, @repo_files), "Fichero de requisitos de Python con nombre correcto" );
+   }
+
+  if ( $this_hito > 1 ) { # Comprobar milestones y eso
+    doing("hito 2");
+    isnt( grep( /.travis.yml/, @repo_files), 0, ".travis.yml presente" );
+    my $travis_domain = travis_domain( $README, $user, $name );
+    ok( $travis_domain =~ /(com|org)/ , "Está presente el badge de Travis con enlace al repo correcto");
+    if ( $travis_domain =~ /(com|org)/ ) {
+      is( travis_status($README), 'Passing', "Los tests deben pasar en Travis");
+    }
+
+    my ($buildtool) = ($README =~ m{(?:buildtool:)[^\n]+(\S+)\s+});
+    isnt( grep( /$buildtool/, @repo_files), 0, "$buildtool presente" );
+  }
+  
+  if ( $this_hito > 2 ) { # Despliegue en algún lado
     $README =  read_text( "$repo_dir/README.md");
   SKIP: {
       skip "Ya en el hito siguiente", 2 unless $this_hito == 2;
@@ -169,6 +190,19 @@ sub check {
 
 sub fail_x {
   return BOLD.MAGENTA."✘".RESET.join(" ",@_);
+}
+
+sub travis_domain {
+  my ($README, $user, $name) = @_;
+  my ($domain) = ($README =~ /.Build Status..https:\/\/travis-ci.(\w+)\/$user\/$name\.svg.+$name\)/);
+  return $domain;
+}
+
+sub travis_status {
+  my $README = shift;
+  my ($build_status) = ($README =~ /Build Status..([^\)]+)\)/);
+  my $status_svg = `curl -L -s $build_status`;
+  return $status_svg =~ /passing/?"Passing":"Fail";
 }
 
 sub check_ip {
