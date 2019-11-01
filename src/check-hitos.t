@@ -12,7 +12,7 @@ use v5.14; # For say
 
 my $repo = Git->repository ( Directory => '.' );
 my $diff = $repo->command('diff','HEAD^1','HEAD');
-my $diff_regex = qr/a\/proyectos\/hito-(\d)\.md/;
+my $diff_regex = qr/a\/proyectos\/(\d)\.md/;
 my $github;
 
 SKIP: {
@@ -54,9 +54,6 @@ EOC
   my @repo_files = $student_repo->command("ls-files");
   say "Ficheros\n\t→", join( "\n\t→", @repo_files);
   isnt( grep(/proyectos\/0.md/, @repo_files), 1, "No es el repositorio de la asignatura");
-  for my $f (qw( README.md .gitignore LICENSE )) {
-    isnt( grep( /$f/, @repo_files), 0, "$f presente" );
-  }
 
   # Necesitamos el README a partir de ahora.
   my $README =  read_text( "$repo_dir/README.md");
