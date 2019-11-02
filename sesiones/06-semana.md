@@ -11,7 +11,10 @@
 1. Comprender el tipo de aplicaciones que se despliegan en la nube.
 
 ## Otros objetivos
+* Recomendaciones Hito 1
+  * [mald16](https://github.com/ibe16/CC-19-20-Proyecto), [`yoskitar`](https://github.com/yoskitar/Cloud-Computing-CC).
 * Entender problemas en el hito 1
+  * Estructuración de la documentación.
   * Las entregas en hitos tratan de evaluar si se ha entendido un
     concepto. En este caso se trata del concepto de infraestructura virtual.
   * Seguimos con el aprendizaje memorístico y el síndrome "qué hay que poner aquí".
@@ -19,10 +22,9 @@
     que no sean libres, pero nunca servicios externos, ni servicios
     específicos de un proveedor en la nube.
     * Y en todo caso deben ser adecuadas para lo que se supone que son.
+  * Cuidado con Java
 * Tener manejo básico de los lenguajes usados en herramientas de
   provisionamiento, Python y Ruby.
-* Darse de alta en servicios PaaS como zeit.co y Heroku.
-* Conocer las diferentes ofertas de PaaS en la nube.
 * Instalar las herramientas de línea de órdenes de las herramientas cloud.
 * Hacerse con alguna cuenta gratuita o bonificada de cloud.
 * Aprender la mínimo de los lenguajes necesarios para trabajar en la
