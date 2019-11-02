@@ -28,3 +28,14 @@
 - [x] Entender la diferencia entre frontend y backend y cómo se pueden desarrollar de forma independiente. 
 - [ ] Entender el concepto de domain driven design.
 - [x] Entender arquitecturas de paso de mensajes.
+
+# Objetivos de la tercera semana
+ - [x] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
+ - [x] Entender las características de las aplicaciones que se despliegan en la nube.
+ - [x] Entender cómo se hace desarrollo colaborativo en git: resolver conflictos, sincronizar versiones...
+ - [x] Entender por qué no se hace git pull sino git pull --rebase y como arreglarlo en ese caso usando un squash commits con git rebase -i.
+ - [x] Ejemplo de arquitectura basada en eventos: cliente Slack y Celery + servidor de tareas.
+ - [x] Ejemplo adicional Gateway + worker + procesador + store.
+ - [x] Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales.
+ - [x] Manejar con soltura los diferentes recursos de línea de órdenes, especialmente en Linux.
+ - [x] Haber entregado el hito 0 del proyecto y entender qué se buscaba con el mismo.
