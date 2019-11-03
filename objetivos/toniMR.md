@@ -1,6 +1,6 @@
 # Objetivos
 
-[Repositorio de Ejercicios](https://github.com/toniMR/CC-Ejercicios).  
+[Repositorio para los Ejercicios](https://github.com/toniMR/CC-Ejercicios).  
 
 ## Objetivos Semana 1
 
