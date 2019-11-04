@@ -43,6 +43,8 @@
 
 ## Objetivos Semana 4
 
+[Enlace a los ejercicios del tema Desarrollo basado en pruebas](https://github.com/toniMR/CC-Ejercicios/blob/master/desarrolloBasadoEnPruebas.md).  
+
 - [X] Entender las claves del desarrollo basado en pruebas.
 - [X] Comprender el paper fundamental de la infraestructura virtual en este proceso.
 - [X] Entender el concepto de "infraestructura como código" e "infraestructura virtual" para ponerlo en práctica en el hito número 1.
