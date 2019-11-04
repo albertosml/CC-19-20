@@ -28,12 +28,18 @@ Repositorio de ejercicios: [Ejercicios CC](https://github.com/iMiguel10/Ejercici
 - [ ] Aprender a usar integración continua en cualquier aplicación.
 - [ ] [Realizar ejercicios de desarrollo basado en pruebas](https://github.com/iMiguel10/Ejercicios-CC/tree/master/Tema%202%20-%20Desarrollo%20basado%20en%20pruebas)
 ---
-<!--
+
 # Objetivos hito 2
 
+- [x] [Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.](https://github.com/iMiguel10/Ejercicios-CC/tree/master/Tema%202%20-%20Desarrollo%20basado%20en%20pruebas)
+- [x] [Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.](https://github.com/iMiguel10/Proyecto-CC/blob/master/tasks.py)
+- [x] [Entender qué son los sistemas de integración continua y cómo usarlos.](https://travis-ci.com/iMiguel10/Proyecto-CC)
+- [x] [Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.](https://travis-ci.com/iMiguel10)
+- [x] [Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.](https://github.com/iMiguel10/Proyecto-CC/blob/master/test/test_generadorentradasPDF.py)
+- [x] [Realizar ejercicios de desarrollo basado en pruebas](https://github.com/iMiguel10/Ejercicios-CC/tree/master/Tema%202%20-%20Desarrollo%20basado%20en%20pruebas)
 
 ---
-
+<!--
 # Objetivos hito 3
 
 
