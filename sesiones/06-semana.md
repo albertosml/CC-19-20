@@ -7,7 +7,6 @@
    actualidad.
 3. Comprender el paper fundamental de la infraestructura virtual en
    este proceso.
-4. Entender en qué consisten los [servicios web y cómo desplegarlos en la nube](https://jj.github.io/CC/documentos/temas/PaaS)
 1. Comprender el tipo de aplicaciones que se despliegan en la nube.
 
 ## Otros objetivos

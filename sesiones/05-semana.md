@@ -33,7 +33,6 @@ llevar a cabo con éxito las siguientes entregas de hitos.
   [Hito correspondiente](https://jj.github.io/CC/documentos/proyecto/2.CI). *Fecha
   de entrega*: **11 de noviembre**.
 
-
 ## Siguiente semana
 
 [Sexta semana](06-semana.md)

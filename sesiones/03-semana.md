@@ -36,4 +36,4 @@ Continuamos con el tema e hito anterior.
 
 ## Siguiente semana
 
-[Tercera semana, desde el 21 de octubre ](04-semana.md)
+[Cuarta semana](04-semana.md)
