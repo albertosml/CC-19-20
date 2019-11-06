@@ -2,6 +2,8 @@
 
 ### Ejercicios: 
 [Enlace al repositorio con los ejercicios de la asignatura](https://github.com/mcrosales/CC-19-20-Ejercicios)
+[Ejercicios Tema 1](https://github.com/mcrosales/CC-19-20-Ejercicios/blob/master/ArquitecturaParaLaNube.md)
+
 
 ### Objetivos Hito 0:
 
