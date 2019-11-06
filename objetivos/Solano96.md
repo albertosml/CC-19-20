@@ -1,6 +1,6 @@
-## Objetivos de la primera semana
+## Objetivos del hito 0
 
-Enlace al [repositorio de ejercicios](https://github.com/Solano96/CC-Exercises) de Cloud Computing.
+Enlace a los [ejercicios del tema 1](https://github.com/Solano96/CC-Exercises/blob/master/Arquitecturas_para_la_nube.md) de Cloud Computing.
 
 - [x] Entender la metodología docente, de evaluación y de interacción de la asignatura.
 - [x] Darse de alta y comprender el funcionamiento básico
@@ -19,3 +19,16 @@ Enlace al [repositorio de ejercicios](https://github.com/Solano96/CC-Exercises) 
 - [x] Conocer dónde se pueden obtener recursos cloud gratuitos para usar
   en la asignatura.
 - [x] Terminar el hito 0.
+
+## Objetivos del hito 1
+
+Enlace a los [ejercicios del tema 2](https://github.com/Solano96/CC-Exercises/blob/master/Desarrollo_basado_en_pruebas.md) de Cloud Computing.
+
+- [x] Haber entregado el hito 0 del proyecto y entender qué se buscaba con el mismo.
+- [x] Entender los errores cometidos en el hito
+
+    - [x] Entender cómo se hace desarrollo colaborativo en git: resolver conflictos, sincronizar versiones...
+    - [x] Entender por qué no se hace git pull sino git pull --rebase y como arreglarlo en ese caso usando un squash commits con git rebase -i.
+- [x] Comprender el primer hito del proyecto.
+- [x] Entender que es Domain Driven Design.
+- [x] Entender las claves del desarrollo basado en pruebas.
