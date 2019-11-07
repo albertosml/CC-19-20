@@ -7,7 +7,6 @@
    actualidad.
 3. Comprender el paper fundamental de la infraestructura virtual en
    este proceso.
-4. Entender en qué consiste los [servicios web y cómo desplegarlos en la nube](https://jj.github.io/CC/documentos/temas/PaaS)
 1. Comprender el tipo de aplicaciones que se despliegan en la nube.
 
 
@@ -26,8 +25,6 @@
 
 ## Material para la clase
 
-* *Teoría*: Empezamos con el
-  [segundo tema](http://jj.github.io/CC/documentos/temas/PaaS)
-  
-* Seguimos con
-  [el segundo hito](http://jj.github.io/CC/documentos/temas/PaaS). 
+* *Teoría*: Empezamos con el siguiente tema.
+
+

@@ -10,6 +10,7 @@
 1. Comprender el tipo de aplicaciones que se despliegan en la nube.
 
 ## Otros objetivos
+
 * Recomendaciones Hito 1
   * [mald16](https://github.com/ibe16/CC-19-20-Proyecto), [`yoskitar`](https://github.com/yoskitar/Cloud-Computing-CC).
 * Entender problemas en el hito 1
@@ -36,7 +37,7 @@
 * *Práctica*:
   [Hito correspondiente](https://jj.github.io/CC/documentos/proyecto/2.CI). *Fecha
   de entrega*: **11 de noviembre**.
-  
+
 ## Siguiente semana
 
 [Séptima semana](07-semana.md)
