@@ -76,7 +76,7 @@ EOC
 
     my ($buildtool) = ($README =~ m{(?:buildtool:)\s+(\S+)\s+});
     ok( $buildtool, "Encontrado nombre del fichero buildtool" );
-    isnt( grep( /$buildtool/, @repo_files), 0, "$buildtool presente" );
+    isnt( grep( /\b$buildtool\b/, @repo_files), 0, "$buildtool presente" );
   }
   
   if ( $this_hito > 2 ) { # Despliegue en algún lado
