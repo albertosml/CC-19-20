@@ -3,6 +3,8 @@
 
 ## Objetivos a cubrir en esta semana
 
+1. Entender la arquitectura en capas de los microservicios usados en
+   despliegues modernos.
 3. Comprender el paper fundamental de la infraestructura virtual en
    este proceso.
 1. Comprender el tipo de aplicaciones que se despliegan en la nube.
@@ -22,7 +24,7 @@
 ## Material para la clase
 
 * *Teoría*: Empezamos con el siguiente tema, 
-  [virtualización ligera usando contenedores](http://jj.github.io/CC/documentos/temas/Contenedores#gestin-de-contenedores-con-docker)  en este caso con Docker.
+  [sobre uso de microservicios](http://jj.github.io/CC/documentos/temas/Microservicios)  en este caso con Docker.
 
 
 
