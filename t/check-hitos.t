@@ -57159,7 +57159,7 @@ EOC
      ok( grep( /requirements.txt/, @repo_files), "Fichero de requisitos de Python con nombre correcto" );
    }
 
-  if ( $this_hito > 1 ) { # Comprobar milestones y eso
+  if ( $this_hito > 1 ) { # Integración continua
     doing("hito 2");
     isnt( grep( /.travis.yml/, @repo_files), 0, ".travis.yml presente" );
     my $travis_domain = travis_domain( $README, $user, $name );
@@ -57169,6 +57169,7 @@ EOC
     }
 
     my ($buildtool) = ($README =~ m{(?:buildtool:)\s+(\S+)\s+});
+    ok( $buildtool, "Encontrado nombre del fichero buildtool" );
     isnt( grep( /$buildtool/, @repo_files), 0, "$buildtool presente" );
   }
   
