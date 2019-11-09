@@ -40,3 +40,5 @@
 * [x] Aprender a realizar tests de covertura en proyectos en el cloud
 * [x] Aprender a utilizar herramientas de construcción, ejemplo: make
 * [x] Documentar todos los tests realizados y las herramientas utilizadas para la construcción del proyecto
+* [x] Realización de los ejercicios de testing [Ejercicios](https://github.com/OscarRubioGarcia/CC/blob/master/EjerciciosDesarrolloBasadoEnPruebas.md)`
+* [x] Realización de seminario tdd [Seminario](https://github.com/Seminario-PGPI/Proyecto-Trafico)
