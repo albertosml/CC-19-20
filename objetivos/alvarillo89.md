@@ -24,7 +24,7 @@
 
 #### Cuarta semana:
 
-- [ ] Entender las claves del desarrollo basado en pruebas.
+- [X] Entender las claves del desarrollo basado en pruebas.
 - [X] Comprender el papel fundamental de la infraestructura virtual en este proceso.
 - [X] Entender el concepto de "infraestructura como código" e "infraestructura virtual" para ponerlo en práctica en el hito número 1.
 - [X] Repasar ejercicios de autoevaluación.
@@ -35,10 +35,37 @@
 #### Objetivos del hito 1:
 
 - [X] Entender que es lo que se despliega en la nube.
-- [ ] Explicar la arquitectura del proyecto.
+- [X] Explicar la arquitectura del proyecto.
 - [X] Entender que lo que se va a evaluar dentro de la asignatura es la infraestructura, no el proyecto en sí.
 - [X] Entender la diferencia entre servicio y microservicio.
-- [ ] Determinar los servicios y tecnologías (infraestructura) que se emplearán en el proyecto.
-- [ ] Extraer las historias de usuario y organizarlas en issues.
-- [ ] Reestructurar la documentación del proyecto.
-  
+- [X] Determinar los servicios y tecnologías (infraestructura) que se emplearán en el proyecto.
+- [X] Extraer las historias de usuario y organizarlas en issues.
+- [X] Reestructurar la documentación del proyecto.
+
+# Hito 2:
+
+[Ejercicios de desarrollo basado en pruebas](https://github.com/alvarillo89/UGR-CC-Ejercicios/blob/master/Tema%202/EjerciciosDesarrolloPruebas.md).
+
+#### Quinta semana:
+
+- [X] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
+- [X] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
+- [X] Entender qué son los sistemas de integración continua y cómo usarlos.
+- [X] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo: en mi caso, Travis-CI y Github Actions.
+- [X] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación: en mi caso, pytest y unittest.
+
+#### Sexta semana:
+
+- [ ] Entender las arquitecturas de software en la nube de uso en la actualidad.
+- [ ] Comprender el papel fundamental de la infraestructura virtual en este proceso.
+- [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [X] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+- [ ] Instalar las herramientas de línea de órdenes de las herramientas cloud.
+- [ ] Hacerse con alguna cuenta gratuita o bonificada de cloud.
+- [X] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
+
+#### Objetivos Hito 2:
+- [X] Añadir tests y una descripción inicial de la infraestructura virtual a la aplicación, la necesaria para que se ejecuten los tests en un entorno de integración continua. 
+- [X] Entender los conceptos de tests funcionales. 
+- [X] Configurar y usar un sistema (o varios) de integración continua. 
+- [X] Aprender cómo describir la versión del lenguaje de programación que se usa y sus dependencias.
