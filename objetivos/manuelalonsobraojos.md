@@ -54,4 +54,26 @@
 * [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
 * [x] Repasar ejercicios de autoevaluación.
 
+### Quinta semana, 28 de Octubre
+[Enlace a ejercicios del tema 3](https://github.com/manuelalonsobraojos/cc-ejercicios/blob/master/Ejercicios-tema3/EjerciciosTema3.md)
+**Objetivos a cubrir en esta semana**
+* [x] 1. Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
+* [x] 2. Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
+* [x] 3. Entender qué son los sistemas de integración continua y cómo usarlos.
+
+**Otros Objetivos**
+* [x] 1. Darse de alta en plataformas que permiten llevar a cabo integración/despliegue continuo.
+* [x] 2. Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
+
+### Sexta semana, 4 de noviembre
+
+**Objetivos a cubrir en esta semana**
+* [x] 1. Entender las arquitecturas de software en la nube de uso en la actualidad.
+* [x] 2. Comprender el paper fundamental de la infraestructura virtual en este proceso.
+* [x] 3. Comprender el tipo de aplicaciones que se despliegan en la nube.
+
+**Otros Objetivos**
+* [x] Entender problemas en el hito 1.
+* [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+* [x] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
 
