@@ -63,3 +63,39 @@
 - [x] Entender qué son los brokers de mensajería y cómo se usan.
 - [x] Hacer un ejercicio práctico de domain driven design.
 - [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+
+## Cuarta semana
+
+- [x] Entender las claves del desarrollo basado en pruebas.
+
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+
+- [x] Entender el concepto de "infraestructura como código" e "infraestructura virtual" para ponerlo en práctica en el hito número 1.
+
+## Quinta semana 
+
+
+- [x] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
+
+- [x] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
+
+- [x]  Entender qué son los sistemas de integración continua y cómo usarlos.
+
+## Sexta semana
+
+
+- [x] Entender las arquitecturas de software en la nube de uso en la actualidad.
+
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+
+- [x]Comprender el tipo de aplicaciones que se despliegan en la nube.
+
+### En relación con el hito 2
+
+- [x] Añadir test para el desarrollo de la integración continua.
+
+- [x] Entender lo que son test funcionales, y test de cobertura (Gracias al curso de tdd)
+
+- [x] Configurar sistema de integración continua.
+
+[Ejercicios relacionados con el desarrollo basado en pruebas](https://github.com/natalia2911/Ejercicios-CloudComputing/blob/master/Tema%202%20:%20Desarrollo%20basado%20en%20pruebas/Tema2.md)
