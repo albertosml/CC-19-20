@@ -44,6 +44,8 @@
 
 # Hito 2:
 
+[Ejercicios de desarrollo basado en pruebas](https://github.com/alvarillo89/UGR-CC-Ejercicios/blob/master/Tema%202/EjerciciosDesarrolloPruebas.md).
+
 #### Quinta semana:
 
 - [X] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
