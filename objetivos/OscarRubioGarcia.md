@@ -29,6 +29,16 @@
 * [x] Aprender a usar integración continua en cualquier aplicación.
 * [x] Entender qué es lo que se despliega en la nube (la parte que se va a colocar en diferentes servidores).
 * [x] Realización de ejercicios 1,2,3 y 5 de Desarrollo basado en pruebas. [Ejercicios](https://github.com/OscarRubioGarcia/CC/blob/master/EjerciciosDesarrolloBasadoEnPruebas.md)
-* [ ] Realización de ejercicio 4 de Desarrollo basado en pruebas.
-* [ ] Traducción de historias de usuario a issues en el proyecto.
-* [ ] Documentar la arquitectura del proyecto elegido, las razones por la que se ha hecho y los pasos que se van a dar en el mismo.
+* [x] Realización de ejercicio 4 de Desarrollo basado en pruebas.
+* [x] Traducción de historias de usuario a issues en el proyecto.
+* [x] Documentar la arquitectura del proyecto elegido, las razones por la que se ha hecho y los pasos que se van a dar en el mismo.
+
+## Objetivos del hito 2
+* [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento.
+* [x] Comprender el uso de herramientas de testing en línea
+* [x] Aprender a realizar testing de los proyectos en el cloud 
+* [x] Aprender a realizar tests de covertura en proyectos en el cloud
+* [x] Aprender a utilizar herramientas de construcción, ejemplo: make
+* [x] Documentar todos los tests realizados y las herramientas utilizadas para la construcción del proyecto
+* [x] Realización de los ejercicios de testing [Ejercicios](https://github.com/OscarRubioGarcia/CC/blob/master/EjerciciosDesarrolloBasadoEnPruebas.md)`
+* [x] Realización de seminario tdd [Seminario](https://github.com/Seminario-PGPI/Proyecto-Trafico)
