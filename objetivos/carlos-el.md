@@ -1,7 +1,7 @@
 ## Fichero de objetivos de la asignatura.
 
 ### Ejercicios: 
-[Tema1](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema1-Arquitecturas_para_la_nube.md)
+[Tema1](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema1-Arquitecturas_para_la_nube.md), 
 [Tema2](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema2-Desarrollo_basado_en_pruebas.md)
 
 ### Objetivos del hito 0:
@@ -51,3 +51,20 @@ Vernos las caras.
 - [x] Hacer un ejercicio práctico de domain driven design.
 - [x] Tener manejo básico de los lenguajes usados en herramientas de
   provisionamiento, Python y Ruby.
+
+### Objetivos del hito 2:
+
+- [x] Entender las arquitecturas de software en la nube de uso en la actualidad.
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+- [x] Comprender el tipo de aplicaciones que se despliegan en la nube.
+
+- [x] Entender problemas en el hito 1 
+- [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+- [x] Instalar las herramientas de línea de órdenes de las herramientas cloud.
+- [x] Hacerse con alguna cuenta gratuita o bonificada de cloud.
+- [x] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
+- [x] Aprender a realizar test unitarios, de integración y de cobertura en proyectos cloud.
+- [x] Aprender a configurar herramientas de integración continua y de construcción
+- [x] Realizar [proyecto](https://github.com/carlos-el/ProyectoCursoTDD-Notas) del curso de tdd para la afianzación de los conocimientos anteriores.
+
+  
