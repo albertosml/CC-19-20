@@ -51,6 +51,8 @@
 
 ## Objetivos del hito 2.
 
+[Enlace a los ejercicios del tema 2.](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_DesarrolloBasadoEnPruebas.md).
+
 #### Quinta semana.
 
 - [x] Entender los conceptos del desarrollo basado en test y su importancia.
