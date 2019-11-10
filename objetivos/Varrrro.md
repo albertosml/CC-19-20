@@ -35,6 +35,22 @@
 
 [Ejercicios del tema 2](https://github.com/Varrrro/EjerciciosCC-19-20/blob/master/Ejercicios_Tema2.md)
 
-- [ ] Entender las claves del desarrollo basado en pruebas.
-- [ ] Entender el papel fundamental de la infraestructura virtual en este proceso.
+- [X] Entender las claves del desarrollo basado en pruebas.
+- [X] Entender el papel fundamental de la infraestructura virtual en este proceso.
 - [X] Entender el concepto de "infraestructura como código" e "infraestructura virtual".
+
+## Semana 5
+
+[Ejercicios del tema 2](https://github.com/Varrrro/EjerciciosCC-19-20/blob/master/Ejercicios_Tema2.md)
+
+- [X] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
+- [X] Entender el concepto de herramienta de construcción y su importancia en la infraestructura virtual.
+- [X] Entender qué son los sistemas de integración continua y cómo usarlos.
+
+## Semana 6
+
+[Ejercicios del tema 2](https://github.com/Varrrro/EjerciciosCC-19-20/blob/master/Ejercicios_Tema2.md)
+
+- [X] Entender las arquitecturas de software en la nube de uso en la actualidad.
+- [X] Comprender el papel fundamental de la infraestructura virtual en este proceso.
+- [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
