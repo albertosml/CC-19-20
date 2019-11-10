@@ -24,7 +24,16 @@
 ## Material para la clase
 
 * *Teoría*: Empezamos con el siguiente tema, 
-  [sobre uso de microservicios](http://jj.github.io/CC/documentos/temas/Microservicios)  en este caso con Docker.
+  [sobre uso de microservicios](http://jj.github.io/CC/documentos/temas/Microservicios).
+  
+* Esta práctica irá
+  sobre
+  [meter microservicios en un contenedor](http://jj.github.io/CC/documentos/proyecto/3.Docker.html). En
+  la sesión de prácticas explicaremos la primera parte:
+  microservicios. Entrega de este hito ** 28 de noviembre **.
 
 
 
+## Próxima semana
+
+[Semana número 8](08-semana.md)
