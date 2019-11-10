@@ -1,8 +1,8 @@
-## Objetivos del hito 0
-
 [Enlace al repositorio de mis ejercicios](https://github.com/lidiasm/EjerciciosCC.git).
 
-#### Primera semana
+## Objetivos del hito 0.
+
+#### Primera semana.
 
 - [x] Añadido el nick de telegram, git y el correo al documento compartido.
 - [x] Comenzar a usar git desde la línea de órdenes y comprender su funcionamiento básico.
@@ -15,7 +15,7 @@
 - [x] Entender en qué consiste el proyecto de la asignatura y comenzar a trabajar en el mismo.
 - [x] Conocer dónde se pueden obtener recursos cloud gratuitos para usar en la asignatura.
 
-#### Segunda semana
+#### Segunda semana.
 
 - [x] Entender los requisitos que se deben cumplir en el hito 0.
 - [x] Entender cómo se planifica un proyecto informático y cómo se representan sus requisitos en GitHub.
@@ -26,12 +26,12 @@
 - [x] Representar gráficamente la comunicación entre los microservicios de mi proyecto.
 - [x] Reenviar el hito 0.
 
-#### Tercera semana
+#### Tercera semana.
 
 - [x] Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales de almacenamiento de datos, configuración remota y log.
 - [x] Seguir mejorando el hito 0.
 
-#### Cuarta semana
+#### Cuarta semana.
 
 - [x] Comprender el funcionamiento de una API Gateway y sus diversas formas de comunicarse con los microservicios.
 - [x] Comprender las características y los usos de diversas bases de datos como MongoDB, MariaDB, Cassandra, etc.
@@ -39,12 +39,27 @@
 - [x] Comprender la diferencia entre microservicio y servicio y saber aplicarlo a mi proyecto.
 - [x] Reenviar por segunda vez el hito 0.
 
-## Objetivos del hito 1
+## Objetivos del hito 1.
 
-#### Cuarta semana
+#### Cuarta semana.
 
 - [x] Entender el papel fundamental de la infraestructura virtual
 - [x] Entender el concepto de infraestructura como código e infraestructura virtual.
 - [x] Comprender el primer hito del proyecto.
 - [x] Enviar el hito 1.
-- [ ] Hacer los ejercicios de autoevaluación del tema 2.
+- [x] Hacer los ejercicios de autoevaluación del tema 2.
+
+## Objetivos del hito 2.
+
+#### Quinta semana.
+
+- [x] Entender los conceptos del desarrollo basado en test y su importancia.
+- [x] Aprender a desarrollar tests para las funciones de las diversas clases de un microservicio.
+- [x] Comprender el uso de las herramientas de construcción.
+
+### Sexta semana.
+
+- [x] Comprender el concepto de herramienta de integración continua y su uso.
+- [x] Entender el concepto de los test de cobertura y su uso.
+- [x] Subir los tres primeros ejercicios de autoevaluación del tema 2.
+- [x] Subir el hito 2.
