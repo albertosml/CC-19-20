@@ -113,3 +113,50 @@
 - [X] Entender qué son los brokers de mensajería y cómo se usan.
 - [X] Tener manejo básico de los lenguajes usados en herramientas de
   provisionamiento, Python y Ruby.
+
+## Objetivos del hito 2
+[Ejercicios desarrollados para la adquisición de competencias relacionadas con los objetivos.](https://github.com/yoskitar/Ejercicios-CC/blob/master/Ejercicios%20Tema%202.md)
+
+[Curso TDD](https://github.com/Miguel-y-Oscar/Geolocalizaciones-de-medios-sociales)
+
+### Semana 4
+- [X] Entender los conceptos de desarrollo basado en test y otros
+   conceptos de calidad del software.
+- [X] Entender el concepto de herramientas de construcción y su
+   importancia en la infraestructura virtual.
+- [X] Entender qué son los sistemas de integración continua y cómo
+   usarlos.
+
+   
+
+### Semana 5
+- [X] Entender las arquitecturas de software en la nube de uso en la
+   actualidad.
+- [X] Comprender el paper fundamental de la infraestructura virtual en
+   este proceso.
+- [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
+
+## Otros objetivos del hito 2
+- [X] Darse de alta en plataformas que permitan llevar a cabo
+   integración/despliegue continuo.
+- [X] Familiarizarse con marcos de pruebas para el lenguaje en el que se
+   esté desarrollando la aplicación.
+
+- [X] Recomendaciones Hito 1
+  - [X] [mald16](https://github.com/ibe16/CC-19-20-Proyecto), [`yoskitar`](https://github.com/yoskitar/Cloud-Computing-CC).
+- [X] Entender problemas en el hito 1
+  - [X] Estructuración de la documentación.
+  - [X] Las entregas en hitos tratan de evaluar si se ha entendido un
+    concepto. En este caso se trata del concepto de infraestructura virtual.
+  - [X] Seguimos con el aprendizaje memorístico y el síndrome "qué hay que poner aquí".
+  - [X] La infraestructura virtual puede incluir tecnologías específicas
+    que no sean libres, pero nunca servicios externos, ni servicios
+    específicos de un proveedor en la nube.
+    - [X] Y en todo caso deben ser adecuadas para lo que se supone que son.
+  - [X] Cuidado con Java
+- [X] Tener manejo básico de los lenguajes usados en herramientas de
+  provisionamiento, Python y Ruby.
+- [X] Instalar las herramientas de línea de órdenes de las herramientas cloud.
+- [X] Hacerse con alguna cuenta gratuita o bonificada de cloud.
+- [X] Aprender la mínimo de los lenguajes necesarios para trabajar en la
+  nube: Perl, Python y Ruby.
