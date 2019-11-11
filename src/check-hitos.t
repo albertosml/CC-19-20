@@ -195,7 +195,7 @@ sub fail_x {
 
 sub travis_domain {
   my ($README, $user, $name) = @_;
-  my ($domain) = ($README =~ /.Build Status..https:\/\/travis-ci.(\w+)\/$user\/$name\.svg.+$name\)/);
+  my ($domain) = ($README =~ /.Build Status..https:\/\/travis-ci.(\w+)\/$user\/$name\.svg.+$name\)/i);
   return $domain;
 }
 
