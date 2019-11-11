@@ -36,3 +36,10 @@ proyecto.
 - [x] Entender el concepto de [historia de usuario](https://github.com/JJ/curso-qa-template/blob/master/.github/ISSUE_TEMPLATE/caso-de-uso.md).
 - [x] Entender el domain driven design, especialmente el concepto de [entidad](https://medium.com/@jonathanloscalzo/domain-driven-design-principios-beneficios-y-elementos-primera-parte-aad90f30aa35)
 
+### Hito 2
+
+- [x] Entender el concepto de tests funcionales y de integración continua.
+- [x] Diseñar una clase a la cual añadirle tests.
+- [x] Configurar y usar uno o varios sistemas de integración continua: [TravisCI](https://travis-ci.org/) y [CircleCI](https://circleci.com/).
+- [x] Diferenciar entre versión estable y de desarrollo en un lenguaje de programación.
+- [x] Entender la utilidad de las herramientas de construcción.
