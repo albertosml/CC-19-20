@@ -36,8 +36,9 @@
 
 * [x] Diseñar conjunto de clase de forma que se puedan testear, desligado de donde vienen los datos. High level design según las historias de usuario diseñadas
 * [x] Entender y definir la infraestructura virtual, lo necesario para que se ejecute en la nube. 
-* [x] Implementar test automaticos y aplicarlos al proyectos
-* [x] Usar badge Travis en el readme para que profesor chequee si paso las pruebas bien.
-* [x] Crear Documentación del proyecto
-* [x] Incluir herramienta de construcción tipo make al proyecto
+* [x] Implementar test automaticos y aplicarlos al proyectos 
+* [x] Usar badge Travis en el readme para que profesor chequee si paso las pruebas bien.[![Build Status](https://travis-ci.org/rodrigo-orellana/eco-challenge.svg?branch=master)](https://travis-ci.org/rodrigo-orellana/eco-challenge)  
+* [x] Crear Documentación del proyecto  
+* [x] Incluir herramienta de construcción tipo make al proyecto  
+* [x] Despliegue en la nube [Despliegue:](https://ecochallenge.herokuapp.com/)  
  ***
