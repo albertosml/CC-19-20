@@ -19,8 +19,6 @@
 ## Objetivos del hito 1
 
 ###  Ejercicios
-[Enlace al repositorio de mis ejercicios](https://github.com/ibe16/CC-19-20-Ejercicios.git).
-
 - [X] Enviar el hito 1.
 - [X] Entender qué es lo que se despliega en la nube.
 - [X] Entender las claves del desarrollo basado en pruebas.
@@ -30,3 +28,18 @@
 - [X] Entender qué son los brokers de mensajería y cómo se usan.
 - [X] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
 - [X] Usar issues que reflejen historias de usuario
+
+## Objetivos del hito 2
+[Enlace al repositorio de mis ejercicios](https://github.com/ibe16/CC-19-20-Ejercicios/blob/master/Ejercicios%20Tema%202/Ejercicios%20Tema%202.md).
+- [X] Enviar el hito 2.
+- [X] Configuración correcta de herramientas de construcción.
+- [X] Documentación de las herramientas de construcción.
+- [X] Integración continua funcionando.
+- [X] Documentación de los ficheros de configuración usados.
+- [X] Configuración de CI adicional a Travis.
+- [X] Tests significativos y/o avance del proyecto en sí más allá de lo básico.
+- [X] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
+- [X] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
+- [X] Entender qué son los sistemas de integración continua y cómo usarlos.
+- [X] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
+- [X] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
