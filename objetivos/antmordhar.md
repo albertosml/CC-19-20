@@ -23,3 +23,14 @@
 - [X] Arreglar errores de los ejercicios del Hito Anterior.
 - [X] Tener las milestones e issues organizadas por historias de usuario.
 - [X] Realizar los Ejercicios del Tema 1 [EjerciciosTema 1](https://github.com/antmordhar/EjerciciosCC/blob/master/Hito1/Ejercicios.md)
+
+## Objetivos a cubrir en el hito 2
+
+- [X] Configuración correcta de herramientas de construcción
+- [X] Documentación de las mismas.
+- [X] Integración continua funcionando
+- [X] Documentación de los ficheros de configuración usados.
+- [X] Configuración de CI adicional a Travis.
+- [X] Tests significativos y/o avance del proyecto en sí más allá de lo básico.
+- [X] Puesta en practica del curso de TDD [Curso TDD](https://github.com/antmordhar/Programador-de-Actividades)
+
