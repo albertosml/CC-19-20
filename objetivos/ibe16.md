@@ -30,7 +30,7 @@
 - [X] Usar issues que reflejen historias de usuario
 
 ## Objetivos del hito 2
-[Enlace al repositorio de mis ejercicios](https://github.com/ibe16/CC-19-20-Ejercicios.git).
+[Enlace al repositorio de mis ejercicios](https://github.com/ibe16/CC-19-20-Ejercicios/blob/master/Ejercicios%20Tema%202/Ejercicios%20Tema%202.md).
 - [X] Enviar el hito 2.
 - [X] Configuración correcta de herramientas de construcción.
 - [X] Documentación de las herramientas de construcción.
