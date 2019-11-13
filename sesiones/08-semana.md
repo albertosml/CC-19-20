@@ -4,6 +4,12 @@
 
 ## Otros objetivos
 
+* Retro de la entrega del hito 2
+  * Errores coincidentes.
+    * Si no están documentados y justificados, serán en la próxima
+      ocasión objeto de suspenso del hito, y en la siguiente ocasión
+      suspenso de la asignatura y para la convocatoria extraordinaria.
+    
 
 ## Material para la clase
 
