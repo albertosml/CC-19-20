@@ -9,7 +9,8 @@
     * Si no están documentados y justificados, serán en la próxima
       ocasión objeto de suspenso del hito, y en la siguiente ocasión
       suspenso de la asignatura y para la convocatoria extraordinaria.
-    
+  * Las herramientas de construcción se configuran para algo
+    * No para pasar el hito.
 
 ## Material para la clase
 
