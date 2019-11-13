@@ -17,7 +17,7 @@
 * Tener manejo básico de los lenguajes usados en herramientas de
   provisionamiento, Python y Ruby.
 * Repasar los reenvíos del hito 1 y los que no han reenviado todavía.
-2. Alta en Docker Hub si no se ha hecho ya, así como instalación de
+* Alta en Docker Hub si no se ha hecho ya, así como instalación de
    las herramientas de Docker. 
 
 
