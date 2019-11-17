@@ -2,43 +2,77 @@
 
 El Enlace al repositorio que se usara para entregar todas las tareas de la asignatura se puede encontrar [aquí](https://github.com/FernandoRoldan93/CloudComputing)
 
-## Semana 1
+[Ejercicios arquitecturas cloud](https://github.com/FernandoRoldan93/CloudComputing/blob/master/doc/Tema1/Arquitecturas_para_la_nube.md)
 
-- [x] Creación de un repositorio para el seguimiento de los ejercicios y proyectos de la asignatura.
-- [x] Clonación del repositorio de la asignatura, aportado por el profesor.
-- [x] Unirse al grupo de telegram y apuntarse en el documento compartido, especificando cuentas de telegram y github.
-- [x] Conocer el funcionamiento basico de git, necesario para el desarrollo de la asignatura.
-- [x] Preparación del entorno de trabajo, en este caso un sistema Linux.
-- [x] Subir al repositorio de la asignatura el presente documento de objetivos
-- [x] Instalación y configuración de git en el sistema Linux anteriormente instalado. Surgen varios sub-objetivos de dicha configuración. 
-	- [x] Descarga e instalación de git.
-	- [x] Configuración de nombre y correo, estos seran añadidos a los commits.
-	- [x] Creación de claves SSH y subida de clave publica a Github.
-- [x] Añadir la dirección del repositorio creado al fichero de proyectos del profesor
- 
+[Ejercicios desarrollo basado en pruebas](https://github.com/FernandoRoldan93/CloudComputing/blob/master/doc/Tema1/Desarrollo_Basado_En_Pruebas.md)
 
+#### Semana 1
 
+ - [x] Entender la metodología docente, de evaluación y de interacción de la asignatura.
+- [x] Darse de alta y comprender el funcionamiento básico
+   de git y [GitHub](https://github.com) y el grupo de Telegram de la
+   asignatura; conocer y entender el resto de los recursos de la asignatura.
+- [x] Entender el concepto de software libre y su aplicación práctica en clase.
+- [x] Vernos las caras.
+- [x] Comenzar a usar `git` desde línea de órdenes y comprender su papel como sistema para trabajo colaborativo y despliegue de aplicaciones. Un buen conocimiento de git es fundamental para trabajar en esta asignatura.
+- [x] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
+- [x] Entender en qué consiste el proyecto de la asignatura y comenzar a trabajar en el mismo.
 
-
-
+#### Semana 2
 
 
+- [x] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
 
+- [x] Entender las características de las aplicaciones que se despliegan en la nube.
 
+- [x] Entender lo necesario para entregar el hito 0 del proyecto.
 
+#### Semana 3
+- [x] Comprender la metodología de desarrollo, prueba y despliegue en la que se basa la computación en nube.
 
+- [x] Entender las características de las aplicaciones que se despliegan en la nube.
 
+#### Semana 4
+- [x] Entender las claves del desarrollo basado en pruebas.
 
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
 
+- [x] Enviar el hito 1 de la asignatura
 
+#### Semana 5
 
+- [ ] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
 
+- [ ] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
 
+- [ ] Entender qué son los sistemas de integración continua y cómo usarlos.
 
+- [ ] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
 
+- [ ] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
 
+#### Semana 6
 
+- [ ] Entender las arquitecturas de software en la nube de uso en la actualidad.
 
+- [ ] Comprender el paper fundamental de la infraestructura virtual en este proceso.
 
+- [ ] Comprender el tipo de aplicaciones que se despliegan en la nube.
 
- 
+#### Semana 7
+
+- [ ] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+
+- [ ] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+
+- [ ] Comprender el tipo de aplicaciones que se despliegan en la nube.
+
+- [ ] Entender el papel de los contenedores en la infraestructura virtual.
+
+- [ ] Comprender los procesos de definición de contenedores.
+
+#### Semana 8
+
+- [ ] Entender la configuración de infraestructura virtual desde contenedores.
+
+- [ ] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
