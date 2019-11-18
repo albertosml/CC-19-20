@@ -56,27 +56,29 @@
 
 ## Objetivos Semana 5
 
+[Enlace a los ejercicios del tema Desarrollo basado en pruebas](https://github.com/toniMR/CC-Ejercicios/blob/master/desarrolloBasadoEnPruebas.md#ejercicio-2-crear-una-descripci%C3%B3n-del-m%C3%B3dulo-usando-packagejson-en-caso-de-que-se-trate-de-otro-lenguaje-usar-el-m%C3%A9todo-correspondiente).
+
 - [X] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
-- [ ] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
-- [ ] Entender qué son los sistemas de integración continua y cómo usarlos.
+- [X] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
+- [X] Entender qué son los sistemas de integración continua y cómo usarlos.
   - [X] Aprender a configurar y usar TravisCI
-  - [ ] Aprender a configurar y usar CircleCI
+  - [X] Aprender a configurar y usar CircleCI
 - [X] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
-- [ ] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
+- [X] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
   - [X] Pytest para python
-  - [ ] Mocha para Node.js
+  - [X] Mocha para Node.js
 
 ## Objetivos Semana 6
 
-- [ ] Entender las arquitecturas de software en la nube de uso en la actualidad.
-- [ ] Comprender el papel fundamental de la infraestructura virtual en este proceso.
-- [ ] Entender en qué consisten los servicios web y cómo desplegarlos en la nube
-- [ ] Comprender el tipo de aplicaciones que se despliegan en la nube.
-- [ ] Entender problemas en el hito 1.
-- [ ] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+- [X] Entender las arquitecturas de software en la nube de uso en la actualidad.
+- [X] Comprender el papel fundamental de la infraestructura virtual en este proceso.
+- [X] Entender en qué consisten los servicios web y cómo desplegarlos en la nube
+- [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [X] Entender problemas en el hito 1.
+- [X] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
 - [ ] Instalar las herramientas de línea de órdenes de las herramientas cloud.
 - [ ] Hacerse con alguna cuenta gratuita o bonificada de cloud.
-- [ ] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
+- [X] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
 
 ## Objetivos Semana 7
 
