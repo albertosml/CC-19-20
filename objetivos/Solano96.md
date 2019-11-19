@@ -32,3 +32,13 @@ Enlace a los [ejercicios del tema 2](https://github.com/Solano96/CC-Exercises/bl
 - [x] Comprender el primer hito del proyecto.
 - [x] Entender que es Domain Driven Design.
 - [x] Entender las claves del desarrollo basado en pruebas.
+
+## Objetivos del hito 2
+
+Enlace a los [ejercicios del tema 2](https://github.com/Solano96/CC-Exercises/blob/master/Desarrollo_basado_en_pruebas.md) de Cloud Computing.
+
+- [x] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
+- [x] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.   
+- [x] Entender qué son los sistemas de integración continua y cómo usarlos.
+- [x] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
+- [x] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
