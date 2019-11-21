@@ -78,8 +78,17 @@ EOC
     ok( $buildtool, "Encontrado nombre del fichero buildtool" );
     isnt( grep( /\b$buildtool\b/, @repo_files), 0, "$buildtool presente" );
   }
+
+  if ( $this_hito > 2 ) { # Integración continua
+    doing("hito 3");
+    isnt( grep( /Dockerfile/, @repo_files), 0, "Dockerfile presente" );
+    my ($registry) = ($README =~ m{(?:Contenedor:)\s+(\S+)\s+});
+    ok( $registry, "Encontrada dirección de despliegue $registry" );
+    my $dockerfile = get $registry;
+    ok( $dockerfile, "El URL de $registry es correcto");
+  }
   
-  if ( $this_hito > 2 ) { # Despliegue en algún lado
+  if ( $this_hito > 3 ) { # Despliegue en algún lado
   SKIP: {
       skip "Ya en el hito siguiente", 2 unless $this_hito == 2;
 
@@ -101,7 +110,7 @@ EOC
     }
   }
 
-  if ( $this_hito > 2 ) { # Comprobar provisionamiento
+  if ( $this_hito > 3 ) { # Comprobar provisionamiento
     ok( grep( /.yml/, @repo_files), "Hay algún playbook en YAML presente" );
     ok( grep( /provision/, @repo_files), "Hay un directorio 'provision'" );
     ok( grep( m{provision/\w+}, @repo_files), "El directorio 'provision' no está vacío" );
