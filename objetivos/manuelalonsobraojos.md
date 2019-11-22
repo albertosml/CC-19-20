@@ -77,3 +77,17 @@
 * [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
 * [x] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
 
+### Séptima semana, 11 de noviembre
+
+**Objetivos a cubrir en esta semana**
+* [x] 1. Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+* [x] 2. Comprender el paper fundamental de la infraestructura virtual en este proceso.
+* [x] 3. Compreder el tipo de aplicaciones que se despliegan en la nube.
+* [x] 4. Entender el papel de los contenedores en la infraestructura virtual.
+* [x] 5. Comprender los procesos de definición de contenedores.
+
+**Otros objetivos**
+* [x] A más tardar durante la sesión de prácticas, entrega del hito 2.
+* [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+* [x] Repasar los reenvíos del hito 1 y los que no han reenviado todavía.
+* [x] Alta en Docker Hub si no se ha hecho ya, así como instalación de las herramientas de Docker.
