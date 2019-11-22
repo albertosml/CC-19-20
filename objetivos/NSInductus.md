@@ -42,3 +42,15 @@ Algunos de estos objetivos se pueden ver el [fichero de documentación del hito 
 - [x] Entregar el hito 1.
 
 Las historias de usuario se pueden ver en el [fichero de documentación de historias del usuario](https://github.com/NSInductus/CC_Proyecto/blob/master/docs/historias_de_usuario.md)
+
+## Objetivos hito 2
+
+- [ ] Realizar los ejercicios del tema 2. [Ejercicios tema 2](https://github.com/NSInductus/CC_Ejercicios/blob/master/desarrollo_basado_en_pruebas.md)
+- [x] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
+- [x] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
+- [x] Entender qué son los sistemas de integración continua y cómo usarlos.
+Otros objetivos
+- [x] Darse de alta en TravisCI para llevar a cabo integración/despliegue continuo.
+- [x] Darse de alta en CircleCI para llevar a cabo integración/despliegue continuo.
+- [x] Familiarizarse con marcos de pruebas (como pytest) para el lenguaje en el que se esté desarrollando la aplicación.
+- [x] Terminar el hito 2.
