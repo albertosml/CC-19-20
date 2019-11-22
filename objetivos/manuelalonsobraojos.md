@@ -78,7 +78,7 @@
 * [x] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
 
 ### Séptima semana, 11 de noviembre.
-
+[Enlace a ejercicios del tema 4](https://github.com/manuelalonsobraojos/cc-ejercicios/tree/master/Ejercicios-tema4)
 **Objetivos a cubrir en esta semana**
 * [x] 1. Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
 * [x] 2. Comprender el paper fundamental de la infraestructura virtual en este proceso.
