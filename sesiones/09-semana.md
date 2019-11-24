@@ -13,6 +13,7 @@ Esta semana es de transición y la principal tarea es la entrega con
 1. Aclaraciones sobre la corrección de los hitos
    1. Criterios para notas en primera y segunda corrección.
    2. Criterios para evaluar originalidad.
+2. Actualización de los objetivos y su importancia en la nota final.
 1. Instalar podman y buildah, aplicaciones alternativas que siguen el
    estándar OCI.
 2. Usar registros de contenedores alternativos a Docker Hub como
