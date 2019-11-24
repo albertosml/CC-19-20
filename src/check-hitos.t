@@ -44,7 +44,15 @@ EOC
   isnt($url_repo,"","El envío incluye un URL");
   like($url_repo,qr/github.com/,"El URL es de GitHub");
   my ($user,$name) = ($url_repo=~ /github.com\/(\S+)\/(.+)/);
-  ok( fichero_objetivos($user), "$user ha enviado objetivos" ); # Test 4
+  my $este_fichero = fichero_objetivos($user);
+  ok( $este_fichero, "$user ha enviado objetivos" ); # Test 4
+
+  # Comprobar que los ha actualizado
+  my $objetivos_actualizados = objetivos_actualizados( $repo, $este_fichero );
+  is( $objetivos_actualizados, "",
+       "Fichero de objetivos $este_fichero está actualizado")
+    or skip "Fichero de objetivos actualizados hace $objetivos_actualizados" ;
+  
   my $repo_dir = "/tmp/$user-$name";
   if (!(-e $repo_dir) or  !(-d $repo_dir) ) {
     mkdir($repo_dir);
@@ -225,4 +233,19 @@ sub check_ip {
   my $pinger = Net::Ping->new();
   $pinger->port_number(22); # Puerto ssh
   isnt($pinger->ping($ip), 0, "$ip es alcanzable");
+}
+
+sub objetivos_actualizados {
+  my $repo = shift;
+  my $objective_file = shift;
+  my $date = $repo->command('log', '-1', '--date=relative', '--', "$objective_file");
+  my ($hace,$unidad)= $date =~ /Date:.+?(\d+)\s+(\w+)/;
+  if ( $unidad =~ /(semana|week|minut)/ ) {
+    return "";
+  } elsif ( $unidad =~ /ho/ ) {
+    return ($hace > 1 )?"":"Objetivos actualizados demasiado recientemente";
+  } elsif ( $unidad =~ /d\w+/ ){
+    return ($hace < 7)?"":"Los objetivos no han sido actualizados en la semana anterior";
+  }
+
 }
