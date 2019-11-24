@@ -42,3 +42,11 @@
 * [x] Documentar todos los tests realizados y las herramientas utilizadas para la construcción del proyecto
 * [x] Realización de los ejercicios de testing [Ejercicios](https://github.com/OscarRubioGarcia/CC/blob/master/EjerciciosDesarrolloBasadoEnPruebas.md)`
 * [x] Realización de seminario tdd [Seminario](https://github.com/Seminario-PGPI/Proyecto-Trafico)
+
+## Objetivos del hito 3
+* [x] Conocer las diferentes tecnologías y herramientas de virtualización tanto para procesamiento, comunicación y almacenamiento.
+* [x] Comprender los conceptos necesarios para trabajar con diferentes plataformas PaaS
+* [x] Conocer diferentes tecnologías relacionadas con la virtualización (Computación Nube, Utility Computing, Software as a Service) e implementaciones tales como Google AppSpot, OpenShift o Heroku.
+* [x] Realización de infraestructura virtual completa.
+* [x] Comprender los pasos necesarios para la configuración automática de las mismas.
+* [x] Realizacion de los ejercicios del tema en el propio proyecto.[Proyecto](https://github.com/OscarRubioGarcia/CCProyecto/blob/master/docs/Docker.md)
