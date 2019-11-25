@@ -49,6 +49,7 @@ Repositorio de ejercicios: [Ejercicios CC](https://github.com/iMiguel10/Ejercici
 - [] Comprender los procesos de definición de contenedores.
 - [x] [Conocer los conceptos relacionados con el proceso de virtualización tanto de software como de hardware y ponerlos en práctica.](https://github.com/iMiguel10/Ejercicios-CC/tree/master/Tema%203%20-%20Microservicios)
 - [x] [Justificar la necesidad de procesamiento virtual frente a real en el contexto de una infraestructura TIC de una organización.](https://github.com/iMiguel10/Ejercicios-CC/tree/master/Tema%203%20-%20Microservicios)
+- [x] [Hacer ejercicio 2 del tema de contenedores](https://github.com/iMiguel10/Ejercicios-CC/tree/master/Tema%204%20-%20Contenedores)
 ---
 <!--
 # Objetivos hito 4
