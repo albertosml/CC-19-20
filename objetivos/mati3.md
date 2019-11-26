@@ -37,3 +37,21 @@
 - [x] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
 - [x] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
 - [x] Avanzar en el proyecto.
+
+## Objetivos del hito 3
+
+[Ejercicios microservicios](https://github.com/mati3/Ejercicios-CC/blob/master/Microservicios.md)
+[Ejercicios contenedores](https://github.com/mati3/Ejercicios-CC/blob/master/Contenedores_y_como_usarlos.md)
+
+- [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+- [x] Levantar mi primer microservicio.
+- [X] Desacoplar el modelo del sistema real.
+- [x] Automatizar el despliegue del microservicio.
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+- [x] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [x] Entender el papel de los contenedores en la infraestructura virtual.
+- [x] Comprender los procesos de definición de contenedores.
+- [x] Generar un contenedor con un Dockerfile.
+- [x] Subir el contenedor a un registro.
+- [x] Desplegar el microservicio usando Heroku.
+- [x] Avanzar en el segundo microservicio.
