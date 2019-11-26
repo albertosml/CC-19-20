@@ -56,12 +56,12 @@
 
 #### Sexta semana:
 
-- [ ] Entender las arquitecturas de software en la nube de uso en la actualidad.
-- [ ] Comprender el papel fundamental de la infraestructura virtual en este proceso.
+- [X] Entender las arquitecturas de software en la nube de uso en la actualidad.
+- [X] Comprender el papel fundamental de la infraestructura virtual en este proceso.
 - [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
 - [X] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
-- [ ] Instalar las herramientas de línea de órdenes de las herramientas cloud.
-- [ ] Hacerse con alguna cuenta gratuita o bonificada de cloud.
+- [X] Instalar las herramientas de línea de órdenes de las herramientas cloud.
+- [X] Hacerse con alguna cuenta gratuita o bonificada de cloud.
 - [X] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
 
 #### Objetivos Hito 2:
@@ -69,3 +69,33 @@
 - [X] Entender los conceptos de tests funcionales. 
 - [X] Configurar y usar un sistema (o varios) de integración continua. 
 - [X] Aprender cómo describir la versión del lenguaje de programación que se usa y sus dependencias.
+
+# Hito 3:
+
+[Ejercicios de contenedores](https://github.com/alvarillo89/UGR-CC-Ejercicios/blob/master/Tema%204/EjerciciosContenedores.md).
+
+#### Séptima semana:
+
+- [X] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+- [X] Comprender el papel fundamental de la infraestructura virtual en este proceso.
+- [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [X] Entender el papel de los contenedores en la infraestructura virtual.
+- [X] Comprender los procesos de definición de contenedores.
+- [X] Instalación de Docker.
+
+#### Octava semana:
+
+- [X] Entender la configuración de infraestructura virtual desde contenedores.
+- [X] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
+
+#### Novena semana:
+
+- [X] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
+- [ ] Usar registros de contenedores alternativos a Docker Hub como GitHub.
+
+#### Objetivos del Hito 3:
+
+- [X] Programar la aplicación usando microservicios (o servidores de tareas), usando todos los parámetros de calidad habituales.
+- [ ] Empaquetar ese microservicio usando Docker para su despliegue seguro y eficiente en la nube.
+- [ ] Subir el contenedor a Github.
+- [ ] Desplegar el microservicio en Heroku.
