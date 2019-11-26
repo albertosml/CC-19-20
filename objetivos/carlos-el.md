@@ -3,6 +3,7 @@
 ### Ejercicios: 
 [Tema1](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema1-Arquitecturas_para_la_nube.md), 
 [Tema2](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema2-Desarrollo_basado_en_pruebas.md)
+[Tema4](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema4-Contenedores_y_como_usarlos.md)
 
 ### Objetivos del hito 0:
 
@@ -67,4 +68,20 @@ Vernos las caras.
 - [x] Aprender a configurar herramientas de integración continua y de construcción
 - [x] Realizar [proyecto](https://github.com/carlos-el/ProyectoCursoTDD-Notas) del curso de tdd para la afianzación de los conocimientos anteriores.
 
-  
+### Objetivos del hito 3:
+
+- [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+- [x] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [x] Entender el papel de los contenedores en la infraestructura virtual.
+- [x] Comprender los procesos de definición de contenedores.
+- [x] Alta en Docker Hub si no se ha hecho ya, así como instalación de las herramientas de Docker.
+- [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+
+- [x] Entender la configuración de infraestructura virtual desde contenedores.
+- [x] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
+- [x] Probar diferentes microframeworks y quedarse con el más adecuado para el proyecto. Entender las diferencias entre ellos. Esto se ha realizado sobre Flask y Falcon (ambos para python). Despueas de comprobar sus características hemos comprobado que Falcon es el más adecuado para el proyecto ay que aunque no cuenta con sistema de plantillas (tampoco lo necesitaremos) tiene un mejor rendimiento y es igual de fácil de configurar.
+
+- [x] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
+- [x] Instalar podman y buildah, aplicaciones alternativas que siguen el estándar OCI. Se puede comprobar sobre el primer ejercicio incluido en [este](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema4-Contenedores_y_como_usarlos.md) enlace.
+- [x] Usar registros de contenedores alternativos a Docker Hub como GitHub. En nuestro caso ha sido GitHub.
