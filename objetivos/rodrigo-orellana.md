@@ -29,7 +29,6 @@
 * [x] Realizar los ejercicios del tema Desarrollo basado en pruebas.
 * [x] Crear historias de usuario para el proyecto.
 
-
 # Objetivos del hito 2
 
 [Enlace a mis ejercicios](https://github.com/rodrigo-orellana/Ejercicios_CC).
@@ -40,5 +39,27 @@
 * [x] Usar badge Travis en el readme para que profesor chequee si paso las pruebas bien.[![Build Status](https://travis-ci.org/rodrigo-orellana/eco-challenge.svg?branch=master)](https://travis-ci.org/rodrigo-orellana/eco-challenge)  
 * [x] Crear Documentación del proyecto  
 * [x] Incluir herramienta de construcción tipo make al proyecto  
+* [x] Despliegue en la nube [Despliegue:](https://ecochallenge.herokuapp.com/)  
+
+# Objetivos del hito 3
+
+[Enlace a mis ejercicios](https://github.com/rodrigo-orellana/Ejercicios_CC).
+* [x] Comprender el paper fundamental de la infraestructura virtual
+* [x] Comprender el tipo de aplicaciones que se despliegan en la nube.
+* [x] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+* [x] Instalar las herramientas de línea de órdenes de las herramientas cloud.
+* [x] Hacerse con alguna cuenta gratuita o bonificada de cloud.
+* [x] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
+* [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+* [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+* [x] Comprender el tipo de aplicaciones que se despliegan en la nube.
+* [x] Entender el papel de los contenedores en la infraestructura virtual.
+* [x] Comprender los procesos de definición de contenedores.
+* [x] Alta en Docker Hub si no se ha hecho ya, así como instalación de las herramientas de Docker.
+* [x] Entender la configuración de infraestructura virtual desde contenedores.
+* [x] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
+* [x] empaquetar ese microservicio usando Docker para su despliegue seguro y eficiente en la nube.
+* [x] Aplicación de procesos de calidad del software imprescindibles para el buen despliegue en la nube 
+* [x] Tener instaladas las herramientas necesarias para trabajar con Docker y saber usarlas adecuadamente
 * [x] Despliegue en la nube [Despliegue:](https://ecochallenge.herokuapp.com/)  
  ***
