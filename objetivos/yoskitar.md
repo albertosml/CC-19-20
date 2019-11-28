@@ -160,3 +160,33 @@
 - [X] Hacerse con alguna cuenta gratuita o bonificada de cloud.
 - [X] Aprender la mínimo de los lenguajes necesarios para trabajar en la
   nube: Perl, Python y Ruby.
+
+## Objetivos del hito 3
+[Ejercicios desarrollados para la adquisición de competencias relacionadas con los objetivos de microservicios.](https://github.com/yoskitar/Ejercicios-CC/blob/master/Ejercicios%20Tema%203.md)
+
+[Ejercicios desarrollados para la adquisición de competencias relacionadas con los objetivos de contenedores.](https://github.com/yoskitar/Ejercicios-CC/blob/master/Ejercicios%20Tema%204.md)
+
+### Semana 6
+- [X] Entender la arquitectura en capas de los microservicios usados en
+   despliegues modernos.
+- [X] Comprender el paper fundamental de la infraestructura virtual en
+   este proceso.
+- [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [X] Entender el papel de los contenedores en la infraestructura virtual.
+- [X] Comprender los procesos de definición de contenedores.
+
+### Semana 7
+- [X] Entender la configuración de infraestructura virtual desde contenedores.
+- [X] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
+
+### Semana 8
+- [X] Entender el ecosistema de contenedores y diferentes alternativas a
+   todas las aplicaciones.
+
+
+## Otros objetivos del hito 3
+- [X] Aclaraciones sobre la corrección de los hitos.
+- [X] Actualización de los objetivos y su importancia en la nota final.
+- [ ] Usar registros de contenedores alternativos a Docker Hub como
+   GitHub. 
+- [X] Retro de la entrega del hito 2
