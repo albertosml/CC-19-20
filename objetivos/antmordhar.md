@@ -34,3 +34,13 @@
 - [X] Tests significativos y/o avance del proyecto en sí más allá de lo básico.
 - [X] Puesta en practica del curso de TDD [Curso TDD](https://github.com/antmordhar/Programador-de-Actividades)
 
+## Objetivos a cubrir en el hito 3
+
+- [X] Conocer los conceptos relacionados con el proceso de virtualización tanto de software como de hardware y ponerlos en práctica.
+- [X] Justificar la necesidad de procesamiento virtual frente a real en el contexto de una infraestructura TIC de una organización.
+- [X] Entender los mecanismos de diseño, prueba y despliegue de un microservicio antes de efectuarlo y enviarlo a la nube.
+- [X] Aplicar el concepto de DevOps a este tipo específico de plataforma.
+- [X] Aprender prácticas seguras en el desarrollo de aplicaciones en la nube.
+- [X] Documentación de los archivos usados
+- [X] Tests significativos y/o avance del proyecto en sí más allá de lo básico.
+- [X] Ejercicios tema 3 [EjerciciosTema 3](https://github.com/antmordhar/EjerciciosCC/blob/master/Hito3/EjerciciosHito3.md)
