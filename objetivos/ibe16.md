@@ -43,3 +43,15 @@
 - [X] Entender qué son los sistemas de integración continua y cómo usarlos.
 - [X] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
 - [X] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
+
+# Objetivos Hito 3
+[Enlace al repositorio de mis ejercicios](https://github.com/ibe16/CC-19-20-Ejercicios/tree/master/Ejercicios%20Tema%203)
+
+- [X] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+- [X] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+- [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [X] Entender el papel de los contenedores en la infraestructura virtual.
+- [X] Comprender los procesos de definición de contenedores.
+- [X] Entender la configuración de infraestructura virtual desde contenedores.
+- [X] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
+- [X] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
