@@ -99,3 +99,33 @@
 - [x] Configurar sistema de integración continua.
 
 [Ejercicios relacionados con el desarrollo basado en pruebas](https://github.com/natalia2911/Ejercicios-CloudComputing/blob/master/Tema%202%20:%20Desarrollo%20basado%20en%20pruebas/Tema2.md)
+
+
+## Séptima semana
+
+
+- [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+- [x] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [x] Entender el papel de los contenedores en la infraestructura virtual.
+- [x] Comprender los procesos de definición de contenedores.
+
+## Semana ocho
+
+- [x] Entender la configuración de infraestructura virtual desde contenedores.
+- [x] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
+
+## Semana nueve
+
+- [x] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
+
+
+### En relación con el hito 3
+
+- [ ] Documentación del microservicio y su ajuste a las historias de usuario y tests correctos; uso de buenas prácticas en su configuración.
+
+- [x] Creación Dockerfile y documentación del mismo
+- [x] Creación de la documentación y justificación del contenedor base elegido para el despliegue.
+- [x] Arranque automático de la aplicación de microservicios, y documentación y justificación del mismo.
+- [x] Arquitectura por capas del microservicio llevada a cabo correctamente
+- [x] Ejercicio hecho en la clase de teoria: [Ejercicio2](https://github.com/natalia2911/Ejercicios-CloudComputing/blob/master/Tema%204:%20Uso%20de%20contenedores/EJ2/Ejercicio2.md)
