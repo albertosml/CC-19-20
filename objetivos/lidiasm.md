@@ -59,9 +59,30 @@
 - [x] Aprender a desarrollar tests para las funciones de las diversas clases de un microservicio.
 - [x] Comprender el uso de las herramientas de construcción.
 
-### Sexta semana.
+#### Sexta semana.
 
 - [x] Comprender el concepto de herramienta de integración continua y su uso.
 - [x] Entender el concepto de los test de cobertura y su uso.
 - [x] Subir los tres primeros ejercicios de autoevaluación del tema 2.
 - [x] Subir el hito 2.
+
+## Objetivos del hito 3.
+
+#### Séptima semana.
+
+[Enlace al fichero donde se subirán los ejercicios del tema de microservicios](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_Microservicios.md)
+
+- [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+- [x] Comprender la importancia de separar la lógica de negocio de los microservicios.
+- [x] Comprender el funcionamiento de *WSGI* y los gestores de procesos y cuándo utilizarlos.
+- [x] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [x] Entender la importancia de testear los microservicios.
+
+#### Octava semana.
+
+[Enlace al fichero donde se subirán los ejercicios del tema de contenedores.](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_Contenedores.md)
+
+- [x] Entender el funcionamiento, construcción y uso de los contenedores.
+- [x] Comprender la función que tiene el *dockerfile.*
+- [x] Alta en Docker Hub.
+- [x] Subir el hito 3.
