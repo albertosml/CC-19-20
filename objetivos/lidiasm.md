@@ -70,6 +70,8 @@
 
 #### Séptima semana.
 
+[Enlace al fichero donde se subirán los ejercicios del tema de microservicios](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_Microservicios.md)
+
 - [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
 - [x] Comprender la importancia de separar la lógica de negocio de los microservicios.
 - [x] Comprender el funcionamiento de *WSGI* y los gestores de procesos y cuándo utilizarlos.
@@ -77,6 +79,8 @@
 - [x] Entender la importancia de testear los microservicios.
 
 #### Octava semana.
+
+[Enlace al fichero donde se subirán los ejercicios del tema de contenedores.](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_Contenedores.md)
 
 - [x] Entender el funcionamiento, construcción y uso de los contenedores.
 - [x] Comprender la función que tiene el *dockerfile.*
