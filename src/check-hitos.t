@@ -91,8 +91,8 @@ EOC
     doing("hito 3");
     isnt( grep( /Dockerfile/, @repo_files), 0, "Dockerfile presente" );
     my ($registry) = ($README =~ m{(?:Contenedor:)\s+(\S+)\s+});
-    ok( $registry, "Encontrada dirección de despliegue $registry" );
-    my $dockerfile = get $registry;
+    ok( $registry, "Encontrado despliegue en DockerHub $registry" );
+    my $dockerfile = get "$registry/dockerfile";
     ok( $dockerfile, "El URL de $registry es correcto");
   }
   
