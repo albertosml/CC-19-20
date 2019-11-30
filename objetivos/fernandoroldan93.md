@@ -47,7 +47,7 @@ El Enlace al repositorio que se usara para entregar todas las tareas de la asign
 
 - [x] Entender qué son los sistemas de integración continua y cómo usarlos.
 
-- [x] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
+- [x] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo, por ejemplo, [travis](https://travis-ci.org/)
 
 - [x] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
 
