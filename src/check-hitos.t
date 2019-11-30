@@ -90,11 +90,23 @@ EOC
   if ( $this_hito > 2 ) { # Integración continua
     doing("hito 3");
     isnt( grep( /Dockerfile/, @repo_files), 0, "Dockerfile presente" );
+    # Comprobaciones sobre el Dockerfile
+    my $dockerfile_content =   read_text( "$repo_dir/Dockerfile");
+    ok( $dockerfile_content !~ /COPY \./, "Se deben copiar sólo los ficheros necesarios para la construcción" );
+
+    # Comprobación del registry
     my ($registry) = ($README =~ m{(?:Contenedor:)\s+(\S+)\s+});
     ok( $registry, "Encontrado despliegue en DockerHub $registry" );
-    my $dockerfile = get "$registry/dockerfile";
-    ok( $dockerfile, "Se descarga correctamente el URL del Dockerfile $registry/dockerfile" );
-    ok( $dockerfile =~ /Dockerfile/, "La página $registry/dockerfile  es un Dockerfile efectivamente");
+    if ( $registry =~ /hub.docker.com/ ) {
+      my $dockerfile = get "$registry/dockerfile";
+      ok( $dockerfile, "Se descarga correctamente el URL del Dockerfile $registry/dockerfile" );
+      ok( $dockerfile =~ /Dockerfile/, "La página $registry/dockerfile  es un Dockerfile efectivamente");
+    } elsif ( $registry =~ /github.com/ ) {
+      my $dockerfile = get $registry;
+      ok( $dockerfile, "Se descarga correctamente el URL $registry" );
+    } else {
+      fail("$registry no es la dirección de un registro conocido");
+    }
   }
   
   if ( $this_hito > 3 ) { # Despliegue en algún lado
