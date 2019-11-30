@@ -93,7 +93,8 @@ EOC
     my ($registry) = ($README =~ m{(?:Contenedor:)\s+(\S+)\s+});
     ok( $registry, "Encontrado despliegue en DockerHub $registry" );
     my $dockerfile = get "$registry/dockerfile";
-    ok( $dockerfile, "El URL de $registry es correcto");
+    ok( $dockerfile, "Se descarga correctamente el URL del Dockerfile $registry/dockerfile" );
+    ok( $dockerfile =~ /Dockerfile/, "La página $registry/dockerfile  es un Dockerfile efectivamente");
   }
   
   if ( $this_hito > 3 ) { # Despliegue en algún lado
