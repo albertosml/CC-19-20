@@ -2,9 +2,9 @@
 
 El Enlace al repositorio que se usara para entregar todas las tareas de la asignatura se puede encontrar [aquí](https://github.com/FernandoRoldan93/CloudComputing)
 
-[Ejercicios arquitecturas cloud](https://github.com/FernandoRoldan93/CloudComputing/blob/master/doc/Tema1/Arquitecturas_para_la_nube.md)
+[Ejercicios arquitecturas cloud.](https://github.com/FernandoRoldan93/CloudComputing/blob/master/doc/Tema1/Arquitecturas_para_la_nube.md)
 
-[Ejercicios desarrollo basado en pruebas](https://github.com/FernandoRoldan93/CloudComputing/blob/master/doc/Tema1/Desarrollo_Basado_En_Pruebas.md)
+[Ejercicios desarrollo basado en pruebas.](https://github.com/FernandoRoldan93/CloudComputing/blob/master/doc/Tema1/Desarrollo_Basado_En_Pruebas.md)
 
 #### Semana 1
 
@@ -41,15 +41,15 @@ El Enlace al repositorio que se usara para entregar todas las tareas de la asign
 
 #### Semana 5
 
-- [ ] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
+- [x] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
 
-- [ ] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
+- [x] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
 
-- [ ] Entender qué son los sistemas de integración continua y cómo usarlos.
+- [x] Entender qué son los sistemas de integración continua y cómo usarlos.
 
-- [ ] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
+- [x] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
 
-- [ ] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
+- [x] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
 
 #### Semana 6
 
