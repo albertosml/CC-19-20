@@ -1,30 +1,28 @@
 # Décima semana, 2 de diciembre
 
+* El hito se retrasa hasta el **5 de diciembre**.
+
 ## Objetivos de la asignatura
 
-* Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas
-  virtuales.
-
-* Conocer diferentes lugares donde haya imágenes de sistemas
-  operativos listas para usar.
-
-* Instalar y configurar diferentes sistemas de provisionamiento.
-
-* Entender los conceptos de los sistemas de máquinas virtuales y cómo
-  configurarlos desde línea de órdenes.
-* Entender las nociones básicas de seguridad.
+* Repasar conceptos de microservicios
+* Repasar conceptos de contenedores
 
 ## Objetivos adicionales
 
-1. Instalarse los diferentes clientes de líneas de órdenes de los
-   sistemas en la nube a los que se tenga acceso.
-
+1. Revisar errores frecuentes en la entrega retrasada
+   1. No dar medidas numéricas de prestaciones.
+   2. Usar órdenes sin una justificación clara (ARG).
+   3. El contenedor debe tener sólo lo necesario para ejecutar el microservicio.
+   4. El contenedor debe ser configurable.
+   5. El uso de `.dockerignore` no excusa que copiéis solo lo necesario.
+   5. Sobre el documento
+	  1. Liberar lo no necesario
+	  2. Material adicional, colocar en un directorio aparte.
+  6. Sobre el repo
+	 1. Dejar en el directorio principal sólo herramientas de construcción y ficheros de configuración.
+	 2. No usar __init__.py salvo que sea necesario.
+   
 ## Material para la clase
 
-## Material para esta semana
 
-* *Teoría*: Comenzamos
-  el
-  [tercer tema](http://jj.github.io/CC/documentos/temas/Automatizando_cloud)
 
-* El cuarto hito se entregará el *12 de diciembre*
