@@ -95,7 +95,7 @@
 ### Semana 8, 18 de noviembre
 
 **Objetivos a cubrir esta semana**
-* [x] 1. Entender la configuración de infraestructura virtual desde contenedores.
+* [x] 1. Entender la configuración de infraestructura virtual desde contenedores.[Dockerfile](https://github.com/manuelalonsobraojos/cc-proyecto/blob/master/Dockerfile) [Info](https://docs.docker.com/engine/reference/builder/)
 * [x] 2. Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
 
 **Otros objetivos**
