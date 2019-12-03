@@ -101,3 +101,24 @@
 **Otros objetivos**
 * [x] Retro de la entrega del hito 2.
 * [x] Probar diferentes microframeworks y quedarse con el más adecuado para el proyecto. Entender las diferencias entre ellos.
+
+### Semana 9, 25 de noviembre
+
+**Objetivos a cubrir esta semana**
+* [x] 1. Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
+
+**Otros objetivos**
+* [x] Aclaraciones sobre la corrección de los hitos.
+* [x] Actualización de los objetivos y su importancia en la nota final.
+* [] Instalar podman y buildah, aplicaciones alternativas que siguen el estándar OCI.
+* [] Usar registros de contenedores alternativos a Docker Hub como GitHub.
+
+### Semana 10, 2 de Diciembre
+
+**Objetivos a cubrir esta semana**
+* [x] Repasar conceptos de microservicios
+* [x] Repasar conceptos de contenedores
+
+**Otros objetivos**
+
+* [x] Revisar errores frecuentes en la entrega retrasada
