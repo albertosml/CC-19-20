@@ -43,3 +43,11 @@ proyecto.
 - [x] Configurar y usar uno o varios sistemas de integración continua: [TravisCI](https://travis-ci.org/) y [CircleCI](https://circleci.com/).
 - [x] Diferenciar entre versión estable y de desarrollo en un lenguaje de programación.
 - [x] Entender la utilidad de las herramientas de construcción.
+
+### Hito 3
+
+- [x] Entender el uso de Docker y los contenedores para el despliegue de microservicios.
+- [x] Aplicar el concepto de ídempotencia.
+- [x] Configurar una REST API para ambos microservicios.
+- [x] Empaquetar los microservicios para su despliegue en la nube.
+- [x] Aprender a usar [Heroku](https://www.heroku.com/) y [DockerHub](https://hub.docker.com/).
