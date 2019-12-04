@@ -183,10 +183,17 @@
 - [X] Entender el ecosistema de contenedores y diferentes alternativas a
    todas las aplicaciones.
 
+### Semana 9
+- [X] Repasar conceptos de microservicios
+- [X] Repasar conceptos de contenedores
 
 ## Otros objetivos del hito 3
 - [X] Aclaraciones sobre la corrección de los hitos.
 - [X] Actualización de los objetivos y su importancia en la nota final.
-- [ ] Usar registros de contenedores alternativos a Docker Hub como
-   GitHub. 
+- [X] [Usar registros de contenedores alternativos a Docker Hub como
+   GitHub](https://github.com/yoskitar/Cloud-Computing-CC/packages/65803). 
 - [X] Retro de la entrega del hito 2
+- [X] Revisar errores frecuentes en la entrega retrasada
+   - [X] [No dar medidas numéricas de prestaciones](https://github.com/yoskitar/Cloud-Computing-CC/issues/53).
+   - [X] [El uso de `.dockerignore` no excusa que copiéis solo lo necesario](https://github.com/yoskitar/Cloud-Computing-CC/issues/54).
+	- [X] [Dejar en el directorio principal sólo herramientas de construcción y ficheros de configuración](https://github.com/yoskitar/Cloud-Computing-CC/issues/57).
