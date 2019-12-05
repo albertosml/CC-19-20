@@ -70,8 +70,6 @@
 
 #### Séptima semana.
 
-[Enlace al fichero donde se subirán los ejercicios del tema de microservicios](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_Microservicios.md)
-
 - [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
 - [x] Comprender la importancia de separar la lógica de negocio de los microservicios.
 - [x] Comprender el funcionamiento de *WSGI* y los gestores de procesos y cuándo utilizarlos.
@@ -80,9 +78,21 @@
 
 #### Octava semana.
 
-[Enlace al fichero donde se subirán los ejercicios del tema de contenedores.](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_Contenedores.md)
-
 - [x] Entender el funcionamiento, construcción y uso de los contenedores.
 - [x] Comprender la función que tiene el *dockerfile.*
 - [x] Alta en Docker Hub.
+
+#### Novena semana.
+
+[Enlace a los ejercicios del tema de *Microservicios*](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_Microservicios.md)
 - [x] Subir el hito 3.
+- [x] Hacer los ejercicios del tema *Microservicios*.
+
+#### Décima semana.
+
+[Enlace a los ejercicios del tema de *Contenedores*](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_Contenedores.md)
+- [x] Añadir el estudio de prestaciones de diferentes imágenes base para el contenedor y elegir la más conveniente para mi proyecto.
+- [x] Comprender cuándo usar la orden *ARG* en el *dockerfile*.
+- [x] Comprender y programar la construcción automática del contenedor en *Docker Hub* y *Heroku*.
+- [x] Subir de nuevo el hito 3.
+- [x] Hacer los ejercicios de contenedores.
