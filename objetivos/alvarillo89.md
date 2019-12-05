@@ -72,7 +72,7 @@
 
 # Hito 3:
 
-[Ejercicios de contenedores](https://github.com/alvarillo89/UGR-CC-Ejercicios/blob/master/Tema%204/EjerciciosContenedores.md).
+[Ejercicios de contenedores (tema 4)](https://github.com/alvarillo89/UGR-CC-Ejercicios/blob/master/Tema%204/EjerciciosContenedores.md).
 
 #### Séptima semana:
 
@@ -91,11 +91,15 @@
 #### Novena semana:
 
 - [X] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
-- [ ] Usar registros de contenedores alternativos a Docker Hub como GitHub.
+- [X] Usar registros de contenedores alternativos a Docker Hub como GitHub.
 
 #### Objetivos del Hito 3:
 
 - [X] Programar la aplicación usando microservicios (o servidores de tareas), usando todos los parámetros de calidad habituales.
-- [ ] Empaquetar ese microservicio usando Docker para su despliegue seguro y eficiente en la nube.
-- [ ] Subir el contenedor a Github.
-- [ ] Desplegar el microservicio en Heroku.
+- [X] Empaquetar ese microservicio usando Docker para su despliegue seguro y eficiente en la nube.
+- [X] Subir el contenedor a Github Packages Registry y Docker Hub.
+- [X] Desplegar el microservicio en Heroku.
+- [X] Medir las prestaciones de distintos contenedores Docker.
+- [X] Entender que ARG sirve para especificar parámetros en tiempo de construcción, no en tiempo de ejecución.
+- [X] Automatizar la construcción y publicación de las imágenes en GPR y Docker Hub.
+- [X] Automatizar el despliegue en Heroku.
