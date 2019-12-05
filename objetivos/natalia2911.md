@@ -129,3 +129,18 @@
 - [x] Arranque automático de la aplicación de microservicios, y documentación y justificación del mismo.
 - [x] Arquitectura por capas del microservicio llevada a cabo correctamente
 - [x] Ejercicio hecho en la clase de teoria: [Ejercicio2](https://github.com/natalia2911/Ejercicios-CloudComputing/blob/master/Tema%204:%20Uso%20de%20contenedores/EJ2/Ejercicio2.md)
+
+## Décima semana
+
+- [x] Repasar conceptos de microservicios
+- [x] Repasar conceptos de contenedores
+
+### Errores entrega hito 3
+
+- [x] Revisar errores frecuentes en la entrega retrasada
+- [x] No dar medidas numéricas de prestaciones.
+- [x] El contenedor debe tener sólo lo necesario para ejecutar el microservicio.
+- [x] El contenedor debe ser configurable.
+- [x] El uso de .dockerignore no excusa que copiéis solo lo necesario.
+- [x] Liberar lo no necesario
+- [x] Material adicional, colocar en un directorio aparte.
