@@ -20,6 +20,7 @@ Hacemos las explicaciones en un seminario extraordinario el martes día 10 a las
 
 1. Entender los errores de la entrega del hito 3.
    * El README.md es del proyecto que estáis haciendo, con enlaces adicionales (y precisos) para corregir. Por favor, entenderlo así.
+   * No quiero ni un loquesea login más, por favor.
    * Hacer benchmarks cuantitativos está bien, hacerlos bien y de forma precisa está mejor.
 	 * No basta bajarse un URL n veces, sino que hay que seguir una secuencia de POST/GET delete simultánea de varios clientes a la vez. En [este ejemplo](https://gist.github.com/kelvinn/6a1c51b8976acf25bd78) explica como hacerlo.
 	 * Si los resultados son sorprendentes, hay que revisar el proyecto. Por ejemplo, un programa debería dar cientos o incluso [ miles de peticiones al segundo](https://wrongsideofmemphis.com/2013/10/21/requests-per-second-a-reference/).
