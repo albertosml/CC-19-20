@@ -42,3 +42,9 @@
  - [x] Haber entregado el hito 0 del proyecto y entender qué se buscaba con el mismo.
 
  [Ejercicios tema 1](https://github.com/kcobos/Ejercicios-CC/tree/master/Tema1)
+
+ # Objetivos de la cuarta semana
+- [X] Entender las claves del desarrollo basado en pruebas.
+- [X] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+- [X] Entender el concepto de "infraestructura como código" e "infraestructura virtual" para ponerlo en práctica en el hito número 1.
+- [X] Entender qué son los brokers de mensajería y cómo se usan.
