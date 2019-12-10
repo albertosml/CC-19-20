@@ -30,12 +30,8 @@ Hacemos las explicaciones en un seminario extraordinario el martes día 10 a las
 1. Instalarse los diferentes clientes de líneas de órdenes de los
    sistemas en la nube a los que se tenga acceso.
 
-## Material para la clase
-
 ## Material para esta semana
 
-* *Teoría*: Comenzamos
-  el
-  [tercer tema](http://jj.github.io/CC/documentos/temas/Automatizando_cloud)
+* Vemos una práctica nueva, [medición de prestaciones](https://jj.github.io/CC/documentos/proyecto/4.Prestaciones). Fecha de entrega: 19 de diciembre.
 
-* El cuarto hito se entregará el *12 de diciembre*
+## Siguiente semana.
