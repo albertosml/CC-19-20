@@ -90,3 +90,4 @@ Vernos las caras.
 - [x] Repasar conceptos de contenedores
 - [x] Revisar errores frecuentes en la entrega retrasada
 - [x] Dejar en el directorio principal sólo herramientas de construcción y ficheros de configuración.
+- [x] Investigar sobre herramientas medidas numéricas de prestaciones como Taurus y [como usarlas](https://www.blazemeter.com/blog/how-execute-load-test-using-taurus-docker-image/) de manera correcta.
