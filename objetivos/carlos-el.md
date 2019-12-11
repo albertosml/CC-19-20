@@ -85,3 +85,9 @@ Vernos las caras.
 - [x] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
 - [x] Instalar podman y buildah, aplicaciones alternativas que siguen el estándar OCI. Se puede comprobar sobre el primer ejercicio incluido en [este](https://github.com/carlos-el/Ejercicios-CC/blob/master/Tema4-Contenedores_y_como_usarlos.md) enlace.
 - [x] Usar registros de contenedores alternativos a Docker Hub como GitHub. En nuestro caso ha sido GitHub.
+
+- [x] Repasar conceptos de microservicios
+- [x] Repasar conceptos de contenedores
+- [x] Revisar errores frecuentes en la entrega retrasada
+- [x] Dejar en el directorio principal sólo herramientas de construcción y ficheros de configuración.
+- [x] Investigar sobre herramientas medidas numéricas de prestaciones como Taurus y [como usarlas](https://www.blazemeter.com/blog/how-execute-load-test-using-taurus-docker-image/) de manera correcta.
