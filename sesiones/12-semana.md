@@ -1,4 +1,6 @@
-# Duodécima semana, comienza el 19 de diciembre de 2018
+# Duodécima semana, comienza el 16 de diciembre
+
+Última semana del año.
 
 ## Objetivos de la asignatura
 
@@ -20,8 +22,10 @@
 
 ## Material para esta semana
 
-* *Proyecto*: Continuamos con el [hito 5 del proyecto](http://jj.github.io/CC/documentos/proyecto/5.Orquestacion). se
-  entregará el próximo *8 de enero*.
+El hito 4
+de
+[medición de prestaciones](https://jj.github.io/CC/documentos/proyecto/4.Prestaciones) se
+entrega esta semana, el **19 de diciembre**.
 
 ## Siguiente semana
 

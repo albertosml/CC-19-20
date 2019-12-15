@@ -1,4 +1,4 @@
-# Undécima semana, 19 de diciembre
+# Undécima semana, 9 de diciembre
 
 Hacemos las explicaciones en un seminario extraordinario el martes día 10 a las 12:30 de la mañana en la -1.2.
 
@@ -35,3 +35,5 @@ Hacemos las explicaciones en un seminario extraordinario el martes día 10 a las
 * Vemos una práctica nueva, [medición de prestaciones](https://jj.github.io/CC/documentos/proyecto/4.Prestaciones). Fecha de entrega: 19 de diciembre.
 
 ## Siguiente semana.
+
+[Semana número 12](12-semana.md)
