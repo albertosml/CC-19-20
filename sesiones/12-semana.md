@@ -5,20 +5,15 @@
 ## Objetivos de la asignatura
 
 1. Entender los recursos para automatización de actividades en la nube
-
-2. Entender el concepto de infraestructura definida por software. 
+2. Entender el concepto de infraestructura definida por software.
+3. Entender el concepto de sistema completo y cómo arrancarlo.
 
 ## Objetivos adicionales
 
-1. Entender los problemas con el hito 4.
-   1. Las justificaciones de imagen deben ser a base de medidas.
-   2. Las justificaciones de centro de datos también, pero medidas que
-      sepamos exactamente qué hacen (y que no sean las mismas que las
-      de un compañero).
-   3. Se debe justificar también el tamaño de instancia elegido.
-1. Resolver los problemas con Vagrant para diferentes proveedores de nube.
-2. Probar diferentes proveedores de nube y ver las posibilidades que
-   ofrecen. 
+1. Resumen de los errores vistos en el seminario la semana anterior.
+2. Tener listas instalaciones que funcionen de ansible (u otro sistema
+   de medición de prestaciones), vagrant, herramienta de línea de
+   órdenes de Azure o Google.
 
 ## Material para esta semana
 
@@ -26,6 +21,14 @@ El hito 4
 de
 [medición de prestaciones](https://jj.github.io/CC/documentos/proyecto/4.Prestaciones) se
 entrega esta semana, el **19 de diciembre**.
+
+A petición de los estudiantes, se comienza con
+el
+[siguiente tema, sobre aprovisionamiento](http://jj.github.io/CC/documentos/temas/Provision.html) y
+se explica también
+el
+[quinto hito](http://jj.github.io/CC/documentos/proyecto/5.Provisionamiento) que
+se entregará el **19 de enero**.
 
 ## Siguiente semana
 
