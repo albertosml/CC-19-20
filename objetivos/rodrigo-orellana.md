@@ -62,4 +62,9 @@
 * [x] Aplicación de procesos de calidad del software imprescindibles para el buen despliegue en la nube 
 * [x] Tener instaladas las herramientas necesarias para trabajar con Docker y saber usarlas adecuadamente
 * [x] Despliegue en la nube [Despliegue:](https://ecochallenge.herokuapp.com/)  
- ***
+
+# Objetivos del hito 4  
+
+* [x] Dejar en el README del proyecto sólo información de la entrega hito 4.
+* [x] Aplicar herramientas de medición de prestaciones como Taurus [Ejecución inicial:](https://github.com/rodrigo-orellana/Ejercicios_CC/blob/master/taurus.md).  
+***
