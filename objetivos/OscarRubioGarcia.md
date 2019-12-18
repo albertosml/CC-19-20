@@ -54,4 +54,5 @@
 ## Objetivos del hito 4
 * [x] Aprender a utilizar la base de datos Cassandra e incorporarla en mi sistema.
 * [x] Aprender a utilizar el software Taurus para la creación de Benchmarks.
+* [x] Realizacion de experimentación con Taurus y optimización del sistema debido a ello. [Experimentación](https://github.com/OscarRubioGarcia/CCProyecto/blob/master/docs/Taurus.md)
 
