@@ -108,92 +108,12 @@ EOC
       fail("$registry no es la dirección de un registro conocido");
     }
   }
-  
-  if ( $this_hito > 3 ) { # Despliegue en algún lado
-  SKIP: {
-      skip "Ya en el hito siguiente", 2 unless $this_hito == 2;
 
-      my ($deployment_url) = ($README =~ m{(?:[Dd]espliegue|[Dd]eployment)[^\n]+(https://\S+)\b});
-      if ( $deployment_url ) {
-	diag "☑ Hallado URL de despliegue $deployment_url";
-      } else {
-	diag "✗ Problemas extrayendo URL de despliegue";
-      }
-      ok( $deployment_url, "URL de despliegue hito 2");
-      my $status = get($deployment_url);
-      if ( ! $status || $status =~ /html/ ) {
-	$status = get( "$deployment_url/status"); # Por si acaso han movido la ruta
-      }
-      ok( $status, "Despliegue hecho en $deployment_url" );
-      say "Respuesta ", $status;
-      my $status_ref = from_json( $status );
-      like ( $status_ref->{'status'}, qr/[Oo][Kk]/, "Status $status de $deployment_url correcto");
-    }
-  }
-
-  if ( $this_hito > 3 ) { # Comprobar provisionamiento
-    ok( grep( /.yml/, @repo_files), "Hay algún playbook en YAML presente" );
-    ok( grep( /provision/, @repo_files), "Hay un directorio 'provision'" );
-    ok( grep( m{provision/\w+}, @repo_files), "El directorio 'provision' no está vacío" );
-
-    # Comprueba que se ha desplegado en una IP
-    my ($deployment_ip) = ($README =~ /MV:\s*\b(\S+)\b\s+/);
-    unlike($deployment_ip, qr/http/, "$deployment_ip no es una URL sino una IP");
-  SKIP: {
-      skip "Ya en el hito siguiente", 2 unless $this_hito == 3;
-      
-      check_ip($deployment_ip);
-      my $status = get("http://$deployment_ip/");
-      my $status_ref = from_json( $status );
-      like ( $status_ref->{'status'}, qr/[Oo][Kk]/, "Status $status de $deployment_ip correcto");
-    }
-  }
-  
-  if ( $this_hito > 3 ) { # Comprobar script para acopiar las máquinas 
-    isnt( grep( /acopio.sh/, @repo_files), 0, "Está el script de aprovisionamiento" );
-    my ($deployment_ip) = ($README =~ /MV2:\s*\b(\S+)\b\s+/);
-    unlike($deployment_ip, qr/http/, "$deployment_ip no es una URL sino una IP");
-    SKIP: {
-      skip "Ya en el hito siguiente", 1 unless $this_hito == 4;
-      check_ip($deployment_ip);
-      my $status = get("http://$deployment_ip/");
-      my $status_ref = from_json( $status );
-      like ( $status_ref->{'status'}, qr/[Oo][Kk]/, "Status $status de $deployment_ip correcto");
-    };
-  }
-
-  if ( $this_hito > 4 ) { # Comprobar script para acopiar las máquinas
-    isnt( grep( /orquestacion/, @repo_files), 0, "Hay un directorio 'orquestacion'" );
-    
-    isnt( grep( m{orquestacion/Vagrantfile}, @repo_files), 0, "El directorio 'orquestacion' tiene un fichero 'Vagrantfile'" );
-    my $vagrantfile = read_text( "$repo_dir/orquestacion/Vagrantfile");
-    like($vagrantfile,qr/vm.provision/,"El Vagrantfile incluye provisionamiento");
-
-    my ($deployment_ip) = ($README =~ /Despliegue Vagrant:\s*(\S+)\s+/);
-  SKIP: {
-      skip "Ya en el hito siguiente", 1 unless $this_hito < 5;
-      check_ip($deployment_ip);
-    }
-  }
-
-  if ( $this_hito > 5 ) { # Despliegue en algún lado
-    my ($deployment_url) = ($README =~ /(?:[Cc]ontenedor|[Cc]ontainer).+(https?:..\S+)\b/);
-    if ( $deployment_url ) {
-      diag "☑ Detectado URL de despliegue $deployment_url";
-    } else {
-      diag "✗ Problemas detectando URL de despliegue";
-    }
-    isnt( $deployment_url, "", "URL de despliegue hito 5");
-    my $status = get "$deployment_url/status";
-    isnt( $status, undef, "Despliegue hecho en $deployment_url" );
-    my $status_ref = from_json( $status );
-    like ( $status_ref->{'status'}, qr/[Oo][Kk]/, "Status de $deployment_url correcto");
-    ok( grep( /Dockerfile/, @repo_files), "Dockerfile presente" );
-
-    my ($dockerhub_url) = ($README =~ m{(https://hub.docker.com/r/\S+)\b});
-    diag "Detectado URL de Docker Hub '$dockerhub_url'";
-    my $dockerfile = get "$dockerhub_url/Dockerfile";
-    ok( $dockerfile, "Dockerfile actualizado y en Docker Hub");
+  if ( $this_hito > 3 ) { # Integración continua
+    doing("hito 4");
+    my ($m_tool) = ($README =~ m{(?:Prestaciones:)\s+(\S+)\s+});
+    ok( $m_tool, "Encontrado nombre del fichero de prestaciones $m_tool" );
+    isnt( grep( /\b$m_tool\b/, @repo_files), 0, "Fichero de prestaciones $m_tool presente" );
   }
 
 };
