@@ -103,3 +103,30 @@
 - [X] Entender que ARG sirve para especificar parámetros en tiempo de construcción, no en tiempo de ejecución.
 - [X] Automatizar la construcción y publicación de las imágenes en GPR y Docker Hub.
 - [X] Automatizar el despliegue en Heroku.
+
+# Hito 4:
+
+[Enlace al repositorio de ejercicios.](https://github.com/alvarillo89/UGR-CC-Ejercicios)
+
+#### Undécima semana:
+
+- [X] Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas virtuales.
+- [X] Conocer diferentes lugares donde haya imágenes de sistemas operativos listas para usar.
+- [X] Instalar y configurar diferentes sistemas de provisionamiento.
+- [X] Entender los conceptos de los sistemas de máquinas virtuales y cómo configurarlos desde línea de órdenes.
+- [X] Entender las nociones básicas de seguridad.
+- [X] Entender los errores de la entrega del hito 3.
+
+#### Duodécima semana:
+
+- [X] Entender los recursos para automatización de actividades en la nube
+- [X] Entender el concepto de infraestructura definida por software.
+- [X] Entender el concepto de sistema completo y cómo arrancarlo.
+- [ ] Tener listas instalaciones que funcionen de ansible (u otro sistema de medición de prestaciones), vagrant, herramienta de línea de órdenes de Azure o Google.
+
+#### Objetivos del Hito 4:
+
+- [X] Extender los microservicios con el almacenamiento de datos que se haya elegido para ellos.
+- [X] Extender el nivel de prestaciones de los microservicios, de forma que sean capaces de alcanzar un nivel aproximado de 1000 peticiones por segundo.
+- [X] Entender el concepto de SLA, service level agreement.
+- [X] Entender qué es un nivel aceptable de prestaciones.
