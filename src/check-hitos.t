@@ -100,7 +100,6 @@ EOC
     if ( $registry =~ /hub.docker.com/ ) {
       my $dockerfile = get "$registry/dockerfile";
       ok( $dockerfile, "Se descarga correctamente el URL del Dockerfile $registry/dockerfile" );
-      ok( $dockerfile =~ /Dockerfile/, "La página $registry/dockerfile es un Dockerfile efectivamente");
     } elsif ( $registry =~ /github.com/ ) {
       my $dockerfile = get $registry;
       ok( $dockerfile, "Se descarga correctamente el URL $registry" );

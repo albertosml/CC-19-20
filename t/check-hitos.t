@@ -1464,12 +1464,16 @@ ERROR_SIMPLE
 
 $fatpacked{"File/Slurper.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'FILE_SLURPER';
   package File::Slurper;
-  $File::Slurper::VERSION = '0.008';
+  $File::Slurper::VERSION = '0.009';
   use strict;
   use warnings;
   
   use Carp 'croak';
   use Exporter 5.57 'import';
+  
+  use Encode qw(:fallbacks);
+  use PerlIO::encoding;
+  
   our @EXPORT_OK = qw/read_binary read_text read_lines write_binary write_text read_dir/;
   
   sub read_binary {
@@ -1519,7 +1523,7 @@ $fatpacked{"File/Slurper.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'FI
   	my $layer = _text_layers($encoding, $crlf);
   	return read_binary($filename) if $layer eq ':raw';
   
-  	local $PerlIO::encoding::fallback = 1;
+  	local $PerlIO::encoding::fallback = FB_CROAK;
   	open my $fh, "<$layer", $filename or croak "Couldn't open $filename: $!";
   	return do { local $/; <$fh> };
   }
@@ -1529,7 +1533,7 @@ $fatpacked{"File/Slurper.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'FI
   	$encoding ||= 'utf-8';
   	my $layer = _text_layers($encoding, $crlf);
   
-  	local $PerlIO::encoding::fallback = 1;
+  	local $PerlIO::encoding::fallback = FB_CROAK;
   	open my $fh, ">$layer", $filename or croak "Couldn't open $filename: $!";
   	print $fh $_[1] or croak "Couldn't write to $filename: $!";
   	close $fh or croak "Couldn't write to $filename: $!";
@@ -1545,7 +1549,7 @@ $fatpacked{"File/Slurper.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'FI
   	$encoding ||= 'utf-8';
   	my $layer = _text_layers($encoding, $crlf);
   
-  	local $PerlIO::encoding::fallback = 1;
+  	local $PerlIO::encoding::fallback = FB_CROAK;
   	open my $fh, "<$layer", $filename or croak "Couldn't open $filename: $!";
   	return <$fh> if $skip_chomp;
   	my @buf = <$fh>;
@@ -1576,7 +1580,7 @@ $fatpacked{"File/Slurper.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'FI
   
   =head1 VERSION
   
-  version 0.008
+  version 0.009
   
   =head1 SYNOPSIS
   
@@ -1686,7 +1690,8 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
   
   # Totally unstable API.
-  $VERSION = '0.40';
+  $VERSION = '0.42';
+  # pulled from github, commit 217f2767cbcb562872437eed4dec62e00846d90c
   
   
   =head1 SYNOPSIS
@@ -1729,25 +1734,28 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
                   command_bidi_pipe command_close_bidi_pipe
                   version exec_path html_path hash_object git_cmd_try
                   remote_refs prompt
-                  get_tz_offset
+                  get_tz_offset get_record
                   credential credential_read credential_write
-                  temp_acquire temp_is_locked temp_release temp_reset temp_path);
+                  temp_acquire temp_is_locked temp_release temp_reset temp_path
+                  unquote_path);
   
   
   =head1 DESCRIPTION
   
-  This is the Git.pm from github's git/git, which is a mirror of the git source.
-  I (cpan msouth, or current maintainer) update the VERSION string here, and 
-  maintain this little bit of POD.  That's it.  The only reason you would
-  need this is if you are using something like Git::Hooks and you are using
-  a perlbrewed (or otherwise separate) perl from the one git is using on your
-  system (e.g. if you have a dev perl that's separate from system perl and git
-  uses the system perl.  Then the Git.pm gets installed in the system lib and you
-  have no way of getting it from CPAN, so your code that uses modules that 
-  depend on it doesn't work).  Except for this paragraph and the VERSION
-  string, this is just a copy of the latests version of perl/Git.pm from 
-  https://raw.github.com/git/git/master/perl/Git.pm .  Or, at least, it should
-  be--let me know if it's out of date and I hadn't noticed.)
+  [MAINTAINER NOTE: This is Git.pm, plus the other files in the perl/Git directory,
+  from github's git/git, which is a mirror of the git source.  I (cpan msouth, or
+  current maintainer) update the VERSION string (necessary on CPAN because of another
+  CPAN distribution that confused the CPAN toolchain about which was the actual
+  official Git.pm), add this explanatory paragraph, and use Dist::Zilla to package
+  and release on CPAN.  The only reason that I know of that you would need this is
+  if you are using something like Git::Hooks and you are using a perlbrewed (or
+  otherwise separate) perl from the one git is using on your system (e.g. if you
+  have a dev perl that’s separate from system perl, and git uses the system perl.
+  Then the Git.pm gets installed in the system lib and you have no way of getting
+  it from CPAN, so your code--that uses modules that depend on Git.pm--doesn’t work).
+  I try to keep this up to date, so that if you do pull this from CPAN it will be,
+  hopefully, identical in functionality to the Git.pm and Git/*.pm from the git
+  distribution.  If that is not the case, contact me and I'll look into it.]
   
   This module provides Perl scripts easy way to interface the Git version control
   system. The modules have an easy and well-tested way to call arbitrary Git
@@ -1871,7 +1879,8 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   		};
   
   		if ($dir) {
-  			$dir =~ m#^/# or $dir = $opts{Directory} . '/' . $dir;
+  			_verify_require();
+  			File::Spec->file_name_is_absolute($dir) or $dir = $opts{Directory} . '/' . $dir;
   			$opts{Repository} = abs_path($dir);
   
   			# If --git-dir went ok, this shouldn't die either.
@@ -2075,7 +2084,7 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   Execute the given C<COMMAND> in the same way as command_output_pipe()
   does but return both an input pipe filehandle and an output pipe filehandle.
   
-  The function will return return C<($pid, $pipe_in, $pipe_out, $ctx)>.
+  The function will return C<($pid, $pipe_in, $pipe_out, $ctx)>.
   See C<command_close_bidi_pipe()> for details.
   
   =cut
@@ -2213,13 +2222,27 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   =cut
   
   sub get_tz_offset {
-  	# some systmes don't handle or mishandle %z, so be creative.
+  	# some systems don't handle or mishandle %z, so be creative.
   	my $t = shift || time;
   	my $gm = timegm(localtime($t));
   	my $sign = qw( + + - )[ $gm <=> $t ];
   	return sprintf("%s%02d%02d", $sign, (gmtime(abs($t - $gm)))[2,1]);
   }
   
+  =item get_record ( FILEHANDLE, INPUT_RECORD_SEPARATOR )
+  
+  Read one record from FILEHANDLE delimited by INPUT_RECORD_SEPARATOR,
+  removing any trailing INPUT_RECORD_SEPARATOR.
+  
+  =cut
+  
+  sub get_record {
+  	my ($fh, $rs) = @_;
+  	local $/ = $rs;
+  	my $rec = <$fh>;
+  	chomp $rec if defined $rs;
+  	$rec;
+  }
   
   =item prompt ( PROMPT , ISPASSWORD  )
   
@@ -2378,7 +2401,7 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   is simple decimal number.  An optional value suffix of 'k', 'm',
   or 'g' in the config file will cause the value to be multiplied
   by 1024, 1048576 (1024^2), or 1073741824 (1024^3) prior to output.
-  It would return C<undef> if configuration variable is not defined,
+  It would return C<undef> if configuration variable is not defined.
   
   =cut
   
@@ -2387,7 +2410,7 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   }
   
   # Common subroutine to implement bulk of what the config* family of methods
-  # do. This curently wraps command('config') so it is not so fast.
+  # do. This currently wraps command('config') so it is not so fast.
   sub _config_common {
   	my ($opts) = shift @_;
   	my ($self, $var) = _maybe_self(@_);
@@ -2547,6 +2570,76 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   	return "$ident[0] <$ident[1]>";
   }
   
+  =item parse_mailboxes
+  
+  Return an array of mailboxes extracted from a string.
+  
+  =cut
+  
+  # Very close to Mail::Address's parser, but we still have minor
+  # differences in some cases (see t9000 for examples).
+  sub parse_mailboxes {
+  	my $re_comment = qr/\((?:[^)]*)\)/;
+  	my $re_quote = qr/"(?:[^\"\\]|\\.)*"/;
+  	my $re_word = qr/(?:[^]["\s()<>:;@\\,.]|\\.)+/;
+  
+  	# divide the string in tokens of the above form
+  	my $re_token = qr/(?:$re_quote|$re_word|$re_comment|\S)/;
+  	my @tokens = map { $_ =~ /\s*($re_token)\s*/g } @_;
+  	my $end_of_addr_seen = 0;
+  
+  	# add a delimiter to simplify treatment for the last mailbox
+  	push @tokens, ",";
+  
+  	my (@addr_list, @phrase, @address, @comment, @buffer) = ();
+  	foreach my $token (@tokens) {
+  		if ($token =~ /^[,;]$/) {
+  			# if buffer still contains undeterminated strings
+  			# append it at the end of @address or @phrase
+  			if ($end_of_addr_seen) {
+  				push @phrase, @buffer;
+  			} else {
+  				push @address, @buffer;
+  			}
+  
+  			my $str_phrase = join ' ', @phrase;
+  			my $str_address = join '', @address;
+  			my $str_comment = join ' ', @comment;
+  
+  			# quote are necessary if phrase contains
+  			# special characters
+  			if ($str_phrase =~ /[][()<>:;@\\,.\000-\037\177]/) {
+  				$str_phrase =~ s/(^|[^\\])"/$1/g;
+  				$str_phrase = qq["$str_phrase"];
+  			}
+  
+  			# add "<>" around the address if necessary
+  			if ($str_address ne "" && $str_phrase ne "") {
+  				$str_address = qq[<$str_address>];
+  			}
+  
+  			my $str_mailbox = "$str_phrase $str_address $str_comment";
+  			$str_mailbox =~ s/^\s*|\s*$//g;
+  			push @addr_list, $str_mailbox if ($str_mailbox);
+  
+  			@phrase = @address = @comment = @buffer = ();
+  			$end_of_addr_seen = 0;
+  		} elsif ($token =~ /^\(/) {
+  			push @comment, $token;
+  		} elsif ($token eq "<") {
+  			push @phrase, (splice @address), (splice @buffer);
+  		} elsif ($token eq ">") {
+  			$end_of_addr_seen = 1;
+  			push @address, (splice @buffer);
+  		} elsif ($token eq "@" && !$end_of_addr_seen) {
+  			push @address, (splice @buffer), "@";
+  		} else {
+  			push @buffer, $token;
+  		}
+  	}
+  
+  	return @addr_list;
+  }
   
   =item hash_object ( TYPE, FILENAME )
   
@@ -2977,8 +3070,11 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   			$tmpdir = $self->repo_path();
   		}
   
+  		my $n = $name;
+  		$n =~ s/\W/_/g; # no strange chars
+  
   		($$temp_fd, $fname) = File::Temp::tempfile(
-  			'Git_XXXXXX', UNLINK => 1, DIR => $tmpdir,
+  			"Git_${n}_XXXXXX", UNLINK => 1, DIR => $tmpdir,
   			) or throw Error::Simple("couldn't open new temp file");
   
   		$$temp_fd->autoflush;
@@ -3032,6 +3128,95 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   }
   
   } # %TEMP_* Lexical Context
+  
+  =item prefix_lines ( PREFIX, STRING [, STRING... ])
+  
+  Prefixes lines in C<STRING> with C<PREFIX>.
+  
+  =cut
+  
+  sub prefix_lines {
+  	my $prefix = shift;
+  	my $string = join("\n", @_);
+  	$string =~ s/^/$prefix/mg;
+  	return $string;
+  }
+  
+  =item unquote_path ( PATH )
+  
+  Unquote a quoted path containing c-escapes as returned by ls-files etc.
+  when not using -z or when parsing the output of diff -u.
+  
+  =cut
+  
+  {
+  	my %cquote_map = (
+  		"a" => chr(7),
+  		"b" => chr(8),
+  		"t" => chr(9),
+  		"n" => chr(10),
+  		"v" => chr(11),
+  		"f" => chr(12),
+  		"r" => chr(13),
+  		"\\" => "\\",
+  		"\042" => "\042",
+  	);
+  
+  	sub unquote_path {
+  		local ($_) = @_;
+  		my ($retval, $remainder);
+  		if (!/^\042(.*)\042$/) {
+  			return $_;
+  		}
+  		($_, $retval) = ($1, "");
+  		while (/^([^\\]*)\\(.*)$/) {
+  			$remainder = $2;
+  			$retval .= $1;
+  			for ($remainder) {
+  				if (/^([0-3][0-7][0-7])(.*)$/) {
+  					$retval .= chr(oct($1));
+  					$_ = $2;
+  					last;
+  				}
+  				if (/^([\\\042abtnvfr])(.*)$/) {
+  					$retval .= $cquote_map{$1};
+  					$_ = $2;
+  					last;
+  				}
+  				# This is malformed
+  				throw Error::Simple("invalid quoted path $_[0]");
+  			}
+  			$_ = $remainder;
+  		}
+  		$retval .= $_;
+  		return $retval;
+  	}
+  }
+  
+  =item get_comment_line_char ( )
+  
+  Gets the core.commentchar configuration value.
+  The value falls-back to '#' if core.commentchar is set to 'auto'.
+  
+  =cut
+  
+  sub get_comment_line_char {
+  	my $comment_line_char = config("core.commentchar") || '#';
+  	$comment_line_char = '#' if ($comment_line_char eq 'auto');
+  	$comment_line_char = '#' if (length($comment_line_char) != 1);
+  	return $comment_line_char;
+  }
+  
+  =item comment_lines ( STRING [, STRING... ])
+  
+  Comments lines following core.commentchar configuration.
+  
+  =cut
+  
+  sub comment_lines {
+  	my $comment_line_char = get_comment_line_char;
+  	return prefix_lines("$comment_line_char ", @_);
+  }
   
   =back
   
@@ -3310,14 +3495,5927 @@ $fatpacked{"Git.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT';
   1; # Famous last words
 GIT
 
+$fatpacked{"Git/I18N.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_I18N';
+  package Git::I18N;
+  use 5.008;
+  use strict;
+  use warnings;
+  BEGIN {
+  	require Exporter;
+  	if ($] < 5.008003) {
+  		*import = \&Exporter::import;
+  	} else {
+  		# Exporter 5.57 which supports this invocation was
+  		# released with perl 5.8.3
+  		Exporter->import('import');
+  	}
+  }
+  
+  our @EXPORT = qw(__ __n N__);
+  our @EXPORT_OK = @EXPORT;
+  
+  sub __bootstrap_locale_messages {
+  	our $TEXTDOMAIN = 'git';
+  	our $TEXTDOMAINDIR = $ENV{GIT_TEXTDOMAINDIR} || '++LOCALEDIR++';
+  
+  	require POSIX;
+  	POSIX->import(qw(setlocale));
+  	# Non-core prerequisite module
+  	require Locale::Messages;
+  	Locale::Messages->import(qw(:locale_h :libintl_h));
+  
+  	setlocale(LC_MESSAGES(), '');
+  	setlocale(LC_CTYPE(), '');
+  	textdomain($TEXTDOMAIN);
+  	bindtextdomain($TEXTDOMAIN => $TEXTDOMAINDIR);
+  
+  	return;
+  }
+  
+  BEGIN
+  {
+  	# Used by our test script to see if it should test fallbacks or
+  	# not.
+  	our $__HAS_LIBRARY = 1;
+  
+  	local $@;
+  	eval {
+  		__bootstrap_locale_messages();
+  		*__ = \&Locale::Messages::gettext;
+  		*__n = \&Locale::Messages::ngettext;
+  		1;
+  	} or do {
+  		# Tell test.pl that we couldn't load the gettext library.
+  		$Git::I18N::__HAS_LIBRARY = 0;
+  
+  		# Just a fall-through no-op
+  		*__ = sub ($) { $_[0] };
+  		*__n = sub ($$$) { $_[2] == 1 ? $_[0] : $_[1] };
+  	};
+  
+  	sub N__($) { return shift; }
+  }
+  
+  1;
+  
+  __END__
+  
+  =head1 NAME
+  
+  Git::I18N - Perl interface to Git's Gettext localizations
+  
+  =head1 SYNOPSIS
+  
+  	use Git::I18N;
+  
+  	print __("Welcome to Git!\n");
+  
+  	printf __("The following error occurred: %s\n"), $error;
+  
+  	printf __n("committed %d file\n", "committed %d files\n", $files), $files;
+  
+  
+  =head1 DESCRIPTION
+  
+  Git's internal Perl interface to gettext via L<Locale::Messages>. If
+  L<Locale::Messages> can't be loaded (it's not a core module) we
+  provide stub passthrough fallbacks.
+  
+  This is a distilled interface to gettext, see C<info '(gettext)Perl'>
+  for the full interface. This module implements only a small part of
+  it.
+  
+  =head1 FUNCTIONS
+  
+  =head2 __($)
+  
+  L<Locale::Messages>'s gettext function if all goes well, otherwise our
+  passthrough fallback function.
+  
+  =head2 __n($$$)
+  
+  L<Locale::Messages>'s ngettext function or passthrough fallback function.
+  
+  =head2 N__($)
+  
+  No-operation that only returns its argument. Use this if you want xgettext to
+  extract the text to the pot template but do not want to trigger retrival of the
+  translation at run time.
+  
+  =head1 AUTHOR
+  
+  E<AElig>var ArnfjE<ouml>rE<eth> Bjarmason <avarab@gmail.com>
+  
+  =head1 COPYRIGHT
+  
+  Copyright 2010 E<AElig>var ArnfjE<ouml>rE<eth> Bjarmason <avarab@gmail.com>
+  
+  =cut
+GIT_I18N
+
+$fatpacked{"Git/IndexInfo.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_INDEXINFO';
+  package Git::IndexInfo;
+  use strict;
+  use warnings;
+  use Git qw/command_input_pipe command_close_pipe/;
+  
+  sub new {
+  	my ($class) = @_;
+  	my ($gui, $ctx) = command_input_pipe(qw/update-index -z --index-info/);
+  	bless { gui => $gui, ctx => $ctx, nr => 0}, $class;
+  }
+  
+  sub remove {
+  	my ($self, $path) = @_;
+  	if (print { $self->{gui} } '0 ', 0 x 40, "\t", $path, "\0") {
+  		return ++$self->{nr};
+  	}
+  	undef;
+  }
+  
+  sub update {
+  	my ($self, $mode, $hash, $path) = @_;
+  	if (print { $self->{gui} } $mode, ' ', $hash, "\t", $path, "\0") {
+  		return ++$self->{nr};
+  	}
+  	undef;
+  }
+  
+  sub DESTROY {
+  	my ($self) = @_;
+  	command_close_pipe($self->{gui}, $self->{ctx});
+  }
+  
+  1;
+GIT_INDEXINFO
+
+$fatpacked{"Git/SVN.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN';
+  package Git::SVN;
+  use strict;
+  use warnings;
+  use Fcntl qw/:DEFAULT :seek/;
+  use constant rev_map_fmt => 'NH40';
+  use vars qw/$_no_metadata
+              $_repack $_repack_flags $_use_svm_props $_head
+              $_use_svnsync_props $no_reuse_existing
+  	    $_use_log_author $_add_author_from $_localtime/;
+  use Carp qw/croak/;
+  use File::Path qw/mkpath/;
+  use IPC::Open3;
+  use Memoize;  # core since 5.8.0, Jul 2002
+  use POSIX qw(:signal_h);
+  use Time::Local;
+  
+  use Git qw(
+      command
+      command_oneline
+      command_noisy
+      command_output_pipe
+      command_close_pipe
+      get_tz_offset
+  );
+  use Git::SVN::Utils qw(
+  	fatal
+  	can_compress
+  	join_paths
+  	canonicalize_path
+  	canonicalize_url
+  	add_path_to_url
+  );
+  
+  my $memo_backend;
+  our $_follow_parent  = 1;
+  our $_minimize_url   = 'unset';
+  our $default_repo_id = 'svn';
+  our $default_ref_id  = $ENV{GIT_SVN_ID} || 'git-svn';
+  
+  my ($_gc_nr, $_gc_period);
+  
+  # properties that we do not log:
+  my %SKIP_PROP;
+  BEGIN {
+  	%SKIP_PROP = map { $_ => 1 } qw/svn:wc:ra_dav:version-url
+  	                                svn:special svn:executable
+  	                                svn:entry:committed-rev
+  	                                svn:entry:last-author
+  	                                svn:entry:uuid
+  	                                svn:entry:committed-date/;
+  
+  	# some options are read globally, but can be overridden locally
+  	# per [svn-remote "..."] section.  Command-line options will *NOT*
+  	# override options set in an [svn-remote "..."] section
+  	no strict 'refs';
+  	for my $option (qw/follow_parent no_metadata use_svm_props
+  			   use_svnsync_props/) {
+  		my $key = $option;
+  		$key =~ tr/_//d;
+  		my $prop = "-$option";
+  		*$option = sub {
+  			my ($self) = @_;
+  			return $self->{$prop} if exists $self->{$prop};
+  			my $k = "svn-remote.$self->{repo_id}.$key";
+  			eval { command_oneline(qw/config --get/, $k) };
+  			if ($@) {
+  				$self->{$prop} = ${"Git::SVN::_$option"};
+  			} else {
+  				my $v = command_oneline(qw/config --bool/,$k);
+  				$self->{$prop} = $v eq 'false' ? 0 : 1;
+  			}
+  			return $self->{$prop};
+  		}
+  	}
+  }
+  
+  
+  my (%LOCKFILES, %INDEX_FILES);
+  END {
+  	unlink keys %LOCKFILES if %LOCKFILES;
+  	unlink keys %INDEX_FILES if %INDEX_FILES;
+  }
+  
+  sub resolve_local_globs {
+  	my ($url, $fetch, $glob_spec) = @_;
+  	return unless defined $glob_spec;
+  	my $ref = $glob_spec->{ref};
+  	my $path = $glob_spec->{path};
+  	foreach (command(qw#for-each-ref --format=%(refname) refs/#)) {
+  		next unless m#^$ref->{regex}$#;
+  		my $p = $1;
+  		my $pathname = desanitize_refname($path->full_path($p));
+  		my $refname = desanitize_refname($ref->full_path($p));
+  		if (my $existing = $fetch->{$pathname}) {
+  			if ($existing ne $refname) {
+  				die "Refspec conflict:\n",
+  				    "existing: $existing\n",
+  				    " globbed: $refname\n";
+  			}
+  			my $u = (::cmt_metadata("$refname"))[0];
+  			if (!defined($u)) {
+  				warn
+  "W: $refname: no associated commit metadata from SVN, skipping\n";
+  				next;
+  			}
+  			$u =~ s!^\Q$url\E(/|$)!! or die
+  			  "$refname: '$url' not found in '$u'\n";
+  			if ($pathname ne $u) {
+  				warn "W: Refspec glob conflict ",
+  				     "(ref: $refname):\n",
+  				     "expected path: $pathname\n",
+  				     "    real path: $u\n",
+  				     "Continuing ahead with $u\n";
+  				next;
+  			}
+  		} else {
+  			$fetch->{$pathname} = $refname;
+  		}
+  	}
+  }
+  
+  sub parse_revision_argument {
+  	my ($base, $head) = @_;
+  	if (!defined $::_revision || $::_revision eq 'BASE:HEAD') {
+  		return ($base, $head);
+  	}
+  	return ($1, $2) if ($::_revision =~ /^(\d+):(\d+)$/);
+  	return ($::_revision, $::_revision) if ($::_revision =~ /^\d+$/);
+  	return ($head, $head) if ($::_revision eq 'HEAD');
+  	return ($base, $1) if ($::_revision =~ /^BASE:(\d+)$/);
+  	return ($1, $head) if ($::_revision =~ /^(\d+):HEAD$/);
+  	die "revision argument: $::_revision not understood by git-svn\n";
+  }
+  
+  sub fetch_all {
+  	my ($repo_id, $remotes) = @_;
+  	if (ref $repo_id) {
+  		my $gs = $repo_id;
+  		$repo_id = undef;
+  		$repo_id = $gs->{repo_id};
+  	}
+  	$remotes ||= read_all_remotes();
+  	my $remote = $remotes->{$repo_id} or
+  	             die "[svn-remote \"$repo_id\"] unknown\n";
+  	my $fetch = $remote->{fetch};
+  	my $url = $remote->{url} or die "svn-remote.$repo_id.url not defined\n";
+  	my (@gs, @globs);
+  	my $ra = Git::SVN::Ra->new($url);
+  	my $uuid = $ra->get_uuid;
+  	my $head = $ra->get_latest_revnum;
+  
+  	# ignore errors, $head revision may not even exist anymore
+  	eval { $ra->get_log("", $head, 0, 1, 0, 1, sub { $head = $_[1] }) };
+  	warn "W: $@\n" if $@;
+  
+  	my $base = defined $fetch ? $head : 0;
+  
+  	# read the max revs for wildcard expansion (branches/*, tags/*)
+  	foreach my $t (qw/branches tags/) {
+  		defined $remote->{$t} or next;
+  		push @globs, @{$remote->{$t}};
+  
+  		my $max_rev = eval { tmp_config(qw/--int --get/,
+  		                         "svn-remote.$repo_id.${t}-maxRev") };
+  		if (defined $max_rev && ($max_rev < $base)) {
+  			$base = $max_rev;
+  		} elsif (!defined $max_rev) {
+  			$base = 0;
+  		}
+  	}
+  
+  	if ($fetch) {
+  		foreach my $p (sort keys %$fetch) {
+  			my $gs = Git::SVN->new($fetch->{$p}, $repo_id, $p);
+  			my $lr = $gs->rev_map_max;
+  			if (defined $lr) {
+  				$base = $lr if ($lr < $base);
+  			}
+  			push @gs, $gs;
+  		}
+  	}
+  
+  	($base, $head) = parse_revision_argument($base, $head);
+  	$ra->gs_fetch_loop_common($base, $head, \@gs, \@globs);
+  }
+  
+  sub read_all_remotes {
+  	my $r = {};
+  	my $use_svm_props = eval { command_oneline(qw/config --bool
+  	    svn.useSvmProps/) };
+  	$use_svm_props = $use_svm_props eq 'true' if $use_svm_props;
+  	my $svn_refspec = qr{\s*(.*?)\s*:\s*(.+?)\s*};
+  	foreach (grep { s/^svn-remote\.// } command(qw/config -l/)) {
+  		if (m!^(.+)\.fetch=$svn_refspec$!) {
+  			my ($remote, $local_ref, $remote_ref) = ($1, $2, $3);
+  			die("svn-remote.$remote: remote ref '$remote_ref' "
+  			    . "must start with 'refs/'\n")
+  				unless $remote_ref =~ m{^refs/};
+  			$local_ref = uri_decode($local_ref);
+  			$r->{$remote}->{fetch}->{$local_ref} = $remote_ref;
+  			$r->{$remote}->{svm} = {} if $use_svm_props;
+  		} elsif (m!^(.+)\.usesvmprops=\s*(.*)\s*$!) {
+  			$r->{$1}->{svm} = {};
+  		} elsif (m!^(.+)\.url=\s*(.*)\s*$!) {
+  			$r->{$1}->{url} = canonicalize_url($2);
+  		} elsif (m!^(.+)\.pushurl=\s*(.*)\s*$!) {
+  			$r->{$1}->{pushurl} = canonicalize_url($2);
+  		} elsif (m!^(.+)\.ignore-refs=\s*(.*)\s*$!) {
+  			$r->{$1}->{ignore_refs_regex} = $2;
+  		} elsif (m!^(.+)\.(branches|tags)=$svn_refspec$!) {
+  			my ($remote, $t, $local_ref, $remote_ref) =
+  			                                     ($1, $2, $3, $4);
+  			die("svn-remote.$remote: remote ref '$remote_ref' ($t) "
+  			    . "must start with 'refs/'\n")
+  				unless $remote_ref =~ m{^refs/};
+  			$local_ref = uri_decode($local_ref);
+  
+  			require Git::SVN::GlobSpec;
+  			my $rs = {
+  			    t => $t,
+  			    remote => $remote,
+  			    path => Git::SVN::GlobSpec->new($local_ref, 1),
+  			    ref => Git::SVN::GlobSpec->new($remote_ref, 0) };
+  			if (length($rs->{ref}->{right}) != 0) {
+  				die "The '*' glob character must be the last ",
+  				    "character of '$remote_ref'\n";
+  			}
+  			push @{ $r->{$remote}->{$t} }, $rs;
+  		}
+  	}
+  
+  	map {
+  		if (defined $r->{$_}->{svm}) {
+  			my $svm;
+  			eval {
+  				my $section = "svn-remote.$_";
+  				$svm = {
+  					source => tmp_config('--get',
+  					    "$section.svm-source"),
+  					replace => tmp_config('--get',
+  					    "$section.svm-replace"),
+  				}
+  			};
+  			$r->{$_}->{svm} = $svm;
+  		}
+  	} keys %$r;
+  
+  	foreach my $remote (keys %$r) {
+  		foreach ( grep { defined $_ }
+  			  map { $r->{$remote}->{$_} } qw(branches tags) ) {
+  			foreach my $rs ( @$_ ) {
+  				$rs->{ignore_refs_regex} =
+  				    $r->{$remote}->{ignore_refs_regex};
+  			}
+  		}
+  	}
+  
+  	$r;
+  }
+  
+  sub init_vars {
+  	$_gc_nr = $_gc_period = 1000;
+  	if (defined $_repack || defined $_repack_flags) {
+  	       warn "Repack options are obsolete; they have no effect.\n";
+  	}
+  }
+  
+  sub verify_remotes_sanity {
+  	return unless -d $ENV{GIT_DIR};
+  	my %seen;
+  	foreach (command(qw/config -l/)) {
+  		if (m!^svn-remote\.(?:.+)\.fetch=.*:refs/remotes/(\S+)\s*$!) {
+  			if ($seen{$1}) {
+  				die "Remote ref refs/remote/$1 is tracked by",
+  				    "\n  \"$_\"\nand\n  \"$seen{$1}\"\n",
+  				    "Please resolve this ambiguity in ",
+  				    "your git configuration file before ",
+  				    "continuing\n";
+  			}
+  			$seen{$1} = $_;
+  		}
+  	}
+  }
+  
+  sub find_existing_remote {
+  	my ($url, $remotes) = @_;
+  	return undef if $no_reuse_existing;
+  	my $existing;
+  	foreach my $repo_id (keys %$remotes) {
+  		my $u = $remotes->{$repo_id}->{url} or next;
+  		next if $u ne $url;
+  		$existing = $repo_id;
+  		last;
+  	}
+  	$existing;
+  }
+  
+  sub init_remote_config {
+  	my ($self, $url, $no_write) = @_;
+  	$url = canonicalize_url($url);
+  	my $r = read_all_remotes();
+  	my $existing = find_existing_remote($url, $r);
+  	if ($existing) {
+  		unless ($no_write) {
+  			print STDERR "Using existing ",
+  				     "[svn-remote \"$existing\"]\n";
+  		}
+  		$self->{repo_id} = $existing;
+  	} elsif ($_minimize_url) {
+  		my $min_url = Git::SVN::Ra->new($url)->minimize_url;
+  		$existing = find_existing_remote($min_url, $r);
+  		if ($existing) {
+  			unless ($no_write) {
+  				print STDERR "Using existing ",
+  					     "[svn-remote \"$existing\"]\n";
+  			}
+  			$self->{repo_id} = $existing;
+  		}
+  		if ($min_url ne $url) {
+  			unless ($no_write) {
+  				print STDERR "Using higher level of URL: ",
+  					     "$url => $min_url\n";
+  			}
+  			my $old_path = $self->path;
+  			$url =~ s!^\Q$min_url\E(/|$)!!;
+  			$url = join_paths($url, $old_path);
+  			$self->path($url);
+  			$url = $min_url;
+  		}
+  	}
+  	my $orig_url;
+  	if (!$existing) {
+  		# verify that we aren't overwriting anything:
+  		$orig_url = eval {
+  			command_oneline('config', '--get',
+  					"svn-remote.$self->{repo_id}.url")
+  		};
+  		if ($orig_url && ($orig_url ne $url)) {
+  			die "svn-remote.$self->{repo_id}.url already set: ",
+  			    "$orig_url\nwanted to set to: $url\n";
+  		}
+  	}
+  	my ($xrepo_id, $xpath) = find_ref($self->refname);
+  	if (!$no_write && defined $xpath) {
+  		die "svn-remote.$xrepo_id.fetch already set to track ",
+  		    "$xpath:", $self->refname, "\n";
+  	}
+  	unless ($no_write) {
+  		command_noisy('config',
+  			      "svn-remote.$self->{repo_id}.url", $url);
+  		my $path = $self->path;
+  		$path =~ s{^/}{};
+  		$path =~ s{%([0-9A-F]{2})}{chr hex($1)}ieg;
+  		$self->path($path);
+  		command_noisy('config', '--add',
+  			      "svn-remote.$self->{repo_id}.fetch",
+  			      $self->path.":".$self->refname);
+  	}
+  	$self->url($url);
+  }
+  
+  sub find_by_url { # repos_root and, path are optional
+  	my ($class, $full_url, $repos_root, $path) = @_;
+  
+  	$full_url = canonicalize_url($full_url);
+  
+  	return undef unless defined $full_url;
+  	remove_username($full_url);
+  	remove_username($repos_root) if defined $repos_root;
+  	my $remotes = read_all_remotes();
+  	if (defined $full_url && defined $repos_root && !defined $path) {
+  		$path = $full_url;
+  		$path =~ s#^\Q$repos_root\E(?:/|$)##;
+  	}
+  	foreach my $repo_id (keys %$remotes) {
+  		my $u = $remotes->{$repo_id}->{url} or next;
+  		remove_username($u);
+  		next if defined $repos_root && $repos_root ne $u;
+  
+  		my $fetch = $remotes->{$repo_id}->{fetch} || {};
+  		foreach my $t (qw/branches tags/) {
+  			foreach my $globspec (@{$remotes->{$repo_id}->{$t}}) {
+  				resolve_local_globs($u, $fetch, $globspec);
+  			}
+  		}
+  		my $p = $path;
+  		my $rwr = rewrite_root({repo_id => $repo_id});
+  		my $svm = $remotes->{$repo_id}->{svm}
+  			if defined $remotes->{$repo_id}->{svm};
+  		unless (defined $p) {
+  			$p = $full_url;
+  			my $z = $u;
+  			my $prefix = '';
+  			if ($rwr) {
+  				$z = $rwr;
+  				remove_username($z);
+  			} elsif (defined $svm) {
+  				$z = $svm->{source};
+  				$prefix = $svm->{replace};
+  				$prefix =~ s#^\Q$u\E(?:/|$)##;
+  				$prefix =~ s#/$##;
+  			}
+  			$p =~ s#^\Q$z\E(?:/|$)#$prefix# or next;
+  		}
+  
+  		# remote fetch paths are not URI escaped.  Decode ours
+  		# so they match
+  		$p = uri_decode($p);
+  
+  		foreach my $f (keys %$fetch) {
+  			next if $f ne $p;
+  			return Git::SVN->new($fetch->{$f}, $repo_id, $f);
+  		}
+  	}
+  	undef;
+  }
+  
+  sub init {
+  	my ($class, $url, $path, $repo_id, $ref_id, $no_write) = @_;
+  	my $self = _new($class, $repo_id, $ref_id, $path);
+  	if (defined $url) {
+  		$self->init_remote_config($url, $no_write);
+  	}
+  	$self;
+  }
+  
+  sub find_ref {
+  	my ($ref_id) = @_;
+  	foreach (command(qw/config -l/)) {
+  		next unless m!^svn-remote\.(.+)\.fetch=
+  		              \s*(.*?)\s*:\s*(.+?)\s*$!x;
+  		my ($repo_id, $path, $ref) = ($1, $2, $3);
+  		if ($ref eq $ref_id) {
+  			$path = '' if ($path =~ m#^\./?#);
+  			return ($repo_id, $path);
+  		}
+  	}
+  	(undef, undef, undef);
+  }
+  
+  sub new {
+  	my ($class, $ref_id, $repo_id, $path) = @_;
+  	if (defined $ref_id && !defined $repo_id && !defined $path) {
+  		($repo_id, $path) = find_ref($ref_id);
+  		if (!defined $repo_id) {
+  			die "Could not find a \"svn-remote.*.fetch\" key ",
+  			    "in the repository configuration matching: ",
+  			    "$ref_id\n";
+  		}
+  	}
+  	my $self = _new($class, $repo_id, $ref_id, $path);
+  	if (!defined $self->path || !length $self->path) {
+  		my $fetch = command_oneline('config', '--get',
+  		                            "svn-remote.$repo_id.fetch",
+  		                            ":$ref_id\$") or
+  		     die "Failed to read \"svn-remote.$repo_id.fetch\" ",
+  		         "\":$ref_id\$\" in config\n";
+  		my($path) = split(/\s*:\s*/, $fetch);
+  		$self->path($path);
+  	}
+  	{
+  		my $path = $self->path;
+  		$path =~ s{\A/}{};
+  		$path =~ s{/\z}{};
+  		$self->path($path);
+  	}
+  	my $url = command_oneline('config', '--get',
+  	                          "svn-remote.$repo_id.url") or
+                    die "Failed to read \"svn-remote.$repo_id.url\" in config\n";
+  	$self->url($url);
+  	$self->{pushurl} = eval { command_oneline('config', '--get',
+  	                          "svn-remote.$repo_id.pushurl") };
+  	$self->rebuild;
+  	$self;
+  }
+  
+  sub refname {
+  	my ($refname) = $_[0]->{ref_id} ;
+  
+  	# It cannot end with a slash /, we'll throw up on this because
+  	# SVN can't have directories with a slash in their name, either:
+  	if ($refname =~ m{/$}) {
+  		die "ref: '$refname' ends with a trailing slash; this is ",
+  		    "not permitted by git or Subversion\n";
+  	}
+  
+  	# It cannot have ASCII control character space, tilde ~, caret ^,
+  	# colon :, question-mark ?, asterisk *, space, or open bracket [
+  	# anywhere.
+  	#
+  	# Additionally, % must be escaped because it is used for escaping
+  	# and we want our escaped refname to be reversible
+  	$refname =~ s{([ \%~\^:\?\*\[\t\\])}{sprintf('%%%02X',ord($1))}eg;
+  
+  	# no slash-separated component can begin with a dot .
+  	# /.* becomes /%2E*
+  	$refname =~ s{/\.}{/%2E}g;
+  
+  	# It cannot have two consecutive dots .. anywhere
+  	# .. becomes %2E%2E
+  	$refname =~ s{\.\.}{%2E%2E}g;
+  
+  	# trailing dots and .lock are not allowed
+  	# .$ becomes %2E and .lock becomes %2Elock
+  	$refname =~ s{\.(?=$|lock$)}{%2E};
+  
+  	# the sequence @{ is used to access the reflog
+  	# @{ becomes %40{
+  	$refname =~ s{\@\{}{%40\{}g;
+  
+  	return $refname;
+  }
+  
+  sub desanitize_refname {
+  	my ($refname) = @_;
+  	$refname =~ s{%(?:([0-9A-F]{2}))}{chr hex($1)}eg;
+  	return $refname;
+  }
+  
+  sub svm_uuid {
+  	my ($self) = @_;
+  	return $self->{svm}->{uuid} if $self->svm;
+  	$self->ra;
+  	unless ($self->{svm}) {
+  		die "SVM UUID not cached, and reading remotely failed\n";
+  	}
+  	$self->{svm}->{uuid};
+  }
+  
+  sub svm {
+  	my ($self) = @_;
+  	return $self->{svm} if $self->{svm};
+  	my $svm;
+  	# see if we have it in our config, first:
+  	eval {
+  		my $section = "svn-remote.$self->{repo_id}";
+  		$svm = {
+  		  source => tmp_config('--get', "$section.svm-source"),
+  		  uuid => tmp_config('--get', "$section.svm-uuid"),
+  		  replace => tmp_config('--get', "$section.svm-replace"),
+  		}
+  	};
+  	if ($svm && $svm->{source} && $svm->{uuid} && $svm->{replace}) {
+  		$self->{svm} = $svm;
+  	}
+  	$self->{svm};
+  }
+  
+  sub _set_svm_vars {
+  	my ($self, $ra) = @_;
+  	return $ra if $self->svm;
+  
+  	my @err = ( "useSvmProps set, but failed to read SVM properties\n",
+  		    "(svm:source, svm:uuid) ",
+  		    "from the following URLs:\n" );
+  	sub read_svm_props {
+  		my ($self, $ra, $path, $r) = @_;
+  		my $props = ($ra->get_dir($path, $r))[2];
+  		my $src = $props->{'svm:source'};
+  		my $uuid = $props->{'svm:uuid'};
+  		return undef if (!$src || !$uuid);
+  
+  		chomp($src, $uuid);
+  
+  		$uuid =~ m{^[0-9a-f\-]{30,}$}i
+  		    or die "doesn't look right - svm:uuid is '$uuid'\n";
+  
+  		# the '!' is used to mark the repos_root!/relative/path
+  		$src =~ s{/?!/?}{/};
+  		$src =~ s{/+$}{}; # no trailing slashes please
+  		# username is of no interest
+  		$src =~ s{(^[a-z\+]*://)[^/@]*@}{$1};
+  
+  		my $replace = add_path_to_url($ra->url, $path);
+  
+  		my $section = "svn-remote.$self->{repo_id}";
+  		tmp_config("$section.svm-source", $src);
+  		tmp_config("$section.svm-replace", $replace);
+  		tmp_config("$section.svm-uuid", $uuid);
+  		$self->{svm} = {
+  			source => $src,
+  			uuid => $uuid,
+  			replace => $replace
+  		};
+  	}
+  
+  	my $r = $ra->get_latest_revnum;
+  	my $path = $self->path;
+  	my %tried;
+  	while (length $path) {
+  		my $try = add_path_to_url($self->url, $path);
+  		unless ($tried{$try}) {
+  			return $ra if $self->read_svm_props($ra, $path, $r);
+  			$tried{$try} = 1;
+  		}
+  		$path =~ s#/?[^/]+$##;
+  	}
+  	die "Path: '$path' should be ''\n" if $path ne '';
+  	return $ra if $self->read_svm_props($ra, $path, $r);
+  	$tried{ add_path_to_url($self->url, $path) } = 1;
+  
+  	if ($ra->{repos_root} eq $self->url) {
+  		die @err, (map { "  $_\n" } keys %tried), "\n";
+  	}
+  
+  	# nope, make sure we're connected to the repository root:
+  	my $ok;
+  	my @tried_b;
+  	$path = $ra->{svn_path};
+  	$ra = Git::SVN::Ra->new($ra->{repos_root});
+  	while (length $path) {
+  		my $try = add_path_to_url($ra->url, $path);
+  		unless ($tried{$try}) {
+  			$ok = $self->read_svm_props($ra, $path, $r);
+  			last if $ok;
+  			$tried{$try} = 1;
+  		}
+  		$path =~ s#/?[^/]+$##;
+  	}
+  	die "Path: '$path' should be ''\n" if $path ne '';
+  	$ok ||= $self->read_svm_props($ra, $path, $r);
+  	$tried{ add_path_to_url($ra->url, $path) } = 1;
+  	if (!$ok) {
+  		die @err, (map { "  $_\n" } keys %tried), "\n";
+  	}
+  	Git::SVN::Ra->new($self->url);
+  }
+  
+  sub svnsync {
+  	my ($self) = @_;
+  	return $self->{svnsync} if $self->{svnsync};
+  
+  	if ($self->no_metadata) {
+  		die "Can't have both 'noMetadata' and ",
+  		    "'useSvnsyncProps' options set!\n";
+  	}
+  	if ($self->rewrite_root) {
+  		die "Can't have both 'useSvnsyncProps' and 'rewriteRoot' ",
+  		    "options set!\n";
+  	}
+  	if ($self->rewrite_uuid) {
+  		die "Can't have both 'useSvnsyncProps' and 'rewriteUUID' ",
+  		    "options set!\n";
+  	}
+  
+  	my $svnsync;
+  	# see if we have it in our config, first:
+  	eval {
+  		my $section = "svn-remote.$self->{repo_id}";
+  
+  		my $url = tmp_config('--get', "$section.svnsync-url");
+  		($url) = ($url =~ m{^([a-z\+]+://\S+)$}) or
+  		   die "doesn't look right - svn:sync-from-url is '$url'\n";
+  
+  		my $uuid = tmp_config('--get', "$section.svnsync-uuid");
+  		($uuid) = ($uuid =~ m{^([0-9a-f\-]{30,})$}i) or
+  		   die "doesn't look right - svn:sync-from-uuid is '$uuid'\n";
+  
+  		$svnsync = { url => $url, uuid => $uuid }
+  	};
+  	if ($svnsync && $svnsync->{url} && $svnsync->{uuid}) {
+  		return $self->{svnsync} = $svnsync;
+  	}
+  
+  	my $err = "useSvnsyncProps set, but failed to read " .
+  	          "svnsync property: svn:sync-from-";
+  	my $rp = $self->ra->rev_proplist(0);
+  
+  	my $url = $rp->{'svn:sync-from-url'} or die $err . "url\n";
+  	($url) = ($url =~ m{^([a-z\+]+://\S+)$}) or
+  	           die "doesn't look right - svn:sync-from-url is '$url'\n";
+  
+  	my $uuid = $rp->{'svn:sync-from-uuid'} or die $err . "uuid\n";
+  	($uuid) = ($uuid =~ m{^([0-9a-f\-]{30,})$}i) or
+  	           die "doesn't look right - svn:sync-from-uuid is '$uuid'\n";
+  
+  	my $section = "svn-remote.$self->{repo_id}";
+  	tmp_config('--add', "$section.svnsync-uuid", $uuid);
+  	tmp_config('--add', "$section.svnsync-url", $url);
+  	return $self->{svnsync} = { url => $url, uuid => $uuid };
+  }
+  
+  # this allows us to memoize our SVN::Ra UUID locally and avoid a
+  # remote lookup (useful for 'git svn log').
+  sub ra_uuid {
+  	my ($self) = @_;
+  	unless ($self->{ra_uuid}) {
+  		my $key = "svn-remote.$self->{repo_id}.uuid";
+  		my $uuid = eval { tmp_config('--get', $key) };
+  		if (!$@ && $uuid && $uuid =~ /^([a-f\d\-]{30,})$/i) {
+  			$self->{ra_uuid} = $uuid;
+  		} else {
+  			die "ra_uuid called without URL\n" unless $self->url;
+  			$self->{ra_uuid} = $self->ra->get_uuid;
+  			tmp_config('--add', $key, $self->{ra_uuid});
+  		}
+  	}
+  	$self->{ra_uuid};
+  }
+  
+  sub _set_repos_root {
+  	my ($self, $repos_root) = @_;
+  	my $k = "svn-remote.$self->{repo_id}.reposRoot";
+  	$repos_root ||= $self->ra->{repos_root};
+  	tmp_config($k, $repos_root);
+  	$repos_root;
+  }
+  
+  sub repos_root {
+  	my ($self) = @_;
+  	my $k = "svn-remote.$self->{repo_id}.reposRoot";
+  	eval { tmp_config('--get', $k) } || $self->_set_repos_root;
+  }
+  
+  sub ra {
+  	my ($self) = shift;
+  	my $ra = Git::SVN::Ra->new($self->url);
+  	$self->_set_repos_root($ra->{repos_root});
+  	if ($self->use_svm_props && !$self->{svm}) {
+  		if ($self->no_metadata) {
+  			die "Can't have both 'noMetadata' and ",
+  			    "'useSvmProps' options set!\n";
+  		} elsif ($self->use_svnsync_props) {
+  			die "Can't have both 'useSvnsyncProps' and ",
+  			    "'useSvmProps' options set!\n";
+  		}
+  		$ra = $self->_set_svm_vars($ra);
+  		$self->{-want_revprops} = 1;
+  	}
+  	$ra;
+  }
+  
+  # prop_walk(PATH, REV, SUB)
+  # -------------------------
+  # Recursively traverse PATH at revision REV and invoke SUB for each
+  # directory that contains a SVN property.  SUB will be invoked as
+  # follows:  &SUB(gs, path, props);  where `gs' is this instance of
+  # Git::SVN, `path' the path to the directory where the properties
+  # `props' were found.  The `path' will be relative to point of checkout,
+  # that is, if url://repo/trunk is the current Git branch, and that
+  # directory contains a sub-directory `d', SUB will be invoked with `/d/'
+  # as `path' (note the trailing `/').
+  sub prop_walk {
+  	my ($self, $path, $rev, $sub) = @_;
+  
+  	$path =~ s#^/##;
+  	my ($dirent, undef, $props) = $self->ra->get_dir($path, $rev);
+  	$path =~ s#^/*#/#g;
+  	my $p = $path;
+  	# Strip the irrelevant part of the path.
+  	$p =~ s#^/+\Q@{[$self->path]}\E(/|$)#/#;
+  	# Ensure the path is terminated by a `/'.
+  	$p =~ s#/*$#/#;
+  
+  	# The properties contain all the internal SVN stuff nobody
+  	# (usually) cares about.
+  	my $interesting_props = 0;
+  	foreach (keys %{$props}) {
+  		# If it doesn't start with `svn:', it must be a
+  		# user-defined property.
+  		++$interesting_props and next if $_ !~ /^svn:/;
+  		# FIXME: Fragile, if SVN adds new public properties,
+  		# this needs to be updated.
+  		++$interesting_props if /^svn:(?:ignore|keywords|executable
+  		                                 |eol-style|mime-type
+  						 |externals|needs-lock)$/x;
+  	}
+  	&$sub($self, $p, $props) if $interesting_props;
+  
+  	foreach (sort keys %$dirent) {
+  		next if $dirent->{$_}->{kind} != $SVN::Node::dir;
+  		$self->prop_walk($self->path . $p . $_, $rev, $sub);
+  	}
+  }
+  
+  sub last_rev { ($_[0]->last_rev_commit)[0] }
+  sub last_commit { ($_[0]->last_rev_commit)[1] }
+  
+  # returns the newest SVN revision number and newest commit SHA1
+  sub last_rev_commit {
+  	my ($self) = @_;
+  	if (defined $self->{last_rev} && defined $self->{last_commit}) {
+  		return ($self->{last_rev}, $self->{last_commit});
+  	}
+  	my $c = ::verify_ref($self->refname.'^0');
+  	if ($c && !$self->use_svm_props && !$self->no_metadata) {
+  		my $rev = (::cmt_metadata($c))[1];
+  		if (defined $rev) {
+  			($self->{last_rev}, $self->{last_commit}) = ($rev, $c);
+  			return ($rev, $c);
+  		}
+  	}
+  	my $map_path = $self->map_path;
+  	unless (-e $map_path) {
+  		($self->{last_rev}, $self->{last_commit}) = (undef, undef);
+  		return (undef, undef);
+  	}
+  	my ($rev, $commit) = $self->rev_map_max(1);
+  	($self->{last_rev}, $self->{last_commit}) = ($rev, $commit);
+  	return ($rev, $commit);
+  }
+  
+  sub get_fetch_range {
+  	my ($self, $min, $max) = @_;
+  	$max ||= $self->ra->get_latest_revnum;
+  	$min ||= $self->rev_map_max;
+  	(++$min, $max);
+  }
+  
+  sub svn_dir {
+  	command_oneline(qw(rev-parse --git-path svn));
+  }
+  
+  sub tmp_config {
+  	my (@args) = @_;
+  	my $svn_dir = svn_dir();
+  	my $old_def_config = "$svn_dir/config";
+  	my $config = "$svn_dir/.metadata";
+  	if (! -f $config && -f $old_def_config) {
+  		rename $old_def_config, $config or
+  		       die "Failed rename $old_def_config => $config: $!\n";
+  	}
+  	my $old_config = $ENV{GIT_CONFIG};
+  	$ENV{GIT_CONFIG} = $config;
+  	$@ = undef;
+  	my @ret = eval {
+  		unless (-f $config) {
+  			mkfile($config);
+  			open my $fh, '>', $config or
+  			    die "Can't open $config: $!\n";
+  			print $fh "; This file is used internally by ",
+  			          "git-svn\n" or die
+  				  "Couldn't write to $config: $!\n";
+  			print $fh "; You should not have to edit it\n" or
+  			      die "Couldn't write to $config: $!\n";
+  			close $fh or die "Couldn't close $config: $!\n";
+  		}
+  		command('config', @args);
+  	};
+  	my $err = $@;
+  	if (defined $old_config) {
+  		$ENV{GIT_CONFIG} = $old_config;
+  	} else {
+  		delete $ENV{GIT_CONFIG};
+  	}
+  	die $err if $err;
+  	wantarray ? @ret : $ret[0];
+  }
+  
+  sub tmp_index_do {
+  	my ($self, $sub) = @_;
+  	my $old_index = $ENV{GIT_INDEX_FILE};
+  	$ENV{GIT_INDEX_FILE} = $self->{index};
+  	$@ = undef;
+  	my @ret = eval {
+  		my ($dir, $base) = ($self->{index} =~ m#^(.*?)/?([^/]+)$#);
+  		mkpath([$dir]) unless -d $dir;
+  		&$sub;
+  	};
+  	my $err = $@;
+  	if (defined $old_index) {
+  		$ENV{GIT_INDEX_FILE} = $old_index;
+  	} else {
+  		delete $ENV{GIT_INDEX_FILE};
+  	}
+  	die $err if $err;
+  	wantarray ? @ret : $ret[0];
+  }
+  
+  sub assert_index_clean {
+  	my ($self, $treeish) = @_;
+  
+  	$self->tmp_index_do(sub {
+  		command_noisy('read-tree', $treeish) unless -e $self->{index};
+  		my $x = command_oneline('write-tree');
+  		my ($y) = (command(qw/cat-file commit/, $treeish) =~
+  		           /^tree ($::sha1)/mo);
+  		return if $y eq $x;
+  
+  		warn "Index mismatch: $y != $x\nrereading $treeish\n";
+  		unlink $self->{index} or die "unlink $self->{index}: $!\n";
+  		command_noisy('read-tree', $treeish);
+  		$x = command_oneline('write-tree');
+  		if ($y ne $x) {
+  			fatal "trees ($treeish) $y != $x\n",
+  			      "Something is seriously wrong...";
+  		}
+  	});
+  }
+  
+  sub get_commit_parents {
+  	my ($self, $log_entry) = @_;
+  	my (%seen, @ret, @tmp);
+  	# legacy support for 'set-tree'; this is only used by set_tree_cb:
+  	if (my $ip = $self->{inject_parents}) {
+  		if (my $commit = delete $ip->{$log_entry->{revision}}) {
+  			push @tmp, $commit;
+  		}
+  	}
+  	if (my $cur = ::verify_ref($self->refname.'^0')) {
+  		push @tmp, $cur;
+  	}
+  	if (my $ipd = $self->{inject_parents_dcommit}) {
+  		if (my $commit = delete $ipd->{$log_entry->{revision}}) {
+  			push @tmp, @$commit;
+  		}
+  	}
+  	push @tmp, $_ foreach (@{$log_entry->{parents}}, @tmp);
+  	while (my $p = shift @tmp) {
+  		next if $seen{$p};
+  		$seen{$p} = 1;
+  		push @ret, $p;
+  	}
+  	@ret;
+  }
+  
+  sub rewrite_root {
+  	my ($self) = @_;
+  	return $self->{-rewrite_root} if exists $self->{-rewrite_root};
+  	my $k = "svn-remote.$self->{repo_id}.rewriteRoot";
+  	my $rwr = eval { command_oneline(qw/config --get/, $k) };
+  	if ($rwr) {
+  		$rwr =~ s#/+$##;
+  		if ($rwr !~ m#^[a-z\+]+://#) {
+  			die "$rwr is not a valid URL (key: $k)\n";
+  		}
+  	}
+  	$self->{-rewrite_root} = $rwr;
+  }
+  
+  sub rewrite_uuid {
+  	my ($self) = @_;
+  	return $self->{-rewrite_uuid} if exists $self->{-rewrite_uuid};
+  	my $k = "svn-remote.$self->{repo_id}.rewriteUUID";
+  	my $rwid = eval { command_oneline(qw/config --get/, $k) };
+  	if ($rwid) {
+  		$rwid =~ s#/+$##;
+  		if ($rwid !~ m#^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$#) {
+  			die "$rwid is not a valid UUID (key: $k)\n";
+  		}
+  	}
+  	$self->{-rewrite_uuid} = $rwid;
+  }
+  
+  sub metadata_url {
+  	my ($self) = @_;
+  	my $url = $self->rewrite_root || $self->url;
+  	return canonicalize_url( add_path_to_url( $url, $self->path ) );
+  }
+  
+  sub full_url {
+  	my ($self) = @_;
+  	return canonicalize_url( add_path_to_url( $self->url, $self->path ) );
+  }
+  
+  sub full_pushurl {
+  	my ($self) = @_;
+  	if ($self->{pushurl}) {
+  		return canonicalize_url( add_path_to_url( $self->{pushurl}, $self->path ) );
+  	} else {
+  		return $self->full_url;
+  	}
+  }
+  
+  sub set_commit_header_env {
+  	my ($log_entry) = @_;
+  	my %env;
+  	foreach my $ned (qw/NAME EMAIL DATE/) {
+  		foreach my $ac (qw/AUTHOR COMMITTER/) {
+  			$env{"GIT_${ac}_${ned}"} = $ENV{"GIT_${ac}_${ned}"};
+  		}
+  	}
+  
+  	$ENV{GIT_AUTHOR_NAME} = $log_entry->{name};
+  	$ENV{GIT_AUTHOR_EMAIL} = $log_entry->{email};
+  	$ENV{GIT_AUTHOR_DATE} = $ENV{GIT_COMMITTER_DATE} = $log_entry->{date};
+  
+  	$ENV{GIT_COMMITTER_NAME} = (defined $log_entry->{commit_name})
+  						? $log_entry->{commit_name}
+  						: $log_entry->{name};
+  	$ENV{GIT_COMMITTER_EMAIL} = (defined $log_entry->{commit_email})
+  						? $log_entry->{commit_email}
+  						: $log_entry->{email};
+  	\%env;
+  }
+  
+  sub restore_commit_header_env {
+  	my ($env) = @_;
+  	foreach my $ned (qw/NAME EMAIL DATE/) {
+  		foreach my $ac (qw/AUTHOR COMMITTER/) {
+  			my $k = "GIT_${ac}_${ned}";
+  			if (defined $env->{$k}) {
+  				$ENV{$k} = $env->{$k};
+  			} else {
+  				delete $ENV{$k};
+  			}
+  		}
+  	}
+  }
+  
+  sub gc {
+  	command_noisy('gc', '--auto');
+  };
+  
+  sub do_git_commit {
+  	my ($self, $log_entry) = @_;
+  	my $lr = $self->last_rev;
+  	if (defined $lr && $lr >= $log_entry->{revision}) {
+  		die "Last fetched revision of ", $self->refname,
+  		    " was r$lr, but we are about to fetch: ",
+  		    "r$log_entry->{revision}!\n";
+  	}
+  	if (my $c = $self->rev_map_get($log_entry->{revision})) {
+  		croak "$log_entry->{revision} = $c already exists! ",
+  		      "Why are we refetching it?\n";
+  	}
+  	my $old_env = set_commit_header_env($log_entry);
+  	my $tree = $log_entry->{tree};
+  	if (!defined $tree) {
+  		$tree = $self->tmp_index_do(sub {
+  		                            command_oneline('write-tree') });
+  	}
+  	die "Tree is not a valid sha1: $tree\n" if $tree !~ /^$::sha1$/o;
+  
+  	my @exec = ('git', 'commit-tree', $tree);
+  	foreach ($self->get_commit_parents($log_entry)) {
+  		push @exec, '-p', $_;
+  	}
+  	defined(my $pid = open3(my $msg_fh, my $out_fh, '>&STDERR', @exec))
+  	                                                           or croak $!;
+  	binmode $msg_fh;
+  
+  	# we always get UTF-8 from SVN, but we may want our commits in
+  	# a different encoding.
+  	if (my $enc = Git::config('i18n.commitencoding')) {
+  		require Encode;
+  		Encode::from_to($log_entry->{log}, 'UTF-8', $enc);
+  	}
+  	print $msg_fh $log_entry->{log} or croak $!;
+  	restore_commit_header_env($old_env);
+  	unless ($self->no_metadata) {
+  		print $msg_fh "\ngit-svn-id: $log_entry->{metadata}\n"
+  		              or croak $!;
+  	}
+  	$msg_fh->flush == 0 or croak $!;
+  	close $msg_fh or croak $!;
+  	chomp(my $commit = do { local $/; <$out_fh> });
+  	close $out_fh or croak $!;
+  	waitpid $pid, 0;
+  	croak $? if $?;
+  	if ($commit !~ /^$::sha1$/o) {
+  		die "Failed to commit, invalid sha1: $commit\n";
+  	}
+  
+  	$self->rev_map_set($log_entry->{revision}, $commit, 1);
+  
+  	$self->{last_rev} = $log_entry->{revision};
+  	$self->{last_commit} = $commit;
+  	print "r$log_entry->{revision}" unless $::_q > 1;
+  	if (defined $log_entry->{svm_revision}) {
+  		 print " (\@$log_entry->{svm_revision})" unless $::_q > 1;
+  		 $self->rev_map_set($log_entry->{svm_revision}, $commit,
+  		                   0, $self->svm_uuid);
+  	}
+  	print " = $commit ($self->{ref_id})\n" unless $::_q > 1;
+  	if (--$_gc_nr == 0) {
+  		$_gc_nr = $_gc_period;
+  		gc();
+  	}
+  	return $commit;
+  }
+  
+  sub match_paths {
+  	my ($self, $paths, $r) = @_;
+  	return 1 if $self->path eq '';
+  	if (my $path = $paths->{"/".$self->path}) {
+  		return ($path->{action} eq 'D') ? 0 : 1;
+  	}
+  	$self->{path_regex} ||= qr{^/\Q@{[$self->path]}\E/};
+  	if (grep /$self->{path_regex}/, keys %$paths) {
+  		return 1;
+  	}
+  	my $c = '';
+  	foreach (split m#/#, $self->path) {
+  		$c .= "/$_";
+  		next unless ($paths->{$c} &&
+  		             ($paths->{$c}->{action} =~ /^[AR]$/));
+  		if ($self->ra->check_path($self->path, $r) ==
+  		    $SVN::Node::dir) {
+  			return 1;
+  		}
+  	}
+  	return 0;
+  }
+  
+  sub find_parent_branch {
+  	my ($self, $paths, $rev) = @_;
+  	return undef unless $self->follow_parent;
+  	unless (defined $paths) {
+  		my $err_handler = $SVN::Error::handler;
+  		$SVN::Error::handler = \&Git::SVN::Ra::skip_unknown_revs;
+  		$self->ra->get_log([$self->path], $rev, $rev, 0, 1, 1,
+  				   sub { $paths = $_[0] });
+  		$SVN::Error::handler = $err_handler;
+  	}
+  	return undef unless defined $paths;
+  
+  	# look for a parent from another branch:
+  	my @b_path_components = split m#/#, $self->path;
+  	my @a_path_components;
+  	my $i;
+  	while (@b_path_components) {
+  		$i = $paths->{'/'.join('/', @b_path_components)};
+  		last if $i && defined $i->{copyfrom_path};
+  		unshift(@a_path_components, pop(@b_path_components));
+  	}
+  	return undef unless defined $i && defined $i->{copyfrom_path};
+  	my $branch_from = $i->{copyfrom_path};
+  	if (@a_path_components) {
+  		print STDERR "branch_from: $branch_from => ";
+  		$branch_from .= '/'.join('/', @a_path_components);
+  		print STDERR $branch_from, "\n";
+  	}
+  	my $r = $i->{copyfrom_rev};
+  	my $repos_root = $self->ra->{repos_root};
+  	my $url = $self->ra->url;
+  	my $new_url = canonicalize_url( add_path_to_url( $url, $branch_from ) );
+  	print STDERR  "Found possible branch point: ",
+  	              "$new_url => ", $self->full_url, ", $r\n"
+  	              unless $::_q > 1;
+  	$branch_from =~ s#^/##;
+  	my $gs = $self->other_gs($new_url, $url,
+  		                 $branch_from, $r, $self->{ref_id});
+  	my ($r0, $parent) = $gs->find_rev_before($r, 1);
+  	{
+  		my ($base, $head);
+  		if (!defined $r0 || !defined $parent) {
+  			($base, $head) = parse_revision_argument(0, $r);
+  		} else {
+  			if ($r0 < $r) {
+  				$gs->ra->get_log([$gs->path], $r0 + 1, $r, 1,
+  					0, 1, sub { $base = $_[1] - 1 });
+  			}
+  		}
+  		if (defined $base && $base <= $r) {
+  			$gs->fetch($base, $r);
+  		}
+  		($r0, $parent) = $gs->find_rev_before($r, 1);
+  	}
+  	if (defined $r0 && defined $parent) {
+  		print STDERR "Found branch parent: ($self->{ref_id}) $parent\n"
+  		             unless $::_q > 1;
+  		my $ed;
+  		if ($self->ra->can_do_switch) {
+  			$self->assert_index_clean($parent);
+  			print STDERR "Following parent with do_switch\n"
+  			             unless $::_q > 1;
+  			# do_switch works with svn/trunk >= r22312, but that
+  			# is not included with SVN 1.4.3 (the latest version
+  			# at the moment), so we can't rely on it
+  			$self->{last_rev} = $r0;
+  			$self->{last_commit} = $parent;
+  			$ed = Git::SVN::Fetcher->new($self, $gs->path);
+  			$gs->ra->gs_do_switch($r0, $rev, $gs,
+  					      $self->full_url, $ed)
+  			  or die "SVN connection failed somewhere...\n";
+  		} elsif ($self->ra->trees_match($new_url, $r0,
+  			                        $self->full_url, $rev)) {
+  			print STDERR "Trees match:\n",
+  			             "  $new_url\@$r0\n",
+  			             "  ${\$self->full_url}\@$rev\n",
+  			             "Following parent with no changes\n"
+  			             unless $::_q > 1;
+  			$self->tmp_index_do(sub {
+  			    command_noisy('read-tree', $parent);
+  			});
+  			$self->{last_commit} = $parent;
+  		} else {
+  			print STDERR "Following parent with do_update\n"
+  			             unless $::_q > 1;
+  			$ed = Git::SVN::Fetcher->new($self);
+  			$self->ra->gs_do_update($rev, $rev, $self, $ed)
+  			  or die "SVN connection failed somewhere...\n";
+  		}
+  		print STDERR "Successfully followed parent\n" unless $::_q > 1;
+  		return $self->make_log_entry($rev, [$parent], $ed, $r0, $branch_from);
+  	}
+  	return undef;
+  }
+  
+  sub do_fetch {
+  	my ($self, $paths, $rev) = @_;
+  	my $ed;
+  	my ($last_rev, @parents);
+  	if (my $lc = $self->last_commit) {
+  		# we can have a branch that was deleted, then re-added
+  		# under the same name but copied from another path, in
+  		# which case we'll have multiple parents (we don't
+  		# want to break the original ref or lose copypath info):
+  		if (my $log_entry = $self->find_parent_branch($paths, $rev)) {
+  			push @{$log_entry->{parents}}, $lc;
+  			return $log_entry;
+  		}
+  		$ed = Git::SVN::Fetcher->new($self);
+  		$last_rev = $self->{last_rev};
+  		$ed->{c} = $lc;
+  		@parents = ($lc);
+  	} else {
+  		$last_rev = $rev;
+  		if (my $log_entry = $self->find_parent_branch($paths, $rev)) {
+  			return $log_entry;
+  		}
+  		$ed = Git::SVN::Fetcher->new($self);
+  	}
+  	unless ($self->ra->gs_do_update($last_rev, $rev, $self, $ed)) {
+  		die "SVN connection failed somewhere...\n";
+  	}
+  	$self->make_log_entry($rev, \@parents, $ed, $last_rev, $self->path);
+  }
+  
+  sub mkemptydirs {
+  	my ($self, $r) = @_;
+  
+  	# add/remove/collect a paths table
+  	#
+  	# Paths are split into a tree of nodes, stored as a hash of hashes.
+  	#
+  	# Each node contains a 'path' entry for the path (if any) associated
+  	# with that node and a 'children' entry for any nodes under that
+  	# location.
+  	#
+  	# Removing a path requires a hash lookup for each component then
+  	# dropping that node (and anything under it), which is substantially
+  	# faster than a grep slice into a single hash of paths for large
+  	# numbers of paths.
+  	#
+  	# For a large (200K) number of empty_dir directives this reduces
+  	# scanning time to 3 seconds vs 10 minutes for grep+delete on a single
+  	# hash of paths.
+  	sub add_path {
+  		my ($paths_table, $path) = @_;
+  		my $node_ref;
+  
+  		foreach my $x (split('/', $path)) {
+  			if (!exists($paths_table->{$x})) {
+  				$paths_table->{$x} = { children => {} };
+  			}
+  
+  			$node_ref = $paths_table->{$x};
+  			$paths_table = $paths_table->{$x}->{children};
+  		}
+  
+  		$node_ref->{path} = $path;
+  	}
+  
+  	sub remove_path {
+  		my ($paths_table, $path) = @_;
+  		my $nodes_ref;
+  		my $node_name;
+  
+  		foreach my $x (split('/', $path)) {
+  			if (!exists($paths_table->{$x})) {
+  				return;
+  			}
+  
+  			$nodes_ref = $paths_table;
+  			$node_name = $x;
+  
+  			$paths_table = $paths_table->{$x}->{children};
+  		}
+  
+  		delete($nodes_ref->{$node_name});
+  	}
+  
+  	sub collect_paths {
+  		my ($paths_table, $paths_ref) = @_;
+  
+  		foreach my $v (values %$paths_table) {
+  			my $p = $v->{path};
+  			my $c = $v->{children};
+  
+  			collect_paths($c, $paths_ref);
+  
+  			if (defined($p)) {
+  				push(@$paths_ref, $p);
+  			}
+  		}
+  	}
+  
+  	sub scan {
+  		my ($r, $paths_table, $line) = @_;
+  		if (defined $r && $line =~ /^r(\d+)$/) {
+  			return 0 if $1 > $r;
+  		} elsif ($line =~ /^  \+empty_dir: (.+)$/) {
+  			add_path($paths_table, $1);
+  		} elsif ($line =~ /^  \-empty_dir: (.+)$/) {
+  			remove_path($paths_table, $1);
+  		}
+  		1; # continue
+  	};
+  
+  	my @empty_dirs;
+  	my %paths_table;
+  
+  	my $gz_file = "$self->{dir}/unhandled.log.gz";
+  	if (-f $gz_file) {
+  		if (!can_compress()) {
+  			warn "Compress::Zlib could not be found; ",
+  			     "empty directories in $gz_file will not be read\n";
+  		} else {
+  			my $gz = Compress::Zlib::gzopen($gz_file, "rb") or
+  				die "Unable to open $gz_file: $!\n";
+  			my $line;
+  			while ($gz->gzreadline($line) > 0) {
+  				scan($r, \%paths_table, $line) or last;
+  			}
+  			$gz->gzclose;
+  		}
+  	}
+  
+  	if (open my $fh, '<', "$self->{dir}/unhandled.log") {
+  		binmode $fh or croak "binmode: $!";
+  		while (<$fh>) {
+  			scan($r, \%paths_table, $_) or last;
+  		}
+  		close $fh;
+  	}
+  
+  	collect_paths(\%paths_table, \@empty_dirs);
+  	my $strip = qr/\A\Q@{[$self->path]}\E(?:\/|$)/;
+  	foreach my $d (sort @empty_dirs) {
+  		$d = uri_decode($d);
+  		$d =~ s/$strip//;
+  		next unless length($d);
+  		next if -d $d;
+  		if (-e $d) {
+  			warn "$d exists but is not a directory\n";
+  		} else {
+  			print "creating empty directory: $d\n";
+  			mkpath([$d]);
+  		}
+  	}
+  }
+  
+  sub get_untracked {
+  	my ($self, $ed) = @_;
+  	my @out;
+  	my $h = $ed->{empty};
+  	foreach (sort keys %$h) {
+  		my $act = $h->{$_} ? '+empty_dir' : '-empty_dir';
+  		push @out, "  $act: " . uri_encode($_);
+  		warn "W: $act: $_\n";
+  	}
+  	foreach my $t (qw/dir_prop file_prop/) {
+  		$h = $ed->{$t} or next;
+  		foreach my $path (sort keys %$h) {
+  			my $ppath = $path eq '' ? '.' : $path;
+  			foreach my $prop (sort keys %{$h->{$path}}) {
+  				next if $SKIP_PROP{$prop};
+  				my $v = $h->{$path}->{$prop};
+  				my $t_ppath_prop = "$t: " .
+  				                    uri_encode($ppath) . ' ' .
+  				                    uri_encode($prop);
+  				if (defined $v) {
+  					push @out, "  +$t_ppath_prop " .
+  					           uri_encode($v);
+  				} else {
+  					push @out, "  -$t_ppath_prop";
+  				}
+  			}
+  		}
+  	}
+  	foreach my $t (qw/absent_file absent_directory/) {
+  		$h = $ed->{$t} or next;
+  		foreach my $parent (sort keys %$h) {
+  			foreach my $path (sort @{$h->{$parent}}) {
+  				push @out, "  $t: " .
+  				           uri_encode("$parent/$path");
+  				warn "W: $t: $parent/$path ",
+  				     "Insufficient permissions?\n";
+  			}
+  		}
+  	}
+  	\@out;
+  }
+  
+  # parse_svn_date(DATE)
+  # --------------------
+  # Given a date (in UTC) from Subversion, return a string in the format
+  # "<TZ Offset> <local date/time>" that Git will use.
+  #
+  # By default the parsed date will be in UTC; if $Git::SVN::_localtime
+  # is true we'll convert it to the local timezone instead.
+  sub parse_svn_date {
+  	my $date = shift || return '+0000 1970-01-01 00:00:00';
+  	my ($Y,$m,$d,$H,$M,$S) = ($date =~ /^(\d{4})\-(\d\d)\-(\d\d)T
+  	                                    (\d\d?)\:(\d\d)\:(\d\d)\.\d*Z$/x) or
+  	                                 croak "Unable to parse date: $date\n";
+  	my $parsed_date;    # Set next.
+  
+  	if ($Git::SVN::_localtime) {
+  		# Translate the Subversion datetime to an epoch time.
+  		# Begin by switching ourselves to $date's timezone, UTC.
+  		my $old_env_TZ = $ENV{TZ};
+  		$ENV{TZ} = 'UTC';
+  
+  		my $epoch_in_UTC =
+  		    Time::Local::timelocal($S, $M, $H, $d, $m - 1, $Y - 1900);
+  
+  		# Determine our local timezone (including DST) at the
+  		# time of $epoch_in_UTC.  $Git::SVN::Log::TZ stored the
+  		# value of TZ, if any, at the time we were run.
+  		if (defined $Git::SVN::Log::TZ) {
+  			$ENV{TZ} = $Git::SVN::Log::TZ;
+  		} else {
+  			delete $ENV{TZ};
+  		}
+  
+  		my $our_TZ = get_tz_offset($epoch_in_UTC);
+  
+  		# This converts $epoch_in_UTC into our local timezone.
+  		my ($sec, $min, $hour, $mday, $mon, $year,
+  		    $wday, $yday, $isdst) = localtime($epoch_in_UTC);
+  
+  		$parsed_date = sprintf('%s %04d-%02d-%02d %02d:%02d:%02d',
+  				       $our_TZ, $year + 1900, $mon + 1,
+  				       $mday, $hour, $min, $sec);
+  
+  		# Reset us to the timezone in effect when we entered
+  		# this routine.
+  		if (defined $old_env_TZ) {
+  			$ENV{TZ} = $old_env_TZ;
+  		} else {
+  			delete $ENV{TZ};
+  		}
+  	} else {
+  		$parsed_date = "+0000 $Y-$m-$d $H:$M:$S";
+  	}
+  
+  	return $parsed_date;
+  }
+  
+  sub other_gs {
+  	my ($self, $new_url, $url,
+  	    $branch_from, $r, $old_ref_id) = @_;
+  	my $gs = Git::SVN->find_by_url($new_url, $url, $branch_from);
+  	unless ($gs) {
+  		my $ref_id = $old_ref_id;
+  		$ref_id =~ s/\@\d+-*$//;
+  		$ref_id .= "\@$r";
+  		# just grow a tail if we're not unique enough :x
+  		$ref_id .= '-' while find_ref($ref_id);
+  		my ($u, $p, $repo_id) = ($new_url, '', $ref_id);
+  		if ($u =~ s#^\Q$url\E(/|$)##) {
+  			$p = $u;
+  			$u = $url;
+  			$repo_id = $self->{repo_id};
+  		}
+  		while (1) {
+  			# It is possible to tag two different subdirectories at
+  			# the same revision.  If the url for an existing ref
+  			# does not match, we must either find a ref with a
+  			# matching url or create a new ref by growing a tail.
+  			$gs = Git::SVN->init($u, $p, $repo_id, $ref_id, 1);
+  			my (undef, $max_commit) = $gs->rev_map_max(1);
+  			last if (!$max_commit);
+  			my ($url) = ::cmt_metadata($max_commit);
+  			last if ($url eq $gs->metadata_url);
+  			$ref_id .= '-';
+  		}
+  		print STDERR "Initializing parent: $ref_id\n" unless $::_q > 1;
+  	}
+  	$gs
+  }
+  
+  sub call_authors_prog {
+  	my ($orig_author) = @_;
+  	$orig_author = command_oneline('rev-parse', '--sq-quote', $orig_author);
+  	my $author = `$::_authors_prog $orig_author`;
+  	if ($? != 0) {
+  		die "$::_authors_prog failed with exit code $?\n"
+  	}
+  	if ($author =~ /^\s*(.+?)\s*<(.*)>\s*$/) {
+  		my ($name, $email) = ($1, $2);
+  		$email = undef if length $2 == 0;
+  		return [$name, $email];
+  	} else {
+  		die "Author: $orig_author: $::_authors_prog returned "
+  			. "invalid author format: $author\n";
+  	}
+  }
+  
+  sub check_author {
+  	my ($author) = @_;
+  	if (!defined $author || length $author == 0) {
+  		$author = '(no author)';
+  	}
+  	if (!defined $::users{$author}) {
+  		if (defined $::_authors_prog) {
+  			$::users{$author} = call_authors_prog($author);
+  		} elsif (defined $::_authors) {
+  			die "Author: $author not defined in $::_authors file\n";
+  		}
+  	}
+  	$author;
+  }
+  
+  sub find_extra_svk_parents {
+  	my ($self, $tickets, $parents) = @_;
+  	# aha!  svk:merge property changed...
+  	my @tickets = split "\n", $tickets;
+  	my @known_parents;
+  	for my $ticket ( @tickets ) {
+  		my ($uuid, $path, $rev) = split /:/, $ticket;
+  		if ( $uuid eq $self->ra_uuid ) {
+  			my $repos_root = $self->url;
+  			my $branch_from = $path;
+  			$branch_from =~ s{^/}{};
+  			my $gs = $self->other_gs(add_path_to_url( $repos_root, $branch_from ),
+  			                         $repos_root,
+  			                         $branch_from,
+  			                         $rev,
+  			                         $self->{ref_id});
+  			if ( my $commit = $gs->rev_map_get($rev, $uuid) ) {
+  				# wahey!  we found it, but it might be
+  				# an old one (!)
+  				push @known_parents, [ $rev, $commit ];
+  			}
+  		}
+  	}
+  	# Ordering matters; highest-numbered commit merge tickets
+  	# first, as they may account for later merge ticket additions
+  	# or changes.
+  	@known_parents = map {$_->[1]} sort {$b->[0] <=> $a->[0]} @known_parents;
+  	for my $parent ( @known_parents ) {
+  		my @cmd = ('rev-list', $parent, map { "^$_" } @$parents );
+  		my ($msg_fh, $ctx) = command_output_pipe(@cmd);
+  		my $new;
+  		while ( <$msg_fh> ) {
+  			$new=1;last;
+  		}
+  		command_close_pipe($msg_fh, $ctx);
+  		if ( $new ) {
+  			print STDERR
+  			    "Found merge parent (svk:merge ticket): $parent\n";
+  			push @$parents, $parent;
+  		}
+  	}
+  }
+  
+  sub lookup_svn_merge {
+  	my $uuid = shift;
+  	my $url = shift;
+  	my $source = shift;
+  	my $revs = shift;
+  
+  	my $path = $source;
+  	$path =~ s{^/}{};
+  	my $gs = Git::SVN->find_by_url($url.$source, $url, $path);
+  	if ( !$gs ) {
+  		warn "Couldn't find revmap for $url$source\n";
+  		return;
+  	}
+  	my @ranges = split ",", $revs;
+  	my ($tip, $tip_commit);
+  	my @merged_commit_ranges;
+  	# find the tip
+  	for my $range ( @ranges ) {
+  		if ($range =~ /[*]$/) {
+  			warn "W: Ignoring partial merge in svn:mergeinfo "
+  				."dirprop: $source:$range\n";
+  			next;
+  		}
+  		my ($bottom, $top) = split "-", $range;
+  		$top ||= $bottom;
+  		my $bottom_commit = $gs->find_rev_after( $bottom, 1, $top );
+  		my $top_commit = $gs->find_rev_before( $top, 1, $bottom );
+  
+  		unless ($top_commit and $bottom_commit) {
+  			warn "W: unknown path/rev in svn:mergeinfo "
+  				."dirprop: $source:$range\n";
+  			next;
+  		}
+  
+  		if (scalar(command('rev-parse', "$bottom_commit^@"))) {
+  			push @merged_commit_ranges,
+  			     "$bottom_commit^..$top_commit";
+  		} else {
+  			push @merged_commit_ranges, "$top_commit";
+  		}
+  
+  		if ( !defined $tip or $top > $tip ) {
+  			$tip = $top;
+  			$tip_commit = $top_commit;
+  		}
+  	}
+  	return ($tip_commit, @merged_commit_ranges);
+  }
+  
+  sub _rev_list {
+  	my ($msg_fh, $ctx) = command_output_pipe(
+  		"rev-list", @_,
+  	       );
+  	my @rv;
+  	while ( <$msg_fh> ) {
+  		chomp;
+  		push @rv, $_;
+  	}
+  	command_close_pipe($msg_fh, $ctx);
+  	@rv;
+  }
+  
+  sub check_cherry_pick2 {
+  	my $base = shift;
+  	my $tip = shift;
+  	my $parents = shift;
+  	my @ranges = @_;
+  	my %commits = map { $_ => 1 }
+  		_rev_list("--no-merges", $tip, "--not", $base, @$parents, "--");
+  	for my $range ( @ranges ) {
+  		delete @commits{_rev_list($range, "--")};
+  	}
+  	for my $commit (keys %commits) {
+  		if (has_no_changes($commit)) {
+  			delete $commits{$commit};
+  		}
+  	}
+  	my @k = (keys %commits);
+  	return (scalar @k, $k[0]);
+  }
+  
+  sub has_no_changes {
+  	my $commit = shift;
+  
+  	my @revs = split / /, command_oneline(
+  		qw(rev-list --parents -1 -m), $commit);
+  
+  	# Commits with no parents, e.g. the start of a partial branch,
+  	# have changes by definition.
+  	return 1 if (@revs < 2);
+  
+  	# Commits with multiple parents, e.g a merge, have no changes
+  	# by definition.
+  	return 0 if (@revs > 2);
+  
+  	return (command_oneline("rev-parse", "$commit^{tree}") eq
+  		command_oneline("rev-parse", "$commit~1^{tree}"));
+  }
+  
+  sub tie_for_persistent_memoization {
+  	my $hash = shift;
+  	my $path = shift;
+  
+  	unless ($memo_backend) {
+  		if (eval { require Git::SVN::Memoize::YAML; 1}) {
+  			$memo_backend = 1;
+  		} else {
+  			require Memoize::Storable;
+  			$memo_backend = -1;
+  		}
+  	}
+  
+  	if ($memo_backend > 0) {
+  		tie %$hash => 'Git::SVN::Memoize::YAML', "$path.yaml";
+  	} else {
+  		# first verify that any existing file can actually be loaded
+  		# (it may have been saved by an incompatible version)
+  		my $db = "$path.db";
+  		if (-e $db) {
+  			use Storable qw(retrieve);
+  
+  			if (!eval { retrieve($db); 1 }) {
+  				unlink $db or die "unlink $db failed: $!";
+  			}
+  		}
+  		tie %$hash => 'Memoize::Storable', $db, 'nstore';
+  	}
+  }
+  
+  # The GIT_DIR environment variable is not always set until after the command
+  # line arguments are processed, so we can't memoize in a BEGIN block.
+  {
+  	my $memoized = 0;
+  
+  	sub memoize_svn_mergeinfo_functions {
+  		return if $memoized;
+  		$memoized = 1;
+  
+  		my $cache_path = svn_dir() . '/.caches/';
+  		mkpath([$cache_path]) unless -d $cache_path;
+  
+  		my %lookup_svn_merge_cache;
+  		my %check_cherry_pick2_cache;
+  		my %has_no_changes_cache;
+  
+  		tie_for_persistent_memoization(\%lookup_svn_merge_cache,
+  		    "$cache_path/lookup_svn_merge");
+  		memoize 'lookup_svn_merge',
+  			SCALAR_CACHE => 'FAULT',
+  			LIST_CACHE => ['HASH' => \%lookup_svn_merge_cache],
+  		;
+  
+  		tie_for_persistent_memoization(\%check_cherry_pick2_cache,
+  		    "$cache_path/check_cherry_pick2");
+  		memoize 'check_cherry_pick2',
+  			SCALAR_CACHE => 'FAULT',
+  			LIST_CACHE => ['HASH' => \%check_cherry_pick2_cache],
+  		;
+  
+  		tie_for_persistent_memoization(\%has_no_changes_cache,
+  		    "$cache_path/has_no_changes");
+  		memoize 'has_no_changes',
+  			SCALAR_CACHE => ['HASH' => \%has_no_changes_cache],
+  			LIST_CACHE => 'FAULT',
+  		;
+  	}
+  
+  	sub unmemoize_svn_mergeinfo_functions {
+  		return if not $memoized;
+  		$memoized = 0;
+  
+  		Memoize::unmemoize 'lookup_svn_merge';
+  		Memoize::unmemoize 'check_cherry_pick2';
+  		Memoize::unmemoize 'has_no_changes';
+  	}
+  
+  	sub clear_memoized_mergeinfo_caches {
+  		die "Only call this method in non-memoized context" if ($memoized);
+  
+  		my $cache_path = svn_dir() . '/.caches/';
+  		return unless -d $cache_path;
+  
+  		for my $cache_file (("$cache_path/lookup_svn_merge",
+  				     "$cache_path/check_cherry_pick", # old
+  				     "$cache_path/check_cherry_pick2",
+  				     "$cache_path/has_no_changes")) {
+  			for my $suffix (qw(yaml db)) {
+  				my $file = "$cache_file.$suffix";
+  				next unless -e $file;
+  				unlink($file) or die "unlink($file) failed: $!\n";
+  			}
+  		}
+  	}
+  
+  
+  	Memoize::memoize 'Git::SVN::repos_root';
+  }
+  
+  END {
+  	# Force cache writeout explicitly instead of waiting for
+  	# global destruction to avoid segfault in Storable:
+  	# http://rt.cpan.org/Public/Bug/Display.html?id=36087
+  	unmemoize_svn_mergeinfo_functions();
+  }
+  
+  sub parents_exclude {
+  	my $parents = shift;
+  	my @commits = @_;
+  	return unless @commits;
+  
+  	my @excluded;
+  	my $excluded;
+  	do {
+  		my @cmd = ('rev-list', "-1", @commits, "--not", @$parents );
+  		$excluded = command_oneline(@cmd);
+  		if ( $excluded ) {
+  			my @new;
+  			my $found;
+  			for my $commit ( @commits ) {
+  				if ( $commit eq $excluded ) {
+  					push @excluded, $commit;
+  					$found++;
+  				}
+  				else {
+  					push @new, $commit;
+  				}
+  			}
+  			die "saw commit '$excluded' in rev-list output, "
+  				."but we didn't ask for that commit (wanted: @commits --not @$parents)"
+  					unless $found;
+  			@commits = @new;
+  		}
+  	}
+  		while ($excluded and @commits);
+  
+  	return @excluded;
+  }
+  
+  # Compute what's new in svn:mergeinfo.
+  sub mergeinfo_changes {
+  	my ($self, $old_path, $old_rev, $path, $rev, $mergeinfo_prop) = @_;
+  	my %minfo = map {split ":", $_ } split "\n", $mergeinfo_prop;
+  	my $old_minfo = {};
+  
+  	my $ra = $self->ra;
+  	# Give up if $old_path isn't in the repo.
+  	# This is probably a merge on a subtree.
+  	if ($ra->check_path($old_path, $old_rev) != $SVN::Node::dir) {
+  		warn "W: ignoring svn:mergeinfo on $old_path, ",
+  			"directory didn't exist in r$old_rev\n";
+  		return {};
+  	}
+  	my (undef, undef, $props) = $ra->get_dir($old_path, $old_rev);
+  	if (defined $props->{"svn:mergeinfo"}) {
+  		my %omi = map {split ":", $_ } split "\n",
+  			$props->{"svn:mergeinfo"};
+  		$old_minfo = \%omi;
+  	}
+  
+  	my %changes = ();
+  	foreach my $p (keys %minfo) {
+  		my $a = $old_minfo->{$p} || "";
+  		my $b = $minfo{$p};
+  		# Omit merged branches whose ranges lists are unchanged.
+  		next if $a eq $b;
+  		# Remove any common range list prefix.
+  		($a ^ $b) =~ /^[\0]*/;
+  		my $common_prefix = rindex $b, ",", $+[0] - 1;
+  		$changes{$p} = substr $b, $common_prefix + 1;
+  	}
+  	print STDERR "Checking svn:mergeinfo changes since r$old_rev: ",
+  		scalar(keys %minfo), " sources, ",
+  		scalar(keys %changes), " changed\n";
+  
+  	return \%changes;
+  }
+  
+  # note: this function should only be called if the various dirprops
+  # have actually changed
+  sub find_extra_svn_parents {
+  	my ($self, $mergeinfo, $parents) = @_;
+  	# aha!  svk:merge property changed...
+  
+  	memoize_svn_mergeinfo_functions();
+  
+  	# We first search for merged tips which are not in our
+  	# history.  Then, we figure out which git revisions are in
+  	# that tip, but not this revision.  If all of those revisions
+  	# are now marked as merge, we can add the tip as a parent.
+  	my @merges = sort keys %$mergeinfo;
+  	my @merge_tips;
+  	my $url = $self->url;
+  	my $uuid = $self->ra_uuid;
+  	my @all_ranges;
+  	for my $merge ( @merges ) {
+  		my ($tip_commit, @ranges) =
+  			lookup_svn_merge( $uuid, $url,
+  					  $merge, $mergeinfo->{$merge} );
+  		unless (!$tip_commit or
+  				grep { $_ eq $tip_commit } @$parents ) {
+  			push @merge_tips, $tip_commit;
+  			push @all_ranges, @ranges;
+  		} else {
+  			push @merge_tips, undef;
+  		}
+  	}
+  
+  	my %excluded = map { $_ => 1 }
+  		parents_exclude($parents, grep { defined } @merge_tips);
+  
+  	# check merge tips for new parents
+  	my @new_parents;
+  	for my $merge_tip ( @merge_tips ) {
+  		my $merge = shift @merges;
+  		next unless $merge_tip and $excluded{$merge_tip};
+  		my $spec = "$merge:$mergeinfo->{$merge}";
+  
+  		# check out 'new' tips
+  		my $merge_base;
+  		eval {
+  			$merge_base = command_oneline(
+  				"merge-base",
+  				@$parents, $merge_tip,
+  			);
+  		};
+  		if ($@) {
+  			die "An error occurred during merge-base"
+  				unless $@->isa("Git::Error::Command");
+  
+  			warn "W: Cannot find common ancestor between ".
+  			     "@$parents and $merge_tip. Ignoring merge info.\n";
+  			next;
+  		}
+  
+  		# double check that there are no missing non-merge commits
+  		my ($ninc, $ifirst) = check_cherry_pick2(
+  			$merge_base, $merge_tip,
+  			$parents,
+  			@all_ranges,
+  		       );
+  
+  		if ($ninc) {
+  			warn "W: svn cherry-pick ignored ($spec) - missing " .
+  				"$ninc commit(s) (eg $ifirst)\n";
+  		} else {
+  			warn "Found merge parent ($spec): ", $merge_tip, "\n";
+  			push @new_parents, $merge_tip;
+  		}
+  	}
+  
+  	# cater for merges which merge commits from multiple branches
+  	if ( @new_parents > 1 ) {
+  		for ( my $i = 0; $i <= $#new_parents; $i++ ) {
+  			for ( my $j = 0; $j <= $#new_parents; $j++ ) {
+  				next if $i == $j;
+  				next unless $new_parents[$i];
+  				next unless $new_parents[$j];
+  				my $revs = command_oneline(
+  					"rev-list", "-1",
+  					"$new_parents[$i]..$new_parents[$j]",
+  				       );
+  				if ( !$revs ) {
+  					undef($new_parents[$j]);
+  				}
+  			}
+  		}
+  	}
+  	push @$parents, grep { defined } @new_parents;
+  }
+  
+  sub make_log_entry {
+  	my ($self, $rev, $parents, $ed, $parent_rev, $parent_path) = @_;
+  	my $untracked = $self->get_untracked($ed);
+  
+  	my @parents = @$parents;
+  	my $props = $ed->{dir_prop}{$self->path};
+  	if ($self->follow_parent) {
+  		my $tickets = $props->{"svk:merge"};
+  		if ($tickets) {
+  			$self->find_extra_svk_parents($tickets, \@parents);
+  		}
+  
+  		my $mergeinfo_prop = $props->{"svn:mergeinfo"};
+  		if ($mergeinfo_prop) {
+  			my $mi_changes = $self->mergeinfo_changes(
+  						$parent_path,
+  						$parent_rev,
+  						$self->path,
+  						$rev,
+  						$mergeinfo_prop);
+  			$self->find_extra_svn_parents($mi_changes, \@parents);
+  		}
+  	}
+  
+  	open my $un, '>>', "$self->{dir}/unhandled.log" or croak $!;
+  	print $un "r$rev\n" or croak $!;
+  	print $un $_, "\n" foreach @$untracked;
+  	my %log_entry = ( parents => \@parents, revision => $rev,
+  	                  log => '');
+  
+  	my $headrev;
+  	my $logged = delete $self->{logged_rev_props};
+  	if (!$logged || $self->{-want_revprops}) {
+  		my $rp = $self->ra->rev_proplist($rev);
+  		foreach (sort keys %$rp) {
+  			my $v = $rp->{$_};
+  			if (/^svn:(author|date|log)$/) {
+  				$log_entry{$1} = $v;
+  			} elsif ($_ eq 'svm:headrev') {
+  				$headrev = $v;
+  			} else {
+  				print $un "  rev_prop: ", uri_encode($_), ' ',
+  					  uri_encode($v), "\n";
+  			}
+  		}
+  	} else {
+  		map { $log_entry{$_} = $logged->{$_} } keys %$logged;
+  	}
+  	close $un or croak $!;
+  
+  	$log_entry{date} = parse_svn_date($log_entry{date});
+  	$log_entry{log} .= "\n";
+  	my $author = $log_entry{author} = check_author($log_entry{author});
+  	my ($name, $email) = defined $::users{$author} ? @{$::users{$author}}
+  						       : ($author, undef);
+  
+  	my ($commit_name, $commit_email) = ($name, $email);
+  	if ($_use_log_author) {
+  		my $name_field;
+  		if ($log_entry{log} =~ /From:\s+(.*\S)\s*\n/i) {
+  			$name_field = $1;
+  		} elsif ($log_entry{log} =~ /Signed-off-by:\s+(.*\S)\s*\n/i) {
+  			$name_field = $1;
+  		}
+  		if (!defined $name_field) {
+  			if (!defined $email) {
+  				$email = $name;
+  			}
+  		} elsif ($name_field =~ /(.*?)\s+<(.*)>/) {
+  			($name, $email) = ($1, $2);
+  		} elsif ($name_field =~ /(.*)@/) {
+  			($name, $email) = ($1, $name_field);
+  		} else {
+  			($name, $email) = ($name_field, $name_field);
+  		}
+  	}
+  	if (defined $headrev && $self->use_svm_props) {
+  		if ($self->rewrite_root) {
+  			die "Can't have both 'useSvmProps' and 'rewriteRoot' ",
+  			    "options set!\n";
+  		}
+  		if ($self->rewrite_uuid) {
+  			die "Can't have both 'useSvmProps' and 'rewriteUUID' ",
+  			    "options set!\n";
+  		}
+  		my ($uuid, $r) = $headrev =~ m{^([a-f\d\-]{30,}):(\d+)$}i;
+  		# we don't want "SVM: initializing mirror for junk" ...
+  		return undef if $r == 0;
+  		my $svm = $self->svm;
+  		if ($uuid ne $svm->{uuid}) {
+  			die "UUID mismatch on SVM path:\n",
+  			    "expected: $svm->{uuid}\n",
+  			    "     got: $uuid\n";
+  		}
+  		my $full_url = $self->full_url;
+  		$full_url =~ s#^\Q$svm->{replace}\E(/|$)#$svm->{source}$1# or
+  		             die "Failed to replace '$svm->{replace}' with ",
+  		                 "'$svm->{source}' in $full_url\n";
+  		# throw away username for storing in records
+  		remove_username($full_url);
+  		$log_entry{metadata} = "$full_url\@$r $uuid";
+  		$log_entry{svm_revision} = $r;
+  		$email ||= "$author\@$uuid";
+  		$commit_email ||= "$author\@$uuid";
+  	} elsif ($self->use_svnsync_props) {
+  		my $full_url = canonicalize_url(
+  			add_path_to_url( $self->svnsync->{url}, $self->path )
+  		);
+  		remove_username($full_url);
+  		my $uuid = $self->svnsync->{uuid};
+  		$log_entry{metadata} = "$full_url\@$rev $uuid";
+  		$email ||= "$author\@$uuid";
+  		$commit_email ||= "$author\@$uuid";
+  	} else {
+  		my $url = $self->metadata_url;
+  		remove_username($url);
+  		my $uuid = $self->rewrite_uuid || $self->ra->get_uuid;
+  		$log_entry{metadata} = "$url\@$rev " . $uuid;
+  		$email ||= "$author\@" . $uuid;
+  		$commit_email ||= "$author\@" . $uuid;
+  	}
+  	$log_entry{name} = $name;
+  	$log_entry{email} = $email;
+  	$log_entry{commit_name} = $commit_name;
+  	$log_entry{commit_email} = $commit_email;
+  	\%log_entry;
+  }
+  
+  sub fetch {
+  	my ($self, $min_rev, $max_rev, @parents) = @_;
+  	my ($last_rev, $last_commit) = $self->last_rev_commit;
+  	my ($base, $head) = $self->get_fetch_range($min_rev, $max_rev);
+  	$self->ra->gs_fetch_loop_common($base, $head, [$self]);
+  }
+  
+  sub set_tree_cb {
+  	my ($self, $log_entry, $tree, $rev, $date, $author) = @_;
+  	$self->{inject_parents} = { $rev => $tree };
+  	$self->fetch(undef, undef);
+  }
+  
+  sub set_tree {
+  	my ($self, $tree) = (shift, shift);
+  	my $log_entry = ::get_commit_entry($tree);
+  	unless ($self->{last_rev}) {
+  		fatal("Must have an existing revision to commit");
+  	}
+  	my %ed_opts = ( r => $self->{last_rev},
+  	                log => $log_entry->{log},
+  	                ra => $self->ra,
+  	                tree_a => $self->{last_commit},
+  	                tree_b => $tree,
+  	                editor_cb => sub {
+  			       $self->set_tree_cb($log_entry, $tree, @_) },
+  	                svn_path => $self->path );
+  	if (!Git::SVN::Editor->new(\%ed_opts)->apply_diff) {
+  		print "No changes\nr$self->{last_rev} = $tree\n";
+  	}
+  }
+  
+  sub rebuild_from_rev_db {
+  	my ($self, $path) = @_;
+  	my $r = -1;
+  	open my $fh, '<', $path or croak "open: $!";
+  	binmode $fh or croak "binmode: $!";
+  	while (<$fh>) {
+  		length($_) == 41 or croak "inconsistent size in ($_) != 41";
+  		chomp($_);
+  		++$r;
+  		next if $_ eq ('0' x 40);
+  		$self->rev_map_set($r, $_);
+  		print "r$r = $_\n";
+  	}
+  	close $fh or croak "close: $!";
+  	unlink $path or croak "unlink: $!";
+  }
+  
+  #define a global associate map to record rebuild status
+  my %rebuild_status;
+  #define a global associate map to record rebuild verify status
+  my %rebuild_verify_status;
+  
+  sub rebuild {
+  	my ($self) = @_;
+  	my $map_path = $self->map_path;
+  	my $partial = (-e $map_path && ! -z $map_path);
+  	my $verify_key = $self->refname.'^0';
+  	if (!$rebuild_verify_status{$verify_key}) {
+  		my $verify_result = ::verify_ref($verify_key);
+  		if ($verify_result) {
+  			$rebuild_verify_status{$verify_key} = 1;
+  		}
+  	}
+  	if (!$rebuild_verify_status{$verify_key}) {
+  		return;
+  	}
+  	if (!$partial && ($self->use_svm_props || $self->no_metadata)) {
+  		my $rev_db = $self->rev_db_path;
+  		$self->rebuild_from_rev_db($rev_db);
+  		if ($self->use_svm_props) {
+  			my $svm_rev_db = $self->rev_db_path($self->svm_uuid);
+  			$self->rebuild_from_rev_db($svm_rev_db);
+  		}
+  		$self->unlink_rev_db_symlink;
+  		return;
+  	}
+  	print "Rebuilding $map_path ...\n" if (!$partial);
+  	my ($base_rev, $head) = ($partial ? $self->rev_map_max_norebuild(1) :
+  		(undef, undef));
+  	my $key_value = ($head ? "$head.." : "") . $self->refname;
+  	if (exists $rebuild_status{$key_value}) {
+  		print "Done rebuilding $map_path\n" if (!$partial || !$head);
+  		my $rev_db_path = $self->rev_db_path;
+  		if (-f $self->rev_db_path) {
+  			unlink $self->rev_db_path or croak "unlink: $!";
+  		}
+  		$self->unlink_rev_db_symlink;
+  		return;
+  	}
+  	my ($log, $ctx) =
+  		command_output_pipe(qw/rev-list --pretty=raw --reverse/,
+  				$key_value,
+  				'--');
+  	$rebuild_status{$key_value} = 1;
+  	my $metadata_url = $self->metadata_url;
+  	remove_username($metadata_url);
+  	my $svn_uuid = $self->rewrite_uuid || $self->ra_uuid;
+  	my $c;
+  	while (<$log>) {
+  		if ( m{^commit ($::sha1)$} ) {
+  			$c = $1;
+  			next;
+  		}
+  		next unless s{^\s*(git-svn-id:)}{$1};
+  		my ($url, $rev, $uuid) = ::extract_metadata($_);
+  		remove_username($url);
+  
+  		# ignore merges (from set-tree)
+  		next if (!defined $rev || !$uuid);
+  
+  		# if we merged or otherwise started elsewhere, this is
+  		# how we break out of it
+  		if (($uuid ne $svn_uuid) ||
+  		    ($metadata_url && $url && ($url ne $metadata_url))) {
+  			next;
+  		}
+  		if ($partial && $head) {
+  			print "Partial-rebuilding $map_path ...\n";
+  			print "Currently at $base_rev = $head\n";
+  			$head = undef;
+  		}
+  
+  		$self->rev_map_set($rev, $c);
+  		print "r$rev = $c\n";
+  	}
+  	command_close_pipe($log, $ctx);
+  	print "Done rebuilding $map_path\n" if (!$partial || !$head);
+  	my $rev_db_path = $self->rev_db_path;
+  	if (-f $self->rev_db_path) {
+  		unlink $self->rev_db_path or croak "unlink: $!";
+  	}
+  	$self->unlink_rev_db_symlink;
+  }
+  
+  # rev_map:
+  # Tie::File seems to be prone to offset errors if revisions get sparse,
+  # it's not that fast, either.  Tie::File is also not in Perl 5.6.  So
+  # one of my favorite modules is out :<  Next up would be one of the DBM
+  # modules, but I'm not sure which is most portable...
+  #
+  # This is the replacement for the rev_db format, which was too big
+  # and inefficient for large repositories with a lot of sparse history
+  # (mainly tags)
+  #
+  # The format is this:
+  #   - 24 bytes for every record,
+  #     * 4 bytes for the integer representing an SVN revision number
+  #     * 20 bytes representing the sha1 of a git commit
+  #   - No empty padding records like the old format
+  #     (except the last record, which can be overwritten)
+  #   - new records are written append-only since SVN revision numbers
+  #     increase monotonically
+  #   - lookups on SVN revision number are done via a binary search
+  #   - Piping the file to xxd -c24 is a good way of dumping it for
+  #     viewing or editing (piped back through xxd -r), should the need
+  #     ever arise.
+  #   - The last record can be padding revision with an all-zero sha1
+  #     This is used to optimize fetch performance when using multiple
+  #     "fetch" directives in .git/config
+  #
+  # These files are disposable unless noMetadata or useSvmProps is set
+  
+  sub _rev_map_set {
+  	my ($fh, $rev, $commit) = @_;
+  
+  	binmode $fh or croak "binmode: $!";
+  	my $size = (stat($fh))[7];
+  	($size % 24) == 0 or croak "inconsistent size: $size";
+  
+  	my $wr_offset = 0;
+  	if ($size > 0) {
+  		sysseek($fh, -24, SEEK_END) or croak "seek: $!";
+  		my $read = sysread($fh, my $buf, 24) or croak "read: $!";
+  		$read == 24 or croak "read only $read bytes (!= 24)";
+  		my ($last_rev, $last_commit) = unpack(rev_map_fmt, $buf);
+  		if ($last_commit eq ('0' x40)) {
+  			if ($size >= 48) {
+  				sysseek($fh, -48, SEEK_END) or croak "seek: $!";
+  				$read = sysread($fh, $buf, 24) or
+  				    croak "read: $!";
+  				$read == 24 or
+  				    croak "read only $read bytes (!= 24)";
+  				($last_rev, $last_commit) =
+  				    unpack(rev_map_fmt, $buf);
+  				if ($last_commit eq ('0' x40)) {
+  					croak "inconsistent .rev_map\n";
+  				}
+  			}
+  			if ($last_rev >= $rev) {
+  				croak "last_rev is higher!: $last_rev >= $rev";
+  			}
+  			$wr_offset = -24;
+  		}
+  	}
+  	sysseek($fh, $wr_offset, SEEK_END) or croak "seek: $!";
+  	syswrite($fh, pack(rev_map_fmt, $rev, $commit), 24) == 24 or
+  	  croak "write: $!";
+  }
+  
+  sub _rev_map_reset {
+  	my ($fh, $rev, $commit) = @_;
+  	my $c = _rev_map_get($fh, $rev);
+  	$c eq $commit or die "_rev_map_reset(@_) commit $c does not match!\n";
+  	my $offset = sysseek($fh, 0, SEEK_CUR) or croak "seek: $!";
+  	truncate $fh, $offset or croak "truncate: $!";
+  }
+  
+  sub mkfile {
+  	my ($path) = @_;
+  	unless (-e $path) {
+  		my ($dir, $base) = ($path =~ m#^(.*?)/?([^/]+)$#);
+  		mkpath([$dir]) unless -d $dir;
+  		open my $fh, '>>', $path or die "Couldn't create $path: $!\n";
+  		close $fh or die "Couldn't close (create) $path: $!\n";
+  	}
+  }
+  
+  sub rev_map_set {
+  	my ($self, $rev, $commit, $update_ref, $uuid) = @_;
+  	defined $commit or die "missing arg3\n";
+  	length $commit == 40 or die "arg3 must be a full SHA1 hexsum\n";
+  	my $db = $self->map_path($uuid);
+  	my $db_lock = "$db.lock";
+  	my $sigmask;
+  	$update_ref ||= 0;
+  	if ($update_ref) {
+  		$sigmask = POSIX::SigSet->new();
+  		my $signew = POSIX::SigSet->new(SIGINT, SIGHUP, SIGTERM,
+  			SIGALRM, SIGUSR1, SIGUSR2);
+  		sigprocmask(SIG_BLOCK, $signew, $sigmask) or
+  			croak "Can't block signals: $!";
+  	}
+  	mkfile($db);
+  
+  	$LOCKFILES{$db_lock} = 1;
+  	my $sync;
+  	# both of these options make our .rev_db file very, very important
+  	# and we can't afford to lose it because rebuild() won't work
+  	if ($self->use_svm_props || $self->no_metadata) {
+  		require File::Copy;
+  		$sync = 1;
+  		File::Copy::copy($db, $db_lock) or die "rev_map_set(@_): ",
+  					   "Failed to copy: ",
+  					   "$db => $db_lock ($!)\n";
+  	} else {
+  		rename $db, $db_lock or die "rev_map_set(@_): ",
+  					    "Failed to rename: ",
+  					    "$db => $db_lock ($!)\n";
+  	}
+  
+  	sysopen(my $fh, $db_lock, O_RDWR | O_CREAT)
+  	     or croak "Couldn't open $db_lock: $!\n";
+  	if ($update_ref eq 'reset') {
+  		clear_memoized_mergeinfo_caches();
+  		_rev_map_reset($fh, $rev, $commit);
+  	} else {
+  		_rev_map_set($fh, $rev, $commit);
+  	}
+  
+  	if ($sync) {
+  		$fh->flush or die "Couldn't flush $db_lock: $!\n";
+  		$fh->sync or die "Couldn't sync $db_lock: $!\n";
+  	}
+  	close $fh or croak $!;
+  	if ($update_ref) {
+  		$_head = $self;
+  		my $note = "";
+  		$note = " ($update_ref)" if ($update_ref !~ /^\d*$/);
+  		command_noisy('update-ref', '-m', "r$rev$note",
+  		              $self->refname, $commit);
+  	}
+  	rename $db_lock, $db or die "rev_map_set(@_): ", "Failed to rename: ",
+  	                            "$db_lock => $db ($!)\n";
+  	delete $LOCKFILES{$db_lock};
+  	if ($update_ref) {
+  		sigprocmask(SIG_SETMASK, $sigmask) or
+  			croak "Can't restore signal mask: $!";
+  	}
+  }
+  
+  # If want_commit, this will return an array of (rev, commit) where
+  # commit _must_ be a valid commit in the archive.
+  # Otherwise, it'll return the max revision (whether or not the
+  # commit is valid or just a 0x40 placeholder).
+  sub rev_map_max {
+  	my ($self, $want_commit) = @_;
+  	$self->rebuild;
+  	my ($r, $c) = $self->rev_map_max_norebuild($want_commit);
+  	$want_commit ? ($r, $c) : $r;
+  }
+  
+  sub rev_map_max_norebuild {
+  	my ($self, $want_commit) = @_;
+  	my $map_path = $self->map_path;
+  	stat $map_path or return $want_commit ? (0, undef) : 0;
+  	sysopen(my $fh, $map_path, O_RDONLY) or croak "open: $!";
+  	binmode $fh or croak "binmode: $!";
+  	my $size = (stat($fh))[7];
+  	($size % 24) == 0 or croak "inconsistent size: $size";
+  
+  	if ($size == 0) {
+  		close $fh or croak "close: $!";
+  		return $want_commit ? (0, undef) : 0;
+  	}
+  
+  	sysseek($fh, -24, SEEK_END) or croak "seek: $!";
+  	sysread($fh, my $buf, 24) == 24 or croak "read: $!";
+  	my ($r, $c) = unpack(rev_map_fmt, $buf);
+  	if ($want_commit && $c eq ('0' x40)) {
+  		if ($size < 48) {
+  			return $want_commit ? (0, undef) : 0;
+  		}
+  		sysseek($fh, -48, SEEK_END) or croak "seek: $!";
+  		sysread($fh, $buf, 24) == 24 or croak "read: $!";
+  		($r, $c) = unpack(rev_map_fmt, $buf);
+  		if ($c eq ('0'x40)) {
+  			croak "Penultimate record is all-zeroes in $map_path";
+  		}
+  	}
+  	close $fh or croak "close: $!";
+  	$want_commit ? ($r, $c) : $r;
+  }
+  
+  sub rev_map_get {
+  	my ($self, $rev, $uuid) = @_;
+  	my $map_path = $self->map_path($uuid);
+  	return undef unless -e $map_path;
+  
+  	sysopen(my $fh, $map_path, O_RDONLY) or croak "open: $!";
+  	my $c = _rev_map_get($fh, $rev);
+  	close($fh) or croak "close: $!";
+  	$c
+  }
+  
+  sub _rev_map_get {
+  	my ($fh, $rev) = @_;
+  
+  	binmode $fh or croak "binmode: $!";
+  	my $size = (stat($fh))[7];
+  	($size % 24) == 0 or croak "inconsistent size: $size";
+  
+  	if ($size == 0) {
+  		return undef;
+  	}
+  
+  	my ($l, $u) = (0, $size - 24);
+  	my ($r, $c, $buf);
+  
+  	while ($l <= $u) {
+  		my $i = int(($l/24 + $u/24) / 2) * 24;
+  		sysseek($fh, $i, SEEK_SET) or croak "seek: $!";
+  		sysread($fh, my $buf, 24) == 24 or croak "read: $!";
+  		my ($r, $c) = unpack(rev_map_fmt, $buf);
+  
+  		if ($r < $rev) {
+  			$l = $i + 24;
+  		} elsif ($r > $rev) {
+  			$u = $i - 24;
+  		} else { # $r == $rev
+  			return $c eq ('0' x 40) ? undef : $c;
+  		}
+  	}
+  	undef;
+  }
+  
+  # Finds the first svn revision that exists on (if $eq_ok is true) or
+  # before $rev for the current branch.  It will not search any lower
+  # than $min_rev.  Returns the git commit hash and svn revision number
+  # if found, else (undef, undef).
+  sub find_rev_before {
+  	my ($self, $rev, $eq_ok, $min_rev) = @_;
+  	--$rev unless $eq_ok;
+  	$min_rev ||= 1;
+  	my $max_rev = $self->rev_map_max;
+  	$rev = $max_rev if ($rev > $max_rev);
+  	while ($rev >= $min_rev) {
+  		if (my $c = $self->rev_map_get($rev)) {
+  			return ($rev, $c);
+  		}
+  		--$rev;
+  	}
+  	return (undef, undef);
+  }
+  
+  # Finds the first svn revision that exists on (if $eq_ok is true) or
+  # after $rev for the current branch.  It will not search any higher
+  # than $max_rev.  Returns the git commit hash and svn revision number
+  # if found, else (undef, undef).
+  sub find_rev_after {
+  	my ($self, $rev, $eq_ok, $max_rev) = @_;
+  	++$rev unless $eq_ok;
+  	$max_rev ||= $self->rev_map_max;
+  	while ($rev <= $max_rev) {
+  		if (my $c = $self->rev_map_get($rev)) {
+  			return ($rev, $c);
+  		}
+  		++$rev;
+  	}
+  	return (undef, undef);
+  }
+  
+  sub _new {
+  	my ($class, $repo_id, $ref_id, $path) = @_;
+  	unless (defined $repo_id && length $repo_id) {
+  		$repo_id = $default_repo_id;
+  	}
+  	unless (defined $ref_id && length $ref_id) {
+  		# Access the prefix option from the git-svn main program if it's loaded.
+  		my $prefix = defined &::opt_prefix ? ::opt_prefix() : "";
+  		$_[2] = $ref_id =
+  		             "refs/remotes/$prefix$default_ref_id";
+  	}
+  	$_[1] = $repo_id;
+  	my $svn_dir = svn_dir();
+  	my $dir = "$svn_dir/$ref_id";
+  
+  	# Older repos imported by us used $svn_dir/foo instead of
+  	# $svn_dir/refs/remotes/foo when tracking refs/remotes/foo
+  	if ($ref_id =~ m{^refs/remotes/(.+)}) {
+  		my $old_dir = "$svn_dir/$1";
+  		if (-d $old_dir && ! -d $dir) {
+  			$dir = $old_dir;
+  		}
+  	}
+  
+  	$_[3] = $path = '' unless (defined $path);
+  	mkpath([$dir]);
+  	my $obj = bless {
+  		ref_id => $ref_id, dir => $dir, index => "$dir/index",
+  	        config => "$svn_dir/config",
+  	        map_root => "$dir/.rev_map", repo_id => $repo_id }, $class;
+  
+  	# Ensure it gets canonicalized
+  	$obj->path($path);
+  
+  	return $obj;
+  }
+  
+  sub path {
+  	my $self = shift;
+  
+  	if (@_) {
+  		my $path = shift;
+  		$self->{_path} = canonicalize_path($path);
+  		return;
+  	}
+  
+  	return $self->{_path};
+  }
+  
+  sub url {
+  	my $self = shift;
+  
+  	if (@_) {
+  		my $url = shift;
+  		$self->{url} = canonicalize_url($url);
+  		return;
+  	}
+  
+  	return $self->{url};
+  }
+  
+  # for read-only access of old .rev_db formats
+  sub unlink_rev_db_symlink {
+  	my ($self) = @_;
+  	my $link = $self->rev_db_path;
+  	$link =~ s/\.[\w-]+$// or croak "missing UUID at the end of $link";
+  	if (-l $link) {
+  		unlink $link or croak "unlink: $link failed!";
+  	}
+  }
+  
+  sub rev_db_path {
+  	my ($self, $uuid) = @_;
+  	my $db_path = $self->map_path($uuid);
+  	$db_path =~ s{/\.rev_map\.}{/\.rev_db\.}
+  	    or croak "map_path: $db_path does not contain '/.rev_map.' !";
+  	$db_path;
+  }
+  
+  # the new replacement for .rev_db
+  sub map_path {
+  	my ($self, $uuid) = @_;
+  	$uuid ||= $self->ra_uuid;
+  	"$self->{map_root}.$uuid";
+  }
+  
+  sub uri_encode {
+  	my ($f) = @_;
+  	$f =~ s#([^a-zA-Z0-9\*!\:_\./\-])#sprintf("%%%02X",ord($1))#eg;
+  	$f
+  }
+  
+  sub uri_decode {
+  	my ($f) = @_;
+  	$f =~ s#%([0-9a-fA-F]{2})#chr(hex($1))#eg;
+  	$f
+  }
+  
+  sub remove_username {
+  	$_[0] =~ s{^([^:]*://)[^@]+@}{$1};
+  }
+  
+  1;
+GIT_SVN
+
+$fatpacked{"Git/SVN/Editor.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN_EDITOR';
+  package Git::SVN::Editor;
+  use vars qw/@ISA $_rmdir $_cp_similarity $_find_copies_harder $_rename_limit/;
+  use strict;
+  use warnings;
+  use SVN::Core;
+  use SVN::Delta;
+  use Carp qw/croak/;
+  use Git qw/command command_oneline command_noisy command_output_pipe
+             command_input_pipe command_close_pipe
+             command_bidi_pipe command_close_bidi_pipe
+             get_record/;
+  
+  BEGIN {
+  	@ISA = qw(SVN::Delta::Editor);
+  }
+  
+  sub new {
+  	my ($class, $opts) = @_;
+  	foreach (qw/svn_path r ra tree_a tree_b log editor_cb/) {
+  		die "$_ required!\n" unless (defined $opts->{$_});
+  	}
+  
+  	my $pool = SVN::Pool->new;
+  	my $mods = generate_diff($opts->{tree_a}, $opts->{tree_b});
+  	my $types = check_diff_paths($opts->{ra}, $opts->{svn_path},
+  	                             $opts->{r}, $mods);
+  
+  	# $opts->{ra} functions should not be used after this:
+  	my @ce  = $opts->{ra}->get_commit_editor($opts->{log},
+  	                                        $opts->{editor_cb}, $pool);
+  	my $self = SVN::Delta::Editor->new(@ce, $pool);
+  	bless $self, $class;
+  	foreach (qw/svn_path r tree_a tree_b/) {
+  		$self->{$_} = $opts->{$_};
+  	}
+  	$self->{url} = $opts->{ra}->{url};
+  	$self->{mods} = $mods;
+  	$self->{types} = $types;
+  	$self->{pool} = $pool;
+  	$self->{bat} = { '' => $self->open_root($self->{r}, $self->{pool}) };
+  	$self->{rm} = { };
+  	$self->{path_prefix} = length $self->{svn_path} ?
+  	                       "$self->{svn_path}/" : '';
+  	$self->{config} = $opts->{config};
+  	$self->{mergeinfo} = $opts->{mergeinfo};
+  	$self->{pathnameencoding} = Git::config('svn.pathnameencoding');
+  	return $self;
+  }
+  
+  sub generate_diff {
+  	my ($tree_a, $tree_b) = @_;
+  	my @diff_tree = qw(diff-tree -z -r);
+  	if ($_cp_similarity) {
+  		push @diff_tree, "-C$_cp_similarity";
+  	} else {
+  		push @diff_tree, '-C';
+  	}
+  	push @diff_tree, '--find-copies-harder' if $_find_copies_harder;
+  	push @diff_tree, "-l$_rename_limit" if defined $_rename_limit;
+  	push @diff_tree, $tree_a, $tree_b;
+  	my ($diff_fh, $ctx) = command_output_pipe(@diff_tree);
+  	my $state = 'meta';
+  	my @mods;
+  	while (defined($_ = get_record($diff_fh, "\0"))) {
+  		if ($state eq 'meta' && /^:(\d{6})\s(\d{6})\s
+  					($::sha1)\s($::sha1)\s
+  					([MTCRAD])\d*$/xo) {
+  			push @mods, {	mode_a => $1, mode_b => $2,
+  					sha1_a => $3, sha1_b => $4,
+  					chg => $5 };
+  			if ($5 =~ /^(?:C|R)$/) {
+  				$state = 'file_a';
+  			} else {
+  				$state = 'file_b';
+  			}
+  		} elsif ($state eq 'file_a') {
+  			my $x = $mods[$#mods] or croak "Empty array\n";
+  			if ($x->{chg} !~ /^(?:C|R)$/) {
+  				croak "Error parsing $_, $x->{chg}\n";
+  			}
+  			$x->{file_a} = $_;
+  			$state = 'file_b';
+  		} elsif ($state eq 'file_b') {
+  			my $x = $mods[$#mods] or croak "Empty array\n";
+  			if (exists $x->{file_a} && $x->{chg} !~ /^(?:C|R)$/) {
+  				croak "Error parsing $_, $x->{chg}\n";
+  			}
+  			if (!exists $x->{file_a} && $x->{chg} =~ /^(?:C|R)$/) {
+  				croak "Error parsing $_, $x->{chg}\n";
+  			}
+  			$x->{file_b} = $_;
+  			$state = 'meta';
+  		} else {
+  			croak "Error parsing $_\n";
+  		}
+  	}
+  	command_close_pipe($diff_fh, $ctx);
+  	\@mods;
+  }
+  
+  sub check_diff_paths {
+  	my ($ra, $pfx, $rev, $mods) = @_;
+  	my %types;
+  	$pfx .= '/' if length $pfx;
+  
+  	sub type_diff_paths {
+  		my ($ra, $types, $path, $rev) = @_;
+  		my @p = split m#/+#, $path;
+  		my $c = shift @p;
+  		unless (defined $types->{$c}) {
+  			$types->{$c} = $ra->check_path($c, $rev);
+  		}
+  		while (@p) {
+  			$c .= '/' . shift @p;
+  			next if defined $types->{$c};
+  			$types->{$c} = $ra->check_path($c, $rev);
+  		}
+  	}
+  
+  	foreach my $m (@$mods) {
+  		foreach my $f (qw/file_a file_b/) {
+  			next unless defined $m->{$f};
+  			my ($dir) = ($m->{$f} =~ m#^(.*?)/?(?:[^/]+)$#);
+  			if (length $pfx.$dir && ! defined $types{$dir}) {
+  				type_diff_paths($ra, \%types, $pfx.$dir, $rev);
+  			}
+  		}
+  	}
+  	\%types;
+  }
+  
+  sub split_path {
+  	return ($_[0] =~ m#^(.*?)/?([^/]+)$#);
+  }
+  
+  sub repo_path {
+  	my ($self, $path) = @_;
+  	if (my $enc = $self->{pathnameencoding}) {
+  		require Encode;
+  		Encode::from_to($path, $enc, 'UTF-8');
+  	}
+  	$self->{path_prefix}.(defined $path ? $path : '');
+  }
+  
+  sub url_path {
+  	my ($self, $path) = @_;
+  	$path = $self->repo_path($path);
+  	if ($self->{url} =~ m#^https?://#) {
+  		# characters are taken from subversion/libsvn_subr/path.c
+  		$path =~ s#([^~a-zA-Z0-9_./!$&'()*+,-])#sprintf("%%%02X",ord($1))#eg;
+  	}
+  	$self->{url} . '/' . $path;
+  }
+  
+  sub rmdirs {
+  	my ($self) = @_;
+  	my $rm = $self->{rm};
+  	delete $rm->{''}; # we never delete the url we're tracking
+  	return unless %$rm;
+  
+  	foreach (keys %$rm) {
+  		my @d = split m#/#, $_;
+  		my $c = shift @d;
+  		$rm->{$c} = 1;
+  		while (@d) {
+  			$c .= '/' . shift @d;
+  			$rm->{$c} = 1;
+  		}
+  	}
+  	delete $rm->{$self->{svn_path}};
+  	delete $rm->{''}; # we never delete the url we're tracking
+  	return unless %$rm;
+  
+  	my ($fh, $ctx) = command_output_pipe(qw/ls-tree --name-only -r -z/,
+  	                                     $self->{tree_b});
+  	while (defined($_ = get_record($fh, "\0"))) {
+  		my @dn = split m#/#, $_;
+  		while (pop @dn) {
+  			delete $rm->{join '/', @dn};
+  		}
+  		unless (%$rm) {
+  			close $fh;
+  			return;
+  		}
+  	}
+  	command_close_pipe($fh, $ctx);
+  
+  	my ($r, $p, $bat) = ($self->{r}, $self->{pool}, $self->{bat});
+  	foreach my $d (sort { $b =~ tr#/#/# <=> $a =~ tr#/#/# } keys %$rm) {
+  		$self->close_directory($bat->{$d}, $p);
+  		my ($dn) = ($d =~ m#^(.*?)/?(?:[^/]+)$#);
+  		print "\tD+\t$d/\n" unless $::_q;
+  		$self->SUPER::delete_entry($d, $r, $bat->{$dn}, $p);
+  		delete $bat->{$d};
+  	}
+  }
+  
+  sub open_or_add_dir {
+  	my ($self, $full_path, $baton, $deletions) = @_;
+  	my $t = $self->{types}->{$full_path};
+  	if (!defined $t) {
+  		die "$full_path not known in r$self->{r} or we have a bug!\n";
+  	}
+  	{
+  		no warnings 'once';
+  		# SVN::Node::none and SVN::Node::file are used only once,
+  		# so we're shutting up Perl's warnings about them.
+  		if ($t == $SVN::Node::none || defined($deletions->{$full_path})) {
+  			return $self->add_directory($full_path, $baton,
+  			    undef, -1, $self->{pool});
+  		} elsif ($t == $SVN::Node::dir) {
+  			return $self->open_directory($full_path, $baton,
+  			    $self->{r}, $self->{pool});
+  		} # no warnings 'once'
+  		print STDERR "$full_path already exists in repository at ",
+  		    "r$self->{r} and it is not a directory (",
+  		    ($t == $SVN::Node::file ? 'file' : 'unknown'),"/$t)\n";
+  	} # no warnings 'once'
+  	exit 1;
+  }
+  
+  sub ensure_path {
+  	my ($self, $path, $deletions) = @_;
+  	my $bat = $self->{bat};
+  	my $repo_path = $self->repo_path($path);
+  	return $bat->{''} unless (length $repo_path);
+  
+  	my @p = split m#/+#, $repo_path;
+  	my $c = shift @p;
+  	$bat->{$c} ||= $self->open_or_add_dir($c, $bat->{''}, $deletions);
+  	while (@p) {
+  		my $c0 = $c;
+  		$c .= '/' . shift @p;
+  		$bat->{$c} ||= $self->open_or_add_dir($c, $bat->{$c0}, $deletions);
+  	}
+  	return $bat->{$c};
+  }
+  
+  # Subroutine to convert a globbing pattern to a regular expression.
+  # From perl cookbook.
+  sub glob2pat {
+  	my $globstr = shift;
+  	my %patmap = ('*' => '.*', '?' => '.', '[' => '[', ']' => ']');
+  	$globstr =~ s{(.)} { $patmap{$1} || "\Q$1" }ge;
+  	return '^' . $globstr . '$';
+  }
+  
+  sub check_autoprop {
+  	my ($self, $pattern, $properties, $file, $fbat) = @_;
+  	# Convert the globbing pattern to a regular expression.
+  	my $regex = glob2pat($pattern);
+  	# Check if the pattern matches the file name.
+  	if($file =~ m/($regex)/) {
+  		# Parse the list of properties to set.
+  		my @props = split(/;/, $properties);
+  		foreach my $prop (@props) {
+  			# Parse 'name=value' syntax and set the property.
+  			if ($prop =~ /([^=]+)=(.*)/) {
+  				my ($n,$v) = ($1,$2);
+  				for ($n, $v) {
+  					s/^\s+//; s/\s+$//;
+  				}
+  				$self->change_file_prop($fbat, $n, $v);
+  			}
+  		}
+  	}
+  }
+  
+  sub apply_autoprops {
+  	my ($self, $file, $fbat) = @_;
+  	my $conf_t = ${$self->{config}}{'config'};
+  	no warnings 'once';
+  	# Check [miscellany]/enable-auto-props in svn configuration.
+  	if (SVN::_Core::svn_config_get_bool(
+  		$conf_t,
+  		$SVN::_Core::SVN_CONFIG_SECTION_MISCELLANY,
+  		$SVN::_Core::SVN_CONFIG_OPTION_ENABLE_AUTO_PROPS,
+  		0)) {
+  		# Auto-props are enabled.  Enumerate them to look for matches.
+  		my $callback = sub {
+  			$self->check_autoprop($_[0], $_[1], $file, $fbat);
+  		};
+  		SVN::_Core::svn_config_enumerate(
+  			$conf_t,
+  			$SVN::_Core::SVN_CONFIG_SECTION_AUTO_PROPS,
+  			$callback);
+  	}
+  }
+  
+  sub check_attr {
+  	my ($attr,$path) = @_;
+  	my $val = command_oneline("check-attr", $attr, "--", $path);
+  	if ($val) { $val =~ s/^[^:]*:\s*[^:]*:\s*(.*)\s*$/$1/; }
+  	return $val;
+  }
+  
+  sub apply_manualprops {
+  	my ($self, $file, $fbat) = @_;
+  	my $pending_properties = check_attr( "svn-properties", $file );
+  	if ($pending_properties eq "") { return; }
+  	# Parse the list of properties to set.
+  	my @props = split(/;/, $pending_properties);
+  	# TODO: get existing properties to compare to
+  	# - this fails for add so currently not done
+  	# my $existing_props = ::get_svnprops($file);
+  	my $existing_props = {};
+  	# TODO: caching svn properties or storing them in .gitattributes
+  	# would make that faster
+  	foreach my $prop (@props) {
+  		# Parse 'name=value' syntax and set the property.
+  		if ($prop =~ /([^=]+)=(.*)/) {
+  			my ($n,$v) = ($1,$2);
+  			for ($n, $v) {
+  				s/^\s+//; s/\s+$//;
+  			}
+  			my $existing = $existing_props->{$n};
+  			if (!defined($existing) || $existing ne $v) {
+  			    $self->change_file_prop($fbat, $n, $v);
+  			}
+  		}
+  	}
+  }
+  
+  sub A {
+  	my ($self, $m, $deletions) = @_;
+  	my ($dir, $file) = split_path($m->{file_b});
+  	my $pbat = $self->ensure_path($dir, $deletions);
+  	my $fbat = $self->add_file($self->repo_path($m->{file_b}), $pbat,
+  					undef, -1);
+  	print "\tA\t$m->{file_b}\n" unless $::_q;
+  	$self->apply_autoprops($file, $fbat);
+  	$self->apply_manualprops($m->{file_b}, $fbat);
+  	$self->chg_file($fbat, $m);
+  	$self->close_file($fbat,undef,$self->{pool});
+  }
+  
+  sub C {
+  	my ($self, $m, $deletions) = @_;
+  	my ($dir, $file) = split_path($m->{file_b});
+  	my $pbat = $self->ensure_path($dir, $deletions);
+  	# workaround for a bug in svn serf backend (v1.8.5 and below):
+  	# store third argument to ->add_file() in a local variable, to make it
+  	# have the same lifetime as $fbat
+  	my $upa = $self->url_path($m->{file_a});
+  	my $fbat = $self->add_file($self->repo_path($m->{file_b}), $pbat,
+  				$upa, $self->{r});
+  	print "\tC\t$m->{file_a} => $m->{file_b}\n" unless $::_q;
+  	$self->apply_manualprops($m->{file_b}, $fbat);
+  	$self->chg_file($fbat, $m);
+  	$self->close_file($fbat,undef,$self->{pool});
+  }
+  
+  sub delete_entry {
+  	my ($self, $path, $pbat) = @_;
+  	my $rpath = $self->repo_path($path);
+  	my ($dir, $file) = split_path($rpath);
+  	$self->{rm}->{$dir} = 1;
+  	$self->SUPER::delete_entry($rpath, $self->{r}, $pbat, $self->{pool});
+  }
+  
+  sub R {
+  	my ($self, $m, $deletions) = @_;
+  	my ($dir, $file) = split_path($m->{file_b});
+  	my $pbat = $self->ensure_path($dir, $deletions);
+  	# workaround for a bug in svn serf backend, see comment in C() above
+  	my $upa = $self->url_path($m->{file_a});
+  	my $fbat = $self->add_file($self->repo_path($m->{file_b}), $pbat,
+  				$upa, $self->{r});
+  	print "\tR\t$m->{file_a} => $m->{file_b}\n" unless $::_q;
+  	$self->apply_autoprops($file, $fbat);
+  	$self->apply_manualprops($m->{file_b}, $fbat);
+  	$self->chg_file($fbat, $m);
+  	$self->close_file($fbat,undef,$self->{pool});
+  
+  	($dir, $file) = split_path($m->{file_a});
+  	$pbat = $self->ensure_path($dir, $deletions);
+  	$self->delete_entry($m->{file_a}, $pbat);
+  }
+  
+  sub M {
+  	my ($self, $m, $deletions) = @_;
+  	my ($dir, $file) = split_path($m->{file_b});
+  	my $pbat = $self->ensure_path($dir, $deletions);
+  	my $fbat = $self->open_file($self->repo_path($m->{file_b}),
+  				$pbat,$self->{r},$self->{pool});
+  	print "\t$m->{chg}\t$m->{file_b}\n" unless $::_q;
+  	$self->apply_manualprops($m->{file_b}, $fbat);
+  	$self->chg_file($fbat, $m);
+  	$self->close_file($fbat,undef,$self->{pool});
+  }
+  
+  sub T {
+  	my ($self, $m, $deletions) = @_;
+  
+  	# Work around subversion issue 4091: toggling the "is a
+  	# symlink" property requires removing and re-adding a
+  	# file or else "svn up" on affected clients trips an
+  	# assertion and aborts.
+  	if (($m->{mode_b} =~ /^120/ && $m->{mode_a} !~ /^120/) ||
+  	    ($m->{mode_b} !~ /^120/ && $m->{mode_a} =~ /^120/)) {
+  		$self->D({
+  			mode_a => $m->{mode_a}, mode_b => '000000',
+  			sha1_a => $m->{sha1_a}, sha1_b => '0' x 40,
+  			chg => 'D', file_b => $m->{file_b}
+  		}, $deletions);
+  		$self->A({
+  			mode_a => '000000', mode_b => $m->{mode_b},
+  			sha1_a => '0' x 40, sha1_b => $m->{sha1_b},
+  			chg => 'A', file_b => $m->{file_b}
+  		}, $deletions);
+  		return;
+  	}
+  
+  	$self->M($m, $deletions);
+  }
+  
+  sub change_file_prop {
+  	my ($self, $fbat, $pname, $pval) = @_;
+  	$self->SUPER::change_file_prop($fbat, $pname, $pval, $self->{pool});
+  }
+  
+  sub change_dir_prop {
+  	my ($self, $pbat, $pname, $pval) = @_;
+  	$self->SUPER::change_dir_prop($pbat, $pname, $pval, $self->{pool});
+  }
+  
+  sub _chg_file_get_blob ($$$$) {
+  	my ($self, $fbat, $m, $which) = @_;
+  	my $fh = $::_repository->temp_acquire("git_blob_$which");
+  	if ($m->{"mode_$which"} =~ /^120/) {
+  		print $fh 'link ' or croak $!;
+  		$self->change_file_prop($fbat,'svn:special','*');
+  	} elsif ($m->{mode_a} =~ /^120/ && $m->{"mode_$which"} !~ /^120/) {
+  		$self->change_file_prop($fbat,'svn:special',undef);
+  	}
+  	my $blob = $m->{"sha1_$which"};
+  	return ($fh,) if ($blob =~ /^0{40}$/);
+  	my $size = $::_repository->cat_blob($blob, $fh);
+  	croak "Failed to read object $blob" if ($size < 0);
+  	$fh->flush == 0 or croak $!;
+  	seek $fh, 0, 0 or croak $!;
+  
+  	my $exp = ::md5sum($fh);
+  	seek $fh, 0, 0 or croak $!;
+  	return ($fh, $exp);
+  }
+  
+  sub chg_file {
+  	my ($self, $fbat, $m) = @_;
+  	if ($m->{mode_b} =~ /755$/ && $m->{mode_a} !~ /755$/) {
+  		$self->change_file_prop($fbat,'svn:executable','*');
+  	} elsif ($m->{mode_b} !~ /755$/ && $m->{mode_a} =~ /755$/) {
+  		$self->change_file_prop($fbat,'svn:executable',undef);
+  	}
+  	my ($fh_a, $exp_a) = _chg_file_get_blob $self, $fbat, $m, 'a';
+  	my ($fh_b, $exp_b) = _chg_file_get_blob $self, $fbat, $m, 'b';
+  	my $pool = SVN::Pool->new;
+  	my $atd = $self->apply_textdelta($fbat, $exp_a, $pool);
+  	if (-s $fh_a) {
+  		my $txstream = SVN::TxDelta::new ($fh_a, $fh_b, $pool);
+  		my $res = SVN::TxDelta::send_txstream($txstream, @$atd, $pool);
+  		if (defined $res) {
+  			die "Unexpected result from send_txstream: $res\n",
+  			    "(SVN::Core::VERSION: $SVN::Core::VERSION)\n";
+  		}
+  	} else {
+  		my $got = SVN::TxDelta::send_stream($fh_b, @$atd, $pool);
+  		die "Checksum mismatch\nexpected: $exp_b\ngot: $got\n"
+  		    if ($got ne $exp_b);
+  	}
+  	Git::temp_release($fh_b, 1);
+  	Git::temp_release($fh_a, 1);
+  	$pool->clear;
+  }
+  
+  sub D {
+  	my ($self, $m, $deletions) = @_;
+  	my ($dir, $file) = split_path($m->{file_b});
+  	my $pbat = $self->ensure_path($dir, $deletions);
+  	print "\tD\t$m->{file_b}\n" unless $::_q;
+  	$self->delete_entry($m->{file_b}, $pbat);
+  }
+  
+  sub close_edit {
+  	my ($self) = @_;
+  	my ($p,$bat) = ($self->{pool}, $self->{bat});
+  	foreach (sort { $b =~ tr#/#/# <=> $a =~ tr#/#/# } keys %$bat) {
+  		next if $_ eq '';
+  		$self->close_directory($bat->{$_}, $p);
+  	}
+  	$self->close_directory($bat->{''}, $p);
+  	$self->SUPER::close_edit($p);
+  	$p->clear;
+  }
+  
+  sub abort_edit {
+  	my ($self) = @_;
+  	$self->SUPER::abort_edit($self->{pool});
+  }
+  
+  sub DESTROY {
+  	my $self = shift;
+  	$self->SUPER::DESTROY(@_);
+  	$self->{pool}->clear;
+  }
+  
+  # this drives the editor
+  sub apply_diff {
+  	my ($self) = @_;
+  	my $mods = $self->{mods};
+  	my %o = ( D => 0, C => 1, R => 2, A => 3, M => 4, T => 5 );
+  	my %deletions;
+  
+  	foreach my $m (@$mods) {
+  		if ($m->{chg} eq "D") {
+  			$deletions{$m->{file_b}} = 1;
+  		}
+  	}
+  
+  	foreach my $m (sort { $o{$a->{chg}} <=> $o{$b->{chg}} } @$mods) {
+  		my $f = $m->{chg};
+  		if (defined $o{$f}) {
+  			$self->$f($m, \%deletions);
+  		} else {
+  			fatal("Invalid change type: $f");
+  		}
+  	}
+  
+  	if (defined($self->{mergeinfo})) {
+  		$self->change_dir_prop($self->{bat}{''}, "svn:mergeinfo",
+  			               $self->{mergeinfo});
+  	}
+  	$self->rmdirs if $_rmdir;
+  	if (@$mods == 0 && !defined($self->{mergeinfo})) {
+  		$self->abort_edit;
+  	} else {
+  		$self->close_edit;
+  	}
+  	return scalar @$mods;
+  }
+  
+  1;
+  __END__
+  
+  =head1 NAME
+  
+  Git::SVN::Editor - commit driver for "git svn set-tree" and dcommit
+  
+  =head1 SYNOPSIS
+  
+  	use Git::SVN::Editor;
+  	use Git::SVN::Ra;
+  
+  	my $ra = Git::SVN::Ra->new($url);
+  	my %opts = (
+  		r => 19,
+  		log => "log message",
+  		ra => $ra,
+  		config => SVN::Core::config_get_config($svn_config_dir),
+  		tree_a => "$commit^",
+  		tree_b => "$commit",
+  		editor_cb => sub { print "Committed r$_[0]\n"; },
+  		mergeinfo => "/branches/foo:1-10",
+  		svn_path => "trunk"
+  	);
+  	Git::SVN::Editor->new(\%opts)->apply_diff or print "No changes\n";
+  
+  	my $re = Git::SVN::Editor::glob2pat("trunk/*");
+  	if ($branchname =~ /$re/) {
+  		print "matched!\n";
+  	}
+  
+  =head1 DESCRIPTION
+  
+  This module is an implementation detail of the "git svn" command.
+  Do not use it unless you are developing git-svn.
+  
+  This module adapts the C<SVN::Delta::Editor> object returned by
+  C<SVN::Delta::get_commit_editor> and drives it to convey the
+  difference between two git tree objects to a remote Subversion
+  repository.
+  
+  The interface will change as git-svn evolves.
+  
+  =head1 DEPENDENCIES
+  
+  Subversion perl bindings,
+  the core L<Carp> module,
+  and git's L<Git> helper module.
+  
+  C<Git::SVN::Editor> has not been tested using callers other than
+  B<git-svn> itself.
+  
+  =head1 SEE ALSO
+  
+  L<SVN::Delta>,
+  L<Git::SVN::Fetcher>.
+  
+  =head1 INCOMPATIBILITIES
+  
+  None reported.
+  
+  =head1 BUGS
+  
+  None.
+GIT_SVN_EDITOR
+
+$fatpacked{"Git/SVN/Fetcher.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN_FETCHER';
+  package Git::SVN::Fetcher;
+  use vars qw/@ISA $_ignore_regex $_include_regex $_preserve_empty_dirs
+              $_placeholder_filename @deleted_gpath %added_placeholder
+              $repo_id/;
+  use strict;
+  use warnings;
+  use SVN::Delta;
+  use Carp qw/croak/;
+  use File::Basename qw/dirname/;
+  use Git qw/command command_oneline command_noisy command_output_pipe
+             command_input_pipe command_close_pipe
+             command_bidi_pipe command_close_bidi_pipe
+             get_record/;
+  BEGIN {
+  	@ISA = qw(SVN::Delta::Editor);
+  }
+  
+  # file baton members: path, mode_a, mode_b, pool, fh, blob, base
+  sub new {
+  	my ($class, $git_svn, $switch_path) = @_;
+  	my $self = SVN::Delta::Editor->new;
+  	bless $self, $class;
+  	if (exists $git_svn->{last_commit}) {
+  		$self->{c} = $git_svn->{last_commit};
+  		$self->{empty_symlinks} =
+  		                  _mark_empty_symlinks($git_svn, $switch_path);
+  	}
+  
+  	# some options are read globally, but can be overridden locally
+  	# per [svn-remote "..."] section.  Command-line options will *NOT*
+  	# override options set in an [svn-remote "..."] section
+  	$repo_id = $git_svn->{repo_id};
+  	my $k = "svn-remote.$repo_id.ignore-paths";
+  	my $v = eval { command_oneline('config', '--get', $k) };
+  	$self->{ignore_regex} = $v;
+  
+  	$k = "svn-remote.$repo_id.include-paths";
+  	$v = eval { command_oneline('config', '--get', $k) };
+  	$self->{include_regex} = $v;
+  
+  	$k = "svn-remote.$repo_id.preserve-empty-dirs";
+  	$v = eval { command_oneline('config', '--get', '--bool', $k) };
+  	if ($v && $v eq 'true') {
+  		$_preserve_empty_dirs = 1;
+  		$k = "svn-remote.$repo_id.placeholder-filename";
+  		$v = eval { command_oneline('config', '--get', $k) };
+  		$_placeholder_filename = $v;
+  	}
+  
+  	# Load the list of placeholder files added during previous invocations.
+  	$k = "svn-remote.$repo_id.added-placeholder";
+  	$v = eval { command_oneline('config', '--get-all', $k) };
+  	if ($_preserve_empty_dirs && $v) {
+  		# command() prints errors to stderr, so we only call it if
+  		# command_oneline() succeeded.
+  		my @v = command('config', '--get-all', $k);
+  		$added_placeholder{ dirname($_) } = $_ foreach @v;
+  	}
+  
+  	$self->{empty} = {};
+  	$self->{dir_prop} = {};
+  	$self->{file_prop} = {};
+  	$self->{absent_dir} = {};
+  	$self->{absent_file} = {};
+  	require Git::IndexInfo;
+  	$self->{gii} = $git_svn->tmp_index_do(sub { Git::IndexInfo->new });
+  	$self->{pathnameencoding} = Git::config('svn.pathnameencoding');
+  	$self;
+  }
+  
+  # this uses the Ra object, so it must be called before do_{switch,update},
+  # not inside them (when the Git::SVN::Fetcher object is passed) to
+  # do_{switch,update}
+  sub _mark_empty_symlinks {
+  	my ($git_svn, $switch_path) = @_;
+  	my $bool = Git::config_bool('svn.brokenSymlinkWorkaround');
+  	return {} if (!defined($bool)) || (defined($bool) && ! $bool);
+  
+  	my %ret;
+  	my ($rev, $cmt) = $git_svn->last_rev_commit;
+  	return {} unless ($rev && $cmt);
+  
+  	# allow the warning to be printed for each revision we fetch to
+  	# ensure the user sees it.  The user can also disable the workaround
+  	# on the repository even while git svn is running and the next
+  	# revision fetched will skip this expensive function.
+  	my $printed_warning;
+  	chomp(my $empty_blob = `git hash-object -t blob --stdin < /dev/null`);
+  	my ($ls, $ctx) = command_output_pipe(qw/ls-tree -r -z/, $cmt);
+  	my $pfx = defined($switch_path) ? $switch_path : $git_svn->path;
+  	$pfx .= '/' if length($pfx);
+  	while (defined($_ = get_record($ls, "\0"))) {
+  		s/\A100644 blob $empty_blob\t//o or next;
+  		unless ($printed_warning) {
+  			print STDERR "Scanning for empty symlinks, ",
+  			             "this may take a while if you have ",
+  				     "many empty files\n",
+  				     "You may disable this with `",
+  				     "git config svn.brokenSymlinkWorkaround ",
+  				     "false'.\n",
+  				     "This may be done in a different ",
+  				     "terminal without restarting ",
+  				     "git svn\n";
+  			$printed_warning = 1;
+  		}
+  		my $path = $_;
+  		my (undef, $props) =
+  		               $git_svn->ra->get_file($pfx.$path, $rev, undef);
+  		if ($props->{'svn:special'}) {
+  			$ret{$path} = 1;
+  		}
+  	}
+  	command_close_pipe($ls, $ctx);
+  	\%ret;
+  }
+  
+  # returns true if a given path is inside a ".git" directory
+  sub in_dot_git {
+  	$_[0] =~ m{(?:^|/)\.git(?:/|$)};
+  }
+  
+  # return value: 0 -- don't ignore, 1 -- ignore
+  # This will also check whether the path is explicitly included
+  sub is_path_ignored {
+  	my ($self, $path) = @_;
+  	return 1 if in_dot_git($path);
+  	return 1 if defined($self->{ignore_regex}) &&
+  	            $path =~ m!$self->{ignore_regex}!;
+  	return 0 if defined($self->{include_regex}) &&
+  	            $path =~ m!$self->{include_regex}!;
+  	return 0 if defined($_include_regex) &&
+  	            $path =~ m!$_include_regex!;
+  	return 1 if defined($self->{include_regex});
+  	return 1 if defined($_include_regex);
+  	return 0 unless defined($_ignore_regex);
+  	return 1 if $path =~ m!$_ignore_regex!o;
+  	return 0;
+  }
+  
+  sub set_path_strip {
+  	my ($self, $path) = @_;
+  	$self->{path_strip} = qr/^\Q$path\E(\/|$)/ if length $path;
+  }
+  
+  sub open_root {
+  	{ path => '' };
+  }
+  
+  sub open_directory {
+  	my ($self, $path, $pb, $rev) = @_;
+  	{ path => $path };
+  }
+  
+  sub git_path {
+  	my ($self, $path) = @_;
+  	if (my $enc = $self->{pathnameencoding}) {
+  		require Encode;
+  		Encode::from_to($path, 'UTF-8', $enc);
+  	}
+  	if ($self->{path_strip}) {
+  		$path =~ s!$self->{path_strip}!! or
+  		  die "Failed to strip path '$path' ($self->{path_strip})\n";
+  	}
+  	$path;
+  }
+  
+  sub delete_entry {
+  	my ($self, $path, $rev, $pb) = @_;
+  	return undef if $self->is_path_ignored($path);
+  
+  	my $gpath = $self->git_path($path);
+  	return undef if ($gpath eq '');
+  
+  	# remove entire directories.
+  	my ($tree) = (command('ls-tree', '-z', $self->{c}, "./$gpath")
+  	                 =~ /\A040000 tree ([a-f\d]{40})\t\Q$gpath\E\0/);
+  	if ($tree) {
+  		my ($ls, $ctx) = command_output_pipe(qw/ls-tree
+  		                                     -r --name-only -z/,
+  				                     $tree);
+  		while (defined($_ = get_record($ls, "\0"))) {
+  			my $rmpath = "$gpath/$_";
+  			$self->{gii}->remove($rmpath);
+  			print "\tD\t$rmpath\n" unless $::_q;
+  		}
+  		print "\tD\t$gpath/\n" unless $::_q;
+  		command_close_pipe($ls, $ctx);
+  	} else {
+  		$self->{gii}->remove($gpath);
+  		print "\tD\t$gpath\n" unless $::_q;
+  	}
+  	# Don't add to @deleted_gpath if we're deleting a placeholder file.
+  	push @deleted_gpath, $gpath unless $added_placeholder{dirname($path)};
+  	$self->{empty}->{$path} = 0;
+  	undef;
+  }
+  
+  sub open_file {
+  	my ($self, $path, $pb, $rev) = @_;
+  	my ($mode, $blob);
+  
+  	goto out if $self->is_path_ignored($path);
+  
+  	my $gpath = $self->git_path($path);
+  	($mode, $blob) = (command('ls-tree', '-z', $self->{c}, "./$gpath")
+  	                     =~ /\A(\d{6}) blob ([a-f\d]{40})\t\Q$gpath\E\0/);
+  	unless (defined $mode && defined $blob) {
+  		die "$path was not found in commit $self->{c} (r$rev)\n";
+  	}
+  	if ($mode eq '100644' && $self->{empty_symlinks}->{$path}) {
+  		$mode = '120000';
+  	}
+  out:
+  	{ path => $path, mode_a => $mode, mode_b => $mode, blob => $blob,
+  	  pool => SVN::Pool->new, action => 'M' };
+  }
+  
+  sub add_file {
+  	my ($self, $path, $pb, $cp_path, $cp_rev) = @_;
+  	my $mode;
+  
+  	if (!$self->is_path_ignored($path)) {
+  		my ($dir, $file) = ($path =~ m#^(.*?)/?([^/]+)$#);
+  		delete $self->{empty}->{$dir};
+  		$mode = '100644';
+  
+  		if ($added_placeholder{$dir}) {
+  			# Remove our placeholder file, if we created one.
+  			delete_entry($self, $added_placeholder{$dir})
+  				unless $path eq $added_placeholder{$dir};
+  			delete $added_placeholder{$dir}
+  		}
+  	}
+  
+  	{ path => $path, mode_a => $mode, mode_b => $mode,
+  	  pool => SVN::Pool->new, action => 'A' };
+  }
+  
+  sub add_directory {
+  	my ($self, $path, $cp_path, $cp_rev) = @_;
+  	goto out if $self->is_path_ignored($path);
+  	my $gpath = $self->git_path($path);
+  	if ($gpath eq '') {
+  		my ($ls, $ctx) = command_output_pipe(qw/ls-tree
+  		                                     -r --name-only -z/,
+  				                     $self->{c});
+  		while (defined($_ = get_record($ls, "\0"))) {
+  			$self->{gii}->remove($_);
+  			print "\tD\t$_\n" unless $::_q;
+  			push @deleted_gpath, $gpath;
+  		}
+  		command_close_pipe($ls, $ctx);
+  		$self->{empty}->{$path} = 0;
+  	}
+  	my ($dir, $file) = ($path =~ m#^(.*?)/?([^/]+)$#);
+  	delete $self->{empty}->{$dir};
+  	$self->{empty}->{$path} = 1;
+  
+  	if ($added_placeholder{$dir}) {
+  		# Remove our placeholder file, if we created one.
+  		delete_entry($self, $added_placeholder{$dir});
+  		delete $added_placeholder{$dir}
+  	}
+  
+  out:
+  	{ path => $path };
+  }
+  
+  sub change_dir_prop {
+  	my ($self, $db, $prop, $value) = @_;
+  	return undef if $self->is_path_ignored($db->{path});
+  	$self->{dir_prop}->{$db->{path}} ||= {};
+  	$self->{dir_prop}->{$db->{path}}->{$prop} = $value;
+  	undef;
+  }
+  
+  sub absent_directory {
+  	my ($self, $path, $pb) = @_;
+  	return undef if $self->is_path_ignored($path);
+  	$self->{absent_dir}->{$pb->{path}} ||= [];
+  	push @{$self->{absent_dir}->{$pb->{path}}}, $path;
+  	undef;
+  }
+  
+  sub absent_file {
+  	my ($self, $path, $pb) = @_;
+  	return undef if $self->is_path_ignored($path);
+  	$self->{absent_file}->{$pb->{path}} ||= [];
+  	push @{$self->{absent_file}->{$pb->{path}}}, $path;
+  	undef;
+  }
+  
+  sub change_file_prop {
+  	my ($self, $fb, $prop, $value) = @_;
+  	return undef if $self->is_path_ignored($fb->{path});
+  	if ($prop eq 'svn:executable') {
+  		if ($fb->{mode_b} != 120000) {
+  			$fb->{mode_b} = defined $value ? 100755 : 100644;
+  		}
+  	} elsif ($prop eq 'svn:special') {
+  		$fb->{mode_b} = defined $value ? 120000 : 100644;
+  	} else {
+  		$self->{file_prop}->{$fb->{path}} ||= {};
+  		$self->{file_prop}->{$fb->{path}}->{$prop} = $value;
+  	}
+  	undef;
+  }
+  
+  sub apply_textdelta {
+  	my ($self, $fb, $exp) = @_;
+  	return undef if $self->is_path_ignored($fb->{path});
+  	my $suffix = 0;
+  	++$suffix while $::_repository->temp_is_locked("svn_delta_${$}_$suffix");
+  	my $fh = $::_repository->temp_acquire("svn_delta_${$}_$suffix");
+  	# $fh gets auto-closed() by SVN::TxDelta::apply(),
+  	# (but $base does not,) so dup() it for reading in close_file
+  	open my $dup, '<&', $fh or croak $!;
+  	my $base = $::_repository->temp_acquire("git_blob_${$}_$suffix");
+  	# close_file may call temp_acquire on 'svn_hash', but because of the
+  	# call chain, if the temp_acquire call from close_file ends up being the
+  	# call that first creates the 'svn_hash' temp file, then the FileHandle
+  	# that's created as a result will end up in an SVN::Pool that we clear
+  	# in SVN::Ra::gs_fetch_loop_common.  Avoid that by making sure the
+  	# 'svn_hash' FileHandle is already created before close_file is called.
+  	my $tmp_fh = $::_repository->temp_acquire('svn_hash');
+  	$::_repository->temp_release($tmp_fh, 1);
+  
+  	if ($fb->{blob}) {
+  		my ($base_is_link, $size);
+  
+  		if ($fb->{mode_a} eq '120000' &&
+  		    ! $self->{empty_symlinks}->{$fb->{path}}) {
+  			print $base 'link ' or die "print $!\n";
+  			$base_is_link = 1;
+  		}
+  	retry:
+  		$size = $::_repository->cat_blob($fb->{blob}, $base);
+  		die "Failed to read object $fb->{blob}" if ($size < 0);
+  
+  		if (defined $exp) {
+  			seek $base, 0, 0 or croak $!;
+  			my $got = ::md5sum($base);
+  			if ($got ne $exp) {
+  				my $err = "Checksum mismatch: ".
+  				       "$fb->{path} $fb->{blob}\n" .
+  				       "expected: $exp\n" .
+  				       "     got: $got\n";
+  				if ($base_is_link) {
+  					warn $err,
+  					     "Retrying... (possibly ",
+  					     "a bad symlink from SVN)\n";
+  					$::_repository->temp_reset($base);
+  					$base_is_link = 0;
+  					goto retry;
+  				}
+  				die $err;
+  			}
+  		}
+  	}
+  	seek $base, 0, 0 or croak $!;
+  	$fb->{fh} = $fh;
+  	$fb->{base} = $base;
+  	[ SVN::TxDelta::apply($base, $dup, undef, $fb->{path}, $fb->{pool}) ];
+  }
+  
+  sub close_file {
+  	my ($self, $fb, $exp) = @_;
+  	return undef if $self->is_path_ignored($fb->{path});
+  
+  	my $hash;
+  	my $path = $self->git_path($fb->{path});
+  	if (my $fh = $fb->{fh}) {
+  		if (defined $exp) {
+  			seek($fh, 0, 0) or croak $!;
+  			my $got = ::md5sum($fh);
+  			if ($got ne $exp) {
+  				die "Checksum mismatch: $path\n",
+  				    "expected: $exp\n    got: $got\n";
+  			}
+  		}
+  		if ($fb->{mode_b} == 120000) {
+  			sysseek($fh, 0, 0) or croak $!;
+  			my $rd = sysread($fh, my $buf, 5);
+  
+  			if (!defined $rd) {
+  				croak "sysread: $!\n";
+  			} elsif ($rd == 0) {
+  				warn "$path has mode 120000",
+  				     " but it points to nothing\n",
+  				     "converting to an empty file with mode",
+  				     " 100644\n";
+  				$fb->{mode_b} = '100644';
+  			} elsif ($buf ne 'link ') {
+  				warn "$path has mode 120000",
+  				     " but is not a link\n";
+  			} else {
+  				my $tmp_fh = $::_repository->temp_acquire(
+  					'svn_hash');
+  				my $res;
+  				while ($res = sysread($fh, my $str, 1024)) {
+  					my $out = syswrite($tmp_fh, $str, $res);
+  					defined($out) && $out == $res
+  						or croak("write ",
+  							Git::temp_path($tmp_fh),
+  							": $!\n");
+  				}
+  				defined $res or croak $!;
+  
+  				($fh, $tmp_fh) = ($tmp_fh, $fh);
+  				Git::temp_release($tmp_fh, 1);
+  			}
+  		}
+  
+  		$hash = $::_repository->hash_and_insert_object(
+  				Git::temp_path($fh));
+  		$hash =~ /^[a-f\d]{40}$/ or die "not a sha1: $hash\n";
+  
+  		Git::temp_release($fb->{base}, 1);
+  		Git::temp_release($fh, 1);
+  	} else {
+  		$hash = $fb->{blob} or die "no blob information\n";
+  	}
+  	$fb->{pool}->clear;
+  	$self->{gii}->update($fb->{mode_b}, $hash, $path) or croak $!;
+  	print "\t$fb->{action}\t$path\n" if $fb->{action} && ! $::_q;
+  	undef;
+  }
+  
+  sub abort_edit {
+  	my $self = shift;
+  	$self->{nr} = $self->{gii}->{nr};
+  	delete $self->{gii};
+  	$self->SUPER::abort_edit(@_);
+  }
+  
+  sub close_edit {
+  	my $self = shift;
+  
+  	if ($_preserve_empty_dirs) {
+  		my @empty_dirs;
+  
+  		# Any entry flagged as empty that also has an associated
+  		# dir_prop represents a newly created empty directory.
+  		foreach my $i (keys %{$self->{empty}}) {
+  			push @empty_dirs, $i if exists $self->{dir_prop}->{$i};
+  		}
+  
+  		# Search for directories that have become empty due subsequent
+  		# file deletes.
+  		push @empty_dirs, $self->find_empty_directories();
+  
+  		# Finally, add a placeholder file to each empty directory.
+  		$self->add_placeholder_file($_) foreach (@empty_dirs);
+  
+  		$self->stash_placeholder_list();
+  	}
+  
+  	$self->{git_commit_ok} = 1;
+  	$self->{nr} = $self->{gii}->{nr};
+  	delete $self->{gii};
+  	$self->SUPER::close_edit(@_);
+  }
+  
+  sub find_empty_directories {
+  	my ($self) = @_;
+  	my @empty_dirs;
+  	my %dirs = map { dirname($_) => 1 } @deleted_gpath;
+  
+  	foreach my $dir (sort keys %dirs) {
+  		next if $dir eq ".";
+  
+  		# If there have been any additions to this directory, there is
+  		# no reason to check if it is empty.
+  		my $skip_added = 0;
+  		foreach my $t (qw/dir_prop file_prop/) {
+  			foreach my $path (keys %{ $self->{$t} }) {
+  				if (exists $self->{$t}->{dirname($path)}) {
+  					$skip_added = 1;
+  					last;
+  				}
+  			}
+  			last if $skip_added;
+  		}
+  		next if $skip_added;
+  
+  		# Use `git ls-tree` to get the filenames of this directory
+  		# that existed prior to this particular commit.
+  		my $ls = command('ls-tree', '-z', '--name-only',
+  				 $self->{c}, "$dir/");
+  		my %files = map { $_ => 1 } split(/\0/, $ls);
+  
+  		# Remove the filenames that were deleted during this commit.
+  		delete $files{$_} foreach (@deleted_gpath);
+  
+  		# Report the directory if there are no filenames left.
+  		push @empty_dirs, $dir unless (scalar %files);
+  	}
+  	@empty_dirs;
+  }
+  
+  sub add_placeholder_file {
+  	my ($self, $dir) = @_;
+  	my $path = "$dir/$_placeholder_filename";
+  	my $gpath = $self->git_path($path);
+  
+  	my $fh = $::_repository->temp_acquire($gpath);
+  	my $hash = $::_repository->hash_and_insert_object(Git::temp_path($fh));
+  	Git::temp_release($fh, 1);
+  	$self->{gii}->update('100644', $hash, $gpath) or croak $!;
+  
+  	# The directory should no longer be considered empty.
+  	delete $self->{empty}->{$dir} if exists $self->{empty}->{$dir};
+  
+  	# Keep track of any placeholder files we create.
+  	$added_placeholder{$dir} = $path;
+  }
+  
+  sub stash_placeholder_list {
+  	my ($self) = @_;
+  	my $k = "svn-remote.$repo_id.added-placeholder";
+  	my $v = eval { command_oneline('config', '--get-all', $k) };
+  	command_noisy('config', '--unset-all', $k) if $v;
+  	foreach (values %added_placeholder) {
+  		command_noisy('config', '--add', $k, $_);
+  	}
+  }
+  
+  1;
+  __END__
+  
+  =head1 NAME
+  
+  Git::SVN::Fetcher - tree delta consumer for "git svn fetch"
+  
+  =head1 SYNOPSIS
+  
+      use SVN::Core;
+      use SVN::Ra;
+      use Git::SVN;
+      use Git::SVN::Fetcher;
+      use Git;
+  
+      my $gs = Git::SVN->find_by_url($url);
+      my $ra = SVN::Ra->new(url => $url);
+      my $editor = Git::SVN::Fetcher->new($gs);
+      my $reporter = $ra->do_update($SVN::Core::INVALID_REVNUM, '',
+                                    1, $editor);
+      $reporter->set_path('', $old_rev, 0);
+      $reporter->finish_report;
+      my $tree = $gs->tmp_index_do(sub { command_oneline('write-tree') });
+  
+      foreach my $path (keys %{$editor->{dir_prop}) {
+          my $props = $editor->{dir_prop}{$path};
+          foreach my $prop (keys %$props) {
+              print "property $prop at $path changed to $props->{$prop}\n";
+          }
+      }
+      foreach my $path (keys %{$editor->{empty}) {
+          my $action = $editor->{empty}{$path} ? 'added' : 'removed';
+          print "empty directory $path $action\n";
+      }
+      foreach my $path (keys %{$editor->{file_prop}) { ... }
+      foreach my $parent (keys %{$editor->{absent_dir}}) {
+          my @children = @{$editor->{abstent_dir}{$parent}};
+          print "cannot fetch directory $parent/$_: not authorized?\n"
+              foreach @children;
+      }
+      foreach my $parent (keys %{$editor->{absent_file}) { ... }
+  
+  =head1 DESCRIPTION
+  
+  This is a subclass of C<SVN::Delta::Editor>, which means it implements
+  callbacks to act as a consumer of Subversion tree deltas.  This
+  particular implementation of those callbacks is meant to store
+  information about the resulting content which B<git svn fetch> could
+  use to populate new commits and new entries for F<unhandled.log>.
+  More specifically:
+  
+  =over
+  
+  =item * Additions, removals, and modifications of files are propagated
+  to git-svn's index file F<$GIT_DIR/svn/$refname/index> using
+  B<git update-index>.
+  
+  =item * Changes in Subversion path properties are recorded in the
+  C<dir_prop> and C<file_prop> fields (which are hashes).
+  
+  =item * Addition and removal of empty directories are indicated by
+  entries with value 1 and 0 respectively in the C<empty> hash.
+  
+  =item * Paths that are present but cannot be conveyed (presumably due
+  to permissions) are recorded in the C<absent_file> and
+  C<absent_dirs> hashes.  For each key, the corresponding value is
+  a list of paths under that directory that were present but
+  could not be conveyed.
+  
+  =back
+  
+  The interface is unstable.  Do not use this module unless you are
+  developing git-svn.
+  
+  =head1 DEPENDENCIES
+  
+  L<SVN::Delta> from the Subversion perl bindings,
+  the core L<Carp> and L<File::Basename> modules,
+  and git's L<Git> helper module.
+  
+  C<Git::SVN::Fetcher> has not been tested using callers other than
+  B<git-svn> itself.
+  
+  =head1 SEE ALSO
+  
+  L<SVN::Delta>,
+  L<Git::SVN::Editor>.
+  
+  =head1 INCOMPATIBILITIES
+  
+  None reported.
+  
+  =head1 BUGS
+  
+  None.
+GIT_SVN_FETCHER
+
+$fatpacked{"Git/SVN/GlobSpec.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN_GLOBSPEC';
+  package Git::SVN::GlobSpec;
+  use strict;
+  use warnings;
+  
+  sub new {
+  	my ($class, $glob, $pattern_ok) = @_;
+  	my $re = $glob;
+  	$re =~ s!/+$!!g; # no need for trailing slashes
+  	my (@left, @right, @patterns);
+  	my $state = "left";
+  	my $die_msg = "Only one set of wildcards " .
+  				"(e.g. '*' or '*/*/*') is supported: $glob\n";
+  	for my $part (split(m|/|, $glob)) {
+  		if ($pattern_ok && $part =~ /[{}]/ &&
+  			 $part !~ /^\{[^{}]+\}/) {
+  			die "Invalid pattern in '$glob': $part\n";
+  		}
+  		my $nstars = $part =~ tr/*//;
+  		if ($nstars > 1) {
+  			die "Only one '*' is allowed in a pattern: '$part'\n";
+  		}
+  		if ($part =~ /(.*)\*(.*)/) {
+  			die $die_msg if $state eq "right";
+  			my ($l, $r) = ($1, $2);
+  			$state = "pattern";
+  			my $pat = quotemeta($l) . '[^/]*' . quotemeta($r);
+  			push(@patterns, $pat);
+  		} elsif ($pattern_ok && $part =~ /^\{(.*)\}$/) {
+  			die $die_msg if $state eq "right";
+  			$state = "pattern";
+  			my $p = quotemeta($1);
+  			$p =~ s/\\,/|/g;
+  			push(@patterns, "(?:$p)");
+  		} else {
+  			if ($state eq "left") {
+  				push(@left, $part);
+  			} else {
+  				push(@right, $part);
+  				$state = "right";
+  			}
+  		}
+  	}
+  	my $depth = @patterns;
+  	if ($depth == 0) {
+  		die "One '*' is needed in glob: '$glob'\n";
+  	}
+  	my $left = join('/', @left);
+  	my $right = join('/', @right);
+  	$re = join('/', @patterns);
+  	$re = join('\/',
+  		   grep(length, quotemeta($left),
+                                  "($re)(?=/|\$)",
+                                  quotemeta($right)));
+  	my $left_re = qr/^\/\Q$left\E(\/|$)/;
+  	bless { left => $left, right => $right, left_regex => $left_re,
+  	        regex => qr/$re/, glob => $glob, depth => $depth }, $class;
+  }
+  
+  sub full_path {
+  	my ($self, $path) = @_;
+  	return (length $self->{left} ? "$self->{left}/" : '') .
+  	       $path . (length $self->{right} ? "/$self->{right}" : '');
+  }
+  
+  1;
+GIT_SVN_GLOBSPEC
+
+$fatpacked{"Git/SVN/Log.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN_LOG';
+  package Git::SVN::Log;
+  use strict;
+  use warnings;
+  use Git::SVN::Utils qw(fatal);
+  use Git qw(command
+             command_oneline
+             command_output_pipe
+             command_close_pipe
+             get_tz_offset);
+  use POSIX qw/strftime/;
+  use constant commit_log_separator => ('-' x 72) . "\n";
+  use vars qw/$TZ $limit $color $pager $non_recursive $verbose $oneline
+              %rusers $show_commit $incremental/;
+  
+  # Option set in git-svn
+  our $_git_format;
+  
+  sub cmt_showable {
+  	my ($c) = @_;
+  	return 1 if defined $c->{r};
+  
+  	# big commit message got truncated by the 16k pretty buffer in rev-list
+  	if ($c->{l} && $c->{l}->[-1] eq "...\n" &&
+  				$c->{a_raw} =~ /\@([a-f\d\-]+)>$/) {
+  		@{$c->{l}} = ();
+  		my @log = command(qw/cat-file commit/, $c->{c});
+  
+  		# shift off the headers
+  		shift @log while ($log[0] ne '');
+  		shift @log;
+  
+  		# TODO: make $c->{l} not have a trailing newline in the future
+  		@{$c->{l}} = map { "$_\n" } grep !/^git-svn-id: /, @log;
+  
+  		(undef, $c->{r}, undef) = ::extract_metadata(
+  				(grep(/^git-svn-id: /, @log))[-1]);
+  	}
+  	return defined $c->{r};
+  }
+  
+  sub log_use_color {
+  	return $color || Git->repository->get_colorbool('color.diff');
+  }
+  
+  sub git_svn_log_cmd {
+  	my ($r_min, $r_max, @args) = @_;
+  	my $head = 'HEAD';
+  	my (@files, @log_opts);
+  	foreach my $x (@args) {
+  		if ($x eq '--' || @files) {
+  			push @files, $x;
+  		} else {
+  			if (::verify_ref("$x^0")) {
+  				$head = $x;
+  			} else {
+  				push @log_opts, $x;
+  			}
+  		}
+  	}
+  
+  	my ($url, $rev, $uuid, $gs) = ::working_head_info($head);
+  
+  	require Git::SVN;
+  	$gs ||= Git::SVN->_new;
+  	my @cmd = (qw/log --abbrev-commit --pretty=raw --default/,
+  	           $gs->refname);
+  	push @cmd, '-r' unless $non_recursive;
+  	push @cmd, qw/--raw --name-status/ if $verbose;
+  	push @cmd, '--color' if log_use_color();
+  	push @cmd, @log_opts;
+  	if (defined $r_max && $r_max == $r_min) {
+  		push @cmd, '--max-count=1';
+  		if (my $c = $gs->rev_map_get($r_max)) {
+  			push @cmd, $c;
+  		}
+  	} elsif (defined $r_max) {
+  		if ($r_max < $r_min) {
+  			($r_min, $r_max) = ($r_max, $r_min);
+  		}
+  		my (undef, $c_max) = $gs->find_rev_before($r_max, 1, $r_min);
+  		my (undef, $c_min) = $gs->find_rev_after($r_min, 1, $r_max);
+  		# If there are no commits in the range, both $c_max and $c_min
+  		# will be undefined.  If there is at least 1 commit in the
+  		# range, both will be defined.
+  		return () if !defined $c_min || !defined $c_max;
+  		if ($c_min eq $c_max) {
+  			push @cmd, '--max-count=1', $c_min;
+  		} else {
+  			push @cmd, '--boundary', "$c_min..$c_max";
+  		}
+  	}
+  	return (@cmd, @files);
+  }
+  
+  # adapted from pager.c
+  sub config_pager {
+  	if (! -t *STDOUT) {
+  		$ENV{GIT_PAGER_IN_USE} = 'false';
+  		$pager = undef;
+  		return;
+  	}
+  	chomp($pager = command_oneline(qw(var GIT_PAGER)));
+  	if ($pager eq 'cat') {
+  		$pager = undef;
+  	}
+  	$ENV{GIT_PAGER_IN_USE} = defined($pager);
+  }
+  
+  sub run_pager {
+  	return unless defined $pager;
+  	pipe my ($rfd, $wfd) or return;
+  	defined(my $pid = fork) or fatal "Can't fork: $!";
+  	if (!$pid) {
+  		open STDOUT, '>&', $wfd or
+  		                     fatal "Can't redirect to stdout: $!";
+  		return;
+  	}
+  	open STDIN, '<&', $rfd or fatal "Can't redirect stdin: $!";
+  	$ENV{LESS} ||= 'FRX';
+  	$ENV{LV} ||= '-c';
+  	exec $pager or fatal "Can't run pager: $! ($pager)";
+  }
+  
+  sub format_svn_date {
+  	my $t = shift || time;
+  	require Git::SVN;
+  	my $gmoff = get_tz_offset($t);
+  	return strftime("%Y-%m-%d %H:%M:%S $gmoff (%a, %d %b %Y)", localtime($t));
+  }
+  
+  sub parse_git_date {
+  	my ($t, $tz) = @_;
+  	# Date::Parse isn't in the standard Perl distro :(
+  	if ($tz =~ s/^\+//) {
+  		$t += tz_to_s_offset($tz);
+  	} elsif ($tz =~ s/^\-//) {
+  		$t -= tz_to_s_offset($tz);
+  	}
+  	return $t;
+  }
+  
+  sub set_local_timezone {
+  	if (defined $TZ) {
+  		$ENV{TZ} = $TZ;
+  	} else {
+  		delete $ENV{TZ};
+  	}
+  }
+  
+  sub tz_to_s_offset {
+  	my ($tz) = @_;
+  	$tz =~ s/(\d\d)$//;
+  	return ($1 * 60) + ($tz * 3600);
+  }
+  
+  sub get_author_info {
+  	my ($dest, $author, $t, $tz) = @_;
+  	$author =~ s/(?:^\s*|\s*$)//g;
+  	$dest->{a_raw} = $author;
+  	my $au;
+  	if ($::_authors) {
+  		$au = $rusers{$author} || undef;
+  	}
+  	if (!$au) {
+  		($au) = ($author =~ /<([^>]+)\@[^>]+>$/);
+  	}
+  	$dest->{t} = $t;
+  	$dest->{tz} = $tz;
+  	$dest->{a} = $au;
+  	$dest->{t_utc} = parse_git_date($t, $tz);
+  }
+  
+  sub process_commit {
+  	my ($c, $r_min, $r_max, $defer) = @_;
+  	if (defined $r_min && defined $r_max) {
+  		if ($r_min == $c->{r} && $r_min == $r_max) {
+  			show_commit($c);
+  			return 0;
+  		}
+  		return 1 if $r_min == $r_max;
+  		if ($r_min < $r_max) {
+  			# we need to reverse the print order
+  			return 0 if (defined $limit && --$limit < 0);
+  			push @$defer, $c;
+  			return 1;
+  		}
+  		if ($r_min != $r_max) {
+  			return 1 if ($r_min < $c->{r});
+  			return 1 if ($r_max > $c->{r});
+  		}
+  	}
+  	return 0 if (defined $limit && --$limit < 0);
+  	show_commit($c);
+  	return 1;
+  }
+  
+  my $l_fmt;
+  sub show_commit {
+  	my $c = shift;
+  	if ($oneline) {
+  		my $x = "\n";
+  		if (my $l = $c->{l}) {
+  			while ($l->[0] =~ /^\s*$/) { shift @$l }
+  			$x = $l->[0];
+  		}
+  		$l_fmt ||= 'A' . length($c->{r});
+  		print 'r',pack($l_fmt, $c->{r}),' | ';
+  		print "$c->{c} | " if $show_commit;
+  		print $x;
+  	} else {
+  		show_commit_normal($c);
+  	}
+  }
+  
+  sub show_commit_changed_paths {
+  	my ($c) = @_;
+  	return unless $c->{changed};
+  	print "Changed paths:\n", @{$c->{changed}};
+  }
+  
+  sub show_commit_normal {
+  	my ($c) = @_;
+  	print commit_log_separator, "r$c->{r} | ";
+  	print "$c->{c} | " if $show_commit;
+  	print "$c->{a} | ", format_svn_date($c->{t_utc}), ' | ';
+  	my $nr_line = 0;
+  
+  	if (my $l = $c->{l}) {
+  		while ($l->[$#$l] eq "\n" && $#$l > 0
+  		                          && $l->[($#$l - 1)] eq "\n") {
+  			pop @$l;
+  		}
+  		$nr_line = scalar @$l;
+  		if (!$nr_line) {
+  			print "1 line\n\n\n";
+  		} else {
+  			if ($nr_line == 1) {
+  				$nr_line = '1 line';
+  			} else {
+  				$nr_line .= ' lines';
+  			}
+  			print $nr_line, "\n";
+  			show_commit_changed_paths($c);
+  			print "\n";
+  			print $_ foreach @$l;
+  		}
+  	} else {
+  		print "1 line\n";
+  		show_commit_changed_paths($c);
+  		print "\n";
+  
+  	}
+  	foreach my $x (qw/raw stat diff/) {
+  		if ($c->{$x}) {
+  			print "\n";
+  			print $_ foreach @{$c->{$x}}
+  		}
+  	}
+  }
+  
+  sub cmd_show_log {
+  	my (@args) = @_;
+  	my ($r_min, $r_max);
+  	my $r_last = -1; # prevent dupes
+  	set_local_timezone();
+  	if (defined $::_revision) {
+  		if ($::_revision =~ /^(\d+):(\d+)$/) {
+  			($r_min, $r_max) = ($1, $2);
+  		} elsif ($::_revision =~ /^\d+$/) {
+  			$r_min = $r_max = $::_revision;
+  		} else {
+  			fatal "-r$::_revision is not supported, use ",
+  				"standard 'git log' arguments instead";
+  		}
+  	}
+  
+  	config_pager();
+  	@args = git_svn_log_cmd($r_min, $r_max, @args);
+  	if (!@args) {
+  		print commit_log_separator unless $incremental || $oneline;
+  		return;
+  	}
+  	my $log = command_output_pipe(@args);
+  	run_pager();
+  	my (@k, $c, $d, $stat);
+  	my $esc_color = qr/(?:\033\[(?:(?:\d+;)*\d*)?m)*/;
+  	while (<$log>) {
+  		if (/^${esc_color}commit (?:- )?($::sha1_short)/o) {
+  			my $cmt = $1;
+  			if ($c && cmt_showable($c) && $c->{r} != $r_last) {
+  				$r_last = $c->{r};
+  				process_commit($c, $r_min, $r_max, \@k) or
+  								goto out;
+  			}
+  			$d = undef;
+  			$c = { c => $cmt };
+  		} elsif (/^${esc_color}author (.+) (\d+) ([\-\+]?\d+)$/o) {
+  			get_author_info($c, $1, $2, $3);
+  		} elsif (/^${esc_color}(?:tree|parent|committer) /o) {
+  			# ignore
+  		} elsif (/^${esc_color}:\d{6} \d{6} $::sha1_short/o) {
+  			push @{$c->{raw}}, $_;
+  		} elsif (/^${esc_color}[ACRMDT]\t/) {
+  			# we could add $SVN->{svn_path} here, but that requires
+  			# remote access at the moment (repo_path_split)...
+  			s#^(${esc_color})([ACRMDT])\t#$1   $2 #o;
+  			push @{$c->{changed}}, $_;
+  		} elsif (/^${esc_color}diff /o) {
+  			$d = 1;
+  			push @{$c->{diff}}, $_;
+  		} elsif ($d) {
+  			push @{$c->{diff}}, $_;
+  		} elsif (/^\ .+\ \|\s*\d+\ $esc_color[\+\-]*
+  		          $esc_color*[\+\-]*$esc_color$/x) {
+  			$stat = 1;
+  			push @{$c->{stat}}, $_;
+  		} elsif ($stat && /^ \d+ files changed, \d+ insertions/) {
+  			push @{$c->{stat}}, $_;
+  			$stat = undef;
+  		} elsif (/^${esc_color}    (git-svn-id:.+)$/o) {
+  			($c->{url}, $c->{r}, undef) = ::extract_metadata($1);
+  		} elsif (s/^${esc_color}    //o) {
+  			push @{$c->{l}}, $_;
+  		}
+  	}
+  	if ($c && defined $c->{r} && $c->{r} != $r_last) {
+  		$r_last = $c->{r};
+  		process_commit($c, $r_min, $r_max, \@k);
+  	}
+  	if (@k) {
+  		($r_min, $r_max) = ($r_max, $r_min);
+  		process_commit($_, $r_min, $r_max) foreach reverse @k;
+  	}
+  out:
+  	close $log;
+  	print commit_log_separator unless $incremental || $oneline;
+  }
+  
+  sub cmd_blame {
+  	my $path = pop;
+  
+  	config_pager();
+  	run_pager();
+  
+  	my ($fh, $ctx, $rev);
+  
+  	if ($_git_format) {
+  		($fh, $ctx) = command_output_pipe('blame', @_, $path);
+  		while (my $line = <$fh>) {
+  			if ($line =~ /^\^?([[:xdigit:]]+)\s/) {
+  				# Uncommitted edits show up as a rev ID of
+  				# all zeros, which we can't look up with
+  				# cmt_metadata
+  				if ($1 !~ /^0+$/) {
+  					(undef, $rev, undef) =
+  						::cmt_metadata($1);
+  					$rev = '0' if (!$rev);
+  				} else {
+  					$rev = '0';
+  				}
+  				$rev = sprintf('%-10s', $rev);
+  				$line =~ s/^\^?[[:xdigit:]]+(\s)/$rev$1/;
+  			}
+  			print $line;
+  		}
+  	} else {
+  		($fh, $ctx) = command_output_pipe('blame', '-p', @_, 'HEAD',
+  						  '--', $path);
+  		my ($sha1);
+  		my %authors;
+  		my @buffer;
+  		my %dsha; #distinct sha keys
+  
+  		while (my $line = <$fh>) {
+  			push @buffer, $line;
+  			if ($line =~ /^([[:xdigit:]]{40})\s\d+\s\d+/) {
+  				$dsha{$1} = 1;
+  			}
+  		}
+  
+  		my $s2r = ::cmt_sha2rev_batch([keys %dsha]);
+  
+  		foreach my $line (@buffer) {
+  			if ($line =~ /^([[:xdigit:]]{40})\s\d+\s\d+/) {
+  				$rev = $s2r->{$1};
+  				$rev = '0' if (!$rev)
+  			}
+  			elsif ($line =~ /^author (.*)/) {
+  				$authors{$rev} = $1;
+  				$authors{$rev} =~ s/\s/_/g;
+  			}
+  			elsif ($line =~ /^\t(.*)$/) {
+  				printf("%6s %10s %s\n", $rev, $authors{$rev}, $1);
+  			}
+  		}
+  	}
+  	command_close_pipe($fh, $ctx);
+  }
+  
+  1;
+GIT_SVN_LOG
+
+$fatpacked{"Git/SVN/Memoize/YAML.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN_MEMOIZE_YAML';
+  package Git::SVN::Memoize::YAML;
+  use warnings;
+  use strict;
+  use YAML::Any ();
+  
+  # based on Memoize::Storable.
+  
+  sub TIEHASH {
+  	my $package = shift;
+  	my $filename = shift;
+  	my $truehash = (-e $filename) ? YAML::Any::LoadFile($filename) : {};
+  	my $self = {FILENAME => $filename, H => $truehash};
+  	bless $self => $package;
+  }
+  
+  sub STORE {
+  	my $self = shift;
+  	$self->{H}{$_[0]} = $_[1];
+  }
+  
+  sub FETCH {
+  	my $self = shift;
+  	$self->{H}{$_[0]};
+  }
+  
+  sub EXISTS {
+  	my $self = shift;
+  	exists $self->{H}{$_[0]};
+  }
+  
+  sub DESTROY {
+  	my $self = shift;
+  	YAML::Any::DumpFile($self->{FILENAME}, $self->{H});
+  }
+  
+  sub SCALAR {
+  	my $self = shift;
+  	scalar(%{$self->{H}});
+  }
+  
+  sub FIRSTKEY {
+  	'Fake hash from Git::SVN::Memoize::YAML';
+  }
+  
+  sub NEXTKEY {
+  	undef;
+  }
+  
+  1;
+  __END__
+  
+  =head1 NAME
+  
+  Git::SVN::Memoize::YAML - store Memoized data in YAML format
+  
+  =head1 SYNOPSIS
+  
+      use Memoize;
+      use Git::SVN::Memoize::YAML;
+  
+      tie my %cache => 'Git::SVN::Memoize::YAML', $filename;
+      memoize('slow_function', SCALAR_CACHE => [HASH => \%cache]);
+      slow_function(arguments);
+  
+  =head1 DESCRIPTION
+  
+  This module provides a class that can be used to tie a hash to a
+  YAML file.  The file is read when the hash is initialized and
+  rewritten when the hash is destroyed.
+  
+  The intent is to allow L<Memoize> to back its cache with a file in
+  YAML format, just like L<Memoize::Storable> allows L<Memoize> to
+  back its cache with a file in Storable format.  Unlike the Storable
+  format, the YAML format is platform-independent and fairly stable.
+  
+  Carps on error.
+  
+  =head1 DIAGNOSTICS
+  
+  See L<YAML::Any>.
+  
+  =head1 DEPENDENCIES
+  
+  L<YAML::Any> from CPAN.
+  
+  =head1 INCOMPATIBILITIES
+  
+  None reported.
+  
+  =head1 BUGS
+  
+  The entire cache is read into a Perl hash when loading the file,
+  so this is not very scalable.
+GIT_SVN_MEMOIZE_YAML
+
+$fatpacked{"Git/SVN/Migration.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN_MIGRATION';
+  package Git::SVN::Migration;
+  # these version numbers do NOT correspond to actual version numbers
+  # of git or git-svn.  They are just relative.
+  #
+  # v0 layout: .git/$id/info/url, refs/heads/$id-HEAD
+  #
+  # v1 layout: .git/$id/info/url, refs/remotes/$id
+  #
+  # v2 layout: .git/svn/$id/info/url, refs/remotes/$id
+  #
+  # v3 layout: .git/svn/$id, refs/remotes/$id
+  #            - info/url may remain for backwards compatibility
+  #            - this is what we migrate up to this layout automatically,
+  #            - this will be used by git svn init on single branches
+  # v3.1 layout (auto migrated):
+  #            - .rev_db => .rev_db.$UUID, .rev_db will remain as a symlink
+  #              for backwards compatibility
+  #
+  # v4 layout: .git/svn/$repo_id/$id, refs/remotes/$repo_id/$id
+  #            - this is only created for newly multi-init-ed
+  #              repositories.  Similar in spirit to the
+  #              --use-separate-remotes option in git-clone (now default)
+  #            - we do not automatically migrate to this (following
+  #              the example set by core git)
+  #
+  # v5 layout: .rev_db.$UUID => .rev_map.$UUID
+  #            - newer, more-efficient format that uses 24-bytes per record
+  #              with no filler space.
+  #            - use xxd -c24 < .rev_map.$UUID to view and debug
+  #            - This is a one-way migration, repositories updated to the
+  #              new format will not be able to use old git-svn without
+  #              rebuilding the .rev_db.  Rebuilding the rev_db is not
+  #              possible if noMetadata or useSvmProps are set; but should
+  #              be no problem for users that use the (sensible) defaults.
+  use strict;
+  use warnings;
+  use Carp qw/croak/;
+  use File::Path qw/mkpath/;
+  use File::Basename qw/dirname basename/;
+  
+  our $_minimize;
+  use Git qw(
+  	command
+  	command_noisy
+  	command_output_pipe
+  	command_close_pipe
+  	command_oneline
+  );
+  use Git::SVN;
+  
+  sub migrate_from_v0 {
+  	my $git_dir = $ENV{GIT_DIR};
+  	return undef unless -d $git_dir;
+  	my ($fh, $ctx) = command_output_pipe(qw/rev-parse --symbolic --all/);
+  	my $migrated = 0;
+  	while (<$fh>) {
+  		chomp;
+  		my ($id, $orig_ref) = ($_, $_);
+  		next unless $id =~ s#^refs/heads/(.+)-HEAD$#$1#;
+  		my $info_url = command_oneline(qw(rev-parse --git-path),
+  						"$id/info/url");
+  		next unless -f $info_url;
+  		my $new_ref = "refs/remotes/$id";
+  		if (::verify_ref("$new_ref^0")) {
+  			print STDERR "W: $orig_ref is probably an old ",
+  			             "branch used by an ancient version of ",
+  				     "git-svn.\n",
+  				     "However, $new_ref also exists.\n",
+  				     "We will not be able ",
+  				     "to use this branch until this ",
+  				     "ambiguity is resolved.\n";
+  			next;
+  		}
+  		print STDERR "Migrating from v0 layout...\n" if !$migrated;
+  		print STDERR "Renaming ref: $orig_ref => $new_ref\n";
+  		command_noisy('update-ref', $new_ref, $orig_ref);
+  		command_noisy('update-ref', '-d', $orig_ref, $orig_ref);
+  		$migrated++;
+  	}
+  	command_close_pipe($fh, $ctx);
+  	print STDERR "Done migrating from v0 layout...\n" if $migrated;
+  	$migrated;
+  }
+  
+  sub migrate_from_v1 {
+  	my $git_dir = $ENV{GIT_DIR};
+  	my $migrated = 0;
+  	return $migrated unless -d $git_dir;
+  	my $svn_dir = Git::SVN::svn_dir();
+  
+  	# just in case somebody used 'svn' as their $id at some point...
+  	return $migrated if -d $svn_dir && ! -f "$svn_dir/info/url";
+  
+  	print STDERR "Migrating from a git-svn v1 layout...\n";
+  	mkpath([$svn_dir]);
+  	print STDERR "Data from a previous version of git-svn exists, but\n\t",
+  	             "$svn_dir\n\t(required for this version ",
+  	             "($::VERSION) of git-svn) does not exist.\n";
+  	my ($fh, $ctx) = command_output_pipe(qw/rev-parse --symbolic --all/);
+  	while (<$fh>) {
+  		my $x = $_;
+  		next unless $x =~ s#^refs/remotes/##;
+  		chomp $x;
+  		my $info_url = command_oneline(qw(rev-parse --git-path),
+  						"$x/info/url");
+  		next unless -f $info_url;
+  		my $u = eval { ::file_to_s($info_url) };
+  		next unless $u;
+  		my $dn = dirname("$svn_dir/$x");
+  		mkpath([$dn]) unless -d $dn;
+  		if ($x eq 'svn') { # they used 'svn' as GIT_SVN_ID:
+  			mkpath(["$svn_dir/svn"]);
+  			print STDERR " - $git_dir/$x/info => ",
+  			                "$svn_dir/$x/info\n";
+  			rename "$git_dir/$x/info", "$svn_dir/$x/info" or
+  			       croak "$!: $x";
+  			# don't worry too much about these, they probably
+  			# don't exist with repos this old (save for index,
+  			# and we can easily regenerate that)
+  			foreach my $f (qw/unhandled.log index .rev_db/) {
+  				rename "$git_dir/$x/$f", "$svn_dir/$x/$f";
+  			}
+  		} else {
+  			print STDERR " - $git_dir/$x => $svn_dir/$x\n";
+  			rename "$git_dir/$x", "$svn_dir/$x" or croak "$!: $x";
+  		}
+  		$migrated++;
+  	}
+  	command_close_pipe($fh, $ctx);
+  	print STDERR "Done migrating from a git-svn v1 layout\n";
+  	$migrated;
+  }
+  
+  sub read_old_urls {
+  	my ($l_map, $pfx, $path) = @_;
+  	my @dir;
+  	foreach (<$path/*>) {
+  		if (-r "$_/info/url") {
+  			$pfx .= '/' if $pfx && $pfx !~ m!/$!;
+  			my $ref_id = $pfx . basename $_;
+  			my $url = ::file_to_s("$_/info/url");
+  			$l_map->{$ref_id} = $url;
+  		} elsif (-d $_) {
+  			push @dir, $_;
+  		}
+  	}
+  	my $svn_dir = Git::SVN::svn_dir();
+  	foreach (@dir) {
+  		my $x = $_;
+  		$x =~ s!^\Q$svn_dir\E/!!o;
+  		read_old_urls($l_map, $x, $_);
+  	}
+  }
+  
+  sub migrate_from_v2 {
+  	my @cfg = command(qw/config -l/);
+  	return if grep /^svn-remote\..+\.url=/, @cfg;
+  	my %l_map;
+  	read_old_urls(\%l_map, '', Git::SVN::svn_dir());
+  	my $migrated = 0;
+  
+  	require Git::SVN;
+  	foreach my $ref_id (sort keys %l_map) {
+  		eval { Git::SVN->init($l_map{$ref_id}, '', undef, $ref_id) };
+  		if ($@) {
+  			Git::SVN->init($l_map{$ref_id}, '', $ref_id, $ref_id);
+  		}
+  		$migrated++;
+  	}
+  	$migrated;
+  }
+  
+  sub minimize_connections {
+  	require Git::SVN;
+  	require Git::SVN::Ra;
+  
+  	my $r = Git::SVN::read_all_remotes();
+  	my $new_urls = {};
+  	my $root_repos = {};
+  	foreach my $repo_id (keys %$r) {
+  		my $url = $r->{$repo_id}->{url} or next;
+  		my $fetch = $r->{$repo_id}->{fetch} or next;
+  		my $ra = Git::SVN::Ra->new($url);
+  
+  		# skip existing cases where we already connect to the root
+  		if (($ra->url eq $ra->{repos_root}) ||
+  		    ($ra->{repos_root} eq $repo_id)) {
+  			$root_repos->{$ra->url} = $repo_id;
+  			next;
+  		}
+  
+  		my $root_ra = Git::SVN::Ra->new($ra->{repos_root});
+  		my $root_path = $ra->url;
+  		$root_path =~ s#^\Q$ra->{repos_root}\E(/|$)##;
+  		foreach my $path (keys %$fetch) {
+  			my $ref_id = $fetch->{$path};
+  			my $gs = Git::SVN->new($ref_id, $repo_id, $path);
+  
+  			# make sure we can read when connecting to
+  			# a higher level of a repository
+  			my ($last_rev, undef) = $gs->last_rev_commit;
+  			if (!defined $last_rev) {
+  				$last_rev = eval {
+  					$root_ra->get_latest_revnum;
+  				};
+  				next if $@;
+  			}
+  			my $new = $root_path;
+  			$new .= length $path ? "/$path" : '';
+  			eval {
+  				$root_ra->get_log([$new], $last_rev, $last_rev,
+  			                          0, 0, 1, sub { });
+  			};
+  			next if $@;
+  			$new_urls->{$ra->{repos_root}}->{$new} =
+  			        { ref_id => $ref_id,
+  				  old_repo_id => $repo_id,
+  				  old_path => $path };
+  		}
+  	}
+  
+  	my @emptied;
+  	foreach my $url (keys %$new_urls) {
+  		# see if we can re-use an existing [svn-remote "repo_id"]
+  		# instead of creating a(n ugly) new section:
+  		my $repo_id = $root_repos->{$url} || $url;
+  
+  		my $fetch = $new_urls->{$url};
+  		foreach my $path (keys %$fetch) {
+  			my $x = $fetch->{$path};
+  			Git::SVN->init($url, $path, $repo_id, $x->{ref_id});
+  			my $pfx = "svn-remote.$x->{old_repo_id}";
+  
+  			my $old_fetch = quotemeta("$x->{old_path}:".
+  			                          "$x->{ref_id}");
+  			command_noisy(qw/config --unset/,
+  			              "$pfx.fetch", '^'. $old_fetch . '$');
+  			delete $r->{$x->{old_repo_id}}->
+  			       {fetch}->{$x->{old_path}};
+  			if (!keys %{$r->{$x->{old_repo_id}}->{fetch}}) {
+  				command_noisy(qw/config --unset/,
+  				              "$pfx.url");
+  				push @emptied, $x->{old_repo_id}
+  			}
+  		}
+  	}
+  	if (@emptied) {
+  		my $file = $ENV{GIT_CONFIG} ||
+  			command_oneline(qw(rev-parse --git-path config));
+  		print STDERR <<EOF;
+  The following [svn-remote] sections in your config file ($file) are empty
+  and can be safely removed:
+  EOF
+  		print STDERR "[svn-remote \"$_\"]\n" foreach @emptied;
+  	}
+  }
+  
+  sub migration_check {
+  	migrate_from_v0();
+  	migrate_from_v1();
+  	migrate_from_v2();
+  	minimize_connections() if $_minimize;
+  }
+  
+  1;
+GIT_SVN_MIGRATION
+
+$fatpacked{"Git/SVN/Prompt.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN_PROMPT';
+  package Git::SVN::Prompt;
+  use strict;
+  use warnings;
+  require SVN::Core;
+  use vars qw/$_no_auth_cache $_username/;
+  
+  sub simple {
+  	my ($cred, $realm, $default_username, $may_save, $pool) = @_;
+  	$may_save = undef if $_no_auth_cache;
+  	$default_username = $_username if defined $_username;
+  	if (defined $default_username && length $default_username) {
+  		if (defined $realm && length $realm) {
+  			print STDERR "Authentication realm: $realm\n";
+  			STDERR->flush;
+  		}
+  		$cred->username($default_username);
+  	} else {
+  		username($cred, $realm, $may_save, $pool);
+  	}
+  	$cred->password(_read_password("Password for '" .
+  	                               $cred->username . "': ", $realm));
+  	$cred->may_save($may_save);
+  	$SVN::_Core::SVN_NO_ERROR;
+  }
+  
+  sub ssl_server_trust {
+  	my ($cred, $realm, $failures, $cert_info, $may_save, $pool) = @_;
+  	$may_save = undef if $_no_auth_cache;
+  	print STDERR "Error validating server certificate for '$realm':\n";
+  	{
+  		no warnings 'once';
+  		# All variables SVN::Auth::SSL::* are used only once,
+  		# so we're shutting up Perl warnings about this.
+  		if ($failures & $SVN::Auth::SSL::UNKNOWNCA) {
+  			print STDERR " - The certificate is not issued ",
+  			    "by a trusted authority. Use the\n",
+  			    "   fingerprint to validate ",
+  			    "the certificate manually!\n";
+  		}
+  		if ($failures & $SVN::Auth::SSL::CNMISMATCH) {
+  			print STDERR " - The certificate hostname ",
+  			    "does not match.\n";
+  		}
+  		if ($failures & $SVN::Auth::SSL::NOTYETVALID) {
+  			print STDERR " - The certificate is not yet valid.\n";
+  		}
+  		if ($failures & $SVN::Auth::SSL::EXPIRED) {
+  			print STDERR " - The certificate has expired.\n";
+  		}
+  		if ($failures & $SVN::Auth::SSL::OTHER) {
+  			print STDERR " - The certificate has ",
+  			    "an unknown error.\n";
+  		}
+  	} # no warnings 'once'
+  	printf STDERR
+  	        "Certificate information:\n".
+  	        " - Hostname: %s\n".
+  	        " - Valid: from %s until %s\n".
+  	        " - Issuer: %s\n".
+  	        " - Fingerprint: %s\n",
+  	        map $cert_info->$_, qw(hostname valid_from valid_until
+  	                               issuer_dname fingerprint);
+  	my $choice;
+  prompt:
+  	my $options = $may_save ?
+  	      "(R)eject, accept (t)emporarily or accept (p)ermanently? " :
+  	      "(R)eject or accept (t)emporarily? ";
+  	STDERR->flush;
+  	$choice = lc(substr(Git::prompt("Certificate problem.\n" . $options) || 'R', 0, 1));
+  	if ($choice eq 't') {
+  		$cred->may_save(undef);
+  	} elsif ($choice eq 'r') {
+  		return -1;
+  	} elsif ($may_save && $choice eq 'p') {
+  		$cred->may_save($may_save);
+  	} else {
+  		goto prompt;
+  	}
+  	$cred->accepted_failures($failures);
+  	$SVN::_Core::SVN_NO_ERROR;
+  }
+  
+  sub ssl_client_cert {
+  	my ($cred, $realm, $may_save, $pool) = @_;
+  	$may_save = undef if $_no_auth_cache;
+  	print STDERR "Client certificate filename: ";
+  	STDERR->flush;
+  	chomp(my $filename = <STDIN>);
+  	$cred->cert_file($filename);
+  	$cred->may_save($may_save);
+  	$SVN::_Core::SVN_NO_ERROR;
+  }
+  
+  sub ssl_client_cert_pw {
+  	my ($cred, $realm, $may_save, $pool) = @_;
+  	$may_save = undef if $_no_auth_cache;
+  	$cred->password(_read_password("Password: ", $realm));
+  	$cred->may_save($may_save);
+  	$SVN::_Core::SVN_NO_ERROR;
+  }
+  
+  sub username {
+  	my ($cred, $realm, $may_save, $pool) = @_;
+  	$may_save = undef if $_no_auth_cache;
+  	if (defined $realm && length $realm) {
+  		print STDERR "Authentication realm: $realm\n";
+  	}
+  	my $username;
+  	if (defined $_username) {
+  		$username = $_username;
+  	} else {
+  		$username = Git::prompt("Username: ");
+  	}
+  	$cred->username($username);
+  	$cred->may_save($may_save);
+  	$SVN::_Core::SVN_NO_ERROR;
+  }
+  
+  sub _read_password {
+  	my ($prompt, $realm) = @_;
+  	my $password = Git::prompt($prompt, 1);
+  	$password;
+  }
+  
+  1;
+  __END__
+  
+  =head1 NAME
+  
+  Git::SVN::Prompt - authentication callbacks for git-svn
+  
+  =head1 SYNOPSIS
+  
+      use Git::SVN::Prompt qw(simple ssl_client_cert ssl_client_cert_pw
+                              ssl_server_trust username);
+      use SVN::Client ();
+  
+      my $cached_simple = SVN::Client::get_simple_provider();
+      my $git_simple = SVN::Client::get_simple_prompt_provider(\&simple, 2);
+      my $cached_ssl = SVN::Client::get_ssl_server_trust_file_provider();
+      my $git_ssl = SVN::Client::get_ssl_server_trust_prompt_provider(
+          \&ssl_server_trust);
+      my $cached_cert = SVN::Client::get_ssl_client_cert_file_provider();
+      my $git_cert = SVN::Client::get_ssl_client_cert_prompt_provider(
+          \&ssl_client_cert, 2);
+      my $cached_cert_pw = SVN::Client::get_ssl_client_cert_pw_file_provider();
+      my $git_cert_pw = SVN::Client::get_ssl_client_cert_pw_prompt_provider(
+          \&ssl_client_cert_pw, 2);
+      my $cached_username = SVN::Client::get_username_provider();
+      my $git_username = SVN::Client::get_username_prompt_provider(
+          \&username, 2);
+  
+      my $ctx = new SVN::Client(
+          auth => [
+              $cached_simple, $git_simple,
+              $cached_ssl, $git_ssl,
+              $cached_cert, $git_cert,
+              $cached_cert_pw, $git_cert_pw,
+              $cached_username, $git_username
+          ]);
+  
+  =head1 DESCRIPTION
+  
+  This module is an implementation detail of the "git svn" command.
+  It implements git-svn's authentication policy.  Do not use it unless
+  you are developing git-svn.
+  
+  The interface will change as git-svn evolves.
+  
+  =head1 DEPENDENCIES
+  
+  L<SVN::Core>.
+  
+  =head1 SEE ALSO
+  
+  L<SVN::Client>.
+  
+  =head1 INCOMPATIBILITIES
+  
+  None reported.
+  
+  =head1 BUGS
+  
+  None.
+GIT_SVN_PROMPT
+
+$fatpacked{"Git/SVN/Ra.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN_RA';
+  package Git::SVN::Ra;
+  use vars qw/@ISA $config_dir $_ignore_refs_regex $_log_window_size/;
+  use strict;
+  use warnings;
+  use Memoize;
+  use Git::SVN::Utils qw(
+  	canonicalize_url
+  	canonicalize_path
+  	add_path_to_url
+  );
+  
+  use SVN::Ra;
+  BEGIN {
+  	@ISA = qw(SVN::Ra);
+  }
+  
+  my ($ra_invalid, $can_do_switch, %ignored_err, $RA);
+  
+  BEGIN {
+  	# enforce temporary pool usage for some simple functions
+  	no strict 'refs';
+  	for my $f (qw/rev_proplist get_latest_revnum get_uuid get_repos_root
+  	              get_file/) {
+  		my $SUPER = "SUPER::$f";
+  		*$f = sub {
+  			my $self = shift;
+  			my $pool = SVN::Pool->new;
+  			my @ret = $self->$SUPER(@_,$pool);
+  			$pool->clear;
+  			wantarray ? @ret : $ret[0];
+  		};
+  	}
+  }
+  
+  # serf has a bug that leads to a coredump upon termination if the
+  # remote access object is left around (not fixed yet in serf 1.3.1).
+  # Explicitly free it to work around the issue.
+  END {
+  	$RA = undef;
+  	$ra_invalid = 1;
+  }
+  
+  sub _auth_providers () {
+  	require SVN::Client;
+  	my @rv = (
+  	  SVN::Client::get_simple_provider(),
+  	  SVN::Client::get_ssl_server_trust_file_provider(),
+  	  SVN::Client::get_simple_prompt_provider(
+  	    \&Git::SVN::Prompt::simple, 2),
+  	  SVN::Client::get_ssl_client_cert_file_provider(),
+  	  SVN::Client::get_ssl_client_cert_prompt_provider(
+  	    \&Git::SVN::Prompt::ssl_client_cert, 2),
+  	  SVN::Client::get_ssl_client_cert_pw_file_provider(),
+  	  SVN::Client::get_ssl_client_cert_pw_prompt_provider(
+  	    \&Git::SVN::Prompt::ssl_client_cert_pw, 2),
+  	  SVN::Client::get_username_provider(),
+  	  SVN::Client::get_ssl_server_trust_prompt_provider(
+  	    \&Git::SVN::Prompt::ssl_server_trust),
+  	  SVN::Client::get_username_prompt_provider(
+  	    \&Git::SVN::Prompt::username, 2)
+  	);
+  
+  	# earlier 1.6.x versions would segfault, and <= 1.5.x didn't have
+  	# this function
+  	if (::compare_svn_version('1.6.15') >= 0) {
+  		my $config = SVN::Core::config_get_config($config_dir);
+  		my ($p, @a);
+  		# config_get_config returns all config files from
+  		# ~/.subversion, auth_get_platform_specific_client_providers
+  		# just wants the config "file".
+  		@a = ($config->{'config'}, undef);
+  		$p = SVN::Core::auth_get_platform_specific_client_providers(@a);
+  		# Insert the return value from
+  		# auth_get_platform_specific_providers
+  		unshift @rv, @$p;
+  	}
+  	\@rv;
+  }
+  
+  sub prepare_config_once {
+  	SVN::_Core::svn_config_ensure($config_dir, undef);
+  	my ($baton, $callbacks) = SVN::Core::auth_open_helper(_auth_providers);
+  	my $config = SVN::Core::config_get_config($config_dir);
+  	my $conf_t = $config->{'config'};
+  
+  	no warnings 'once';
+  	# The usage of $SVN::_Core::SVN_CONFIG_* variables
+  	# produces warnings that variables are used only once.
+  	# I had not found the better way to shut them up, so
+  	# the warnings of type 'once' are disabled in this block.
+  	if (SVN::_Core::svn_config_get_bool($conf_t,
+  	    $SVN::_Core::SVN_CONFIG_SECTION_AUTH,
+  	    $SVN::_Core::SVN_CONFIG_OPTION_STORE_PASSWORDS,
+  	    1) == 0) {
+  		my $val = '1';
+  		if (::compare_svn_version('1.9.0') < 0) { # pre-SVN r1553823
+  			my $dont_store_passwords = 1;
+  			$val = bless \$dont_store_passwords, "_p_void";
+  		}
+  		SVN::_Core::svn_auth_set_parameter($baton,
+  		    $SVN::_Core::SVN_AUTH_PARAM_DONT_STORE_PASSWORDS,
+  		    $val);
+  	}
+  	if (SVN::_Core::svn_config_get_bool($conf_t,
+  	    $SVN::_Core::SVN_CONFIG_SECTION_AUTH,
+  	    $SVN::_Core::SVN_CONFIG_OPTION_STORE_AUTH_CREDS,
+  	    1) == 0) {
+  		$Git::SVN::Prompt::_no_auth_cache = 1;
+  	}
+  
+  	return ($config, $baton, $callbacks);
+  } # no warnings 'once'
+  
+  INIT {
+  	Memoize::memoize '_auth_providers';
+  	Memoize::memoize 'prepare_config_once';
+  }
+  
+  sub new {
+  	my ($class, $url) = @_;
+  	$url = canonicalize_url($url);
+  	return $RA if ($RA && $RA->url eq $url);
+  
+  	::_req_svn();
+  
+  	$RA = undef;
+  	my ($config, $baton, $callbacks) = prepare_config_once();
+  	my $self = SVN::Ra->new(url => $url, auth => $baton,
+  	                      config => $config,
+  			      pool => SVN::Pool->new,
+  	                      auth_provider_callbacks => $callbacks);
+  	$RA = bless $self, $class;
+  
+  	# Make sure its canonicalized
+  	$self->url($url);
+  	$self->{svn_path} = $url;
+  	$self->{repos_root} = $self->get_repos_root;
+  	$self->{svn_path} =~ s#^\Q$self->{repos_root}\E(/|$)##;
+  	$self->{cache} = { check_path => { r => 0, data => {} },
+  	                   get_dir => { r => 0, data => {} } };
+  
+  	return $RA;
+  }
+  
+  sub url {
+  	my $self = shift;
+  
+  	if (@_) {
+  		my $url = shift;
+  		$self->{url} = canonicalize_url($url);
+  		return;
+  	}
+  
+  	return $self->{url};
+  }
+  
+  sub check_path {
+  	my ($self, $path, $r) = @_;
+  	my $cache = $self->{cache}->{check_path};
+  	if ($r == $cache->{r} && exists $cache->{data}->{$path}) {
+  		return $cache->{data}->{$path};
+  	}
+  	my $pool = SVN::Pool->new;
+  	my $t = $self->SUPER::check_path($path, $r, $pool);
+  	$pool->clear;
+  	if ($r != $cache->{r}) {
+  		%{$cache->{data}} = ();
+  		$cache->{r} = $r;
+  	}
+  	$cache->{data}->{$path} = $t;
+  }
+  
+  sub get_dir {
+  	my ($self, $dir, $r) = @_;
+  	my $cache = $self->{cache}->{get_dir};
+  	if ($r == $cache->{r}) {
+  		if (my $x = $cache->{data}->{$dir}) {
+  			return wantarray ? @$x : $x->[0];
+  		}
+  	}
+  	my $pool = SVN::Pool->new;
+  	my ($d, undef, $props);
+  
+  	if (::compare_svn_version('1.4.0') >= 0) {
+  		# n.b. in addition to being potentially more efficient,
+  		# this works around what appears to be a bug in some
+  		# SVN 1.8 versions
+  		my $kind = 1; # SVN_DIRENT_KIND
+  		($d, undef, $props) = $self->get_dir2($dir, $r, $kind, $pool);
+  	} else {
+  		($d, undef, $props) = $self->SUPER::get_dir($dir, $r, $pool);
+  	}
+  	my %dirents = map { $_ => { kind => $d->{$_}->kind } } keys %$d;
+  	$pool->clear;
+  	if ($r != $cache->{r}) {
+  		%{$cache->{data}} = ();
+  		$cache->{r} = $r;
+  	}
+  	$cache->{data}->{$dir} = [ \%dirents, $r, $props ];
+  	wantarray ? (\%dirents, $r, $props) : \%dirents;
+  }
+  
+  # get_log(paths, start, end, limit,
+  #         discover_changed_paths, strict_node_history, receiver)
+  sub get_log {
+  	my ($self, @args) = @_;
+  	my $pool = SVN::Pool->new;
+  
+  	# svn_log_changed_path_t objects passed to get_log are likely to be
+  	# overwritten even if only the refs are copied to an external variable,
+  	# so we should dup the structures in their entirety.  Using an
+  	# externally passed pool (instead of our temporary and quickly cleared
+  	# pool in Git::SVN::Ra) does not help matters at all...
+  	my $receiver = pop @args;
+  	my $prefix = "/".$self->{svn_path};
+  	$prefix =~ s#/+($)##;
+  	my $prefix_regex = qr#^\Q$prefix\E#;
+  	push(@args, sub {
+  		my ($paths) = $_[0];
+  		return &$receiver(@_) unless $paths;
+  		$_[0] = ();
+  		foreach my $p (keys %$paths) {
+  			my $i = $paths->{$p};
+  			# Make path relative to our url, not repos_root
+  			$p =~ s/$prefix_regex//;
+  			my %s = map { $_ => $i->$_; }
+  				qw/copyfrom_path copyfrom_rev action/;
+  			if ($s{'copyfrom_path'}) {
+  				$s{'copyfrom_path'} =~ s/$prefix_regex//;
+  				$s{'copyfrom_path'} = canonicalize_path($s{'copyfrom_path'});
+  			}
+  			$_[0]{$p} = \%s;
+  		}
+  		&$receiver(@_);
+  	});
+  
+  
+  	# the limit parameter was not supported in SVN 1.1.x, so we
+  	# drop it.  Therefore, the receiver callback passed to it
+  	# is made aware of this limitation by being wrapped if
+  	# the limit passed to is being wrapped.
+  	if (::compare_svn_version('1.2.0') <= 0) {
+  		my $limit = splice(@args, 3, 1);
+  		if ($limit > 0) {
+  			my $receiver = pop @args;
+  			push(@args, sub { &$receiver(@_) if (--$limit >= 0) });
+  		}
+  	}
+  	my $ret = $self->SUPER::get_log(@args, $pool);
+  	$pool->clear;
+  	$ret;
+  }
+  
+  # uncommon, only for ancient SVN (<= 1.4.2)
+  sub trees_match {
+  	require IO::File;
+  	require SVN::Client;
+  	my ($self, $url1, $rev1, $url2, $rev2) = @_;
+  	my $ctx = SVN::Client->new(auth => _auth_providers);
+  	my $out = IO::File->new_tmpfile;
+  
+  	# older SVN (1.1.x) doesn't take $pool as the last parameter for
+  	# $ctx->diff(), so we'll create a default one
+  	my $pool = SVN::Pool->new_default_sub;
+  
+  	$ra_invalid = 1; # this will open a new SVN::Ra connection to $url1
+  	$ctx->diff([], $url1, $rev1, $url2, $rev2, 1, 1, 0, $out, $out);
+  	$out->flush;
+  	my $ret = (($out->stat)[7] == 0);
+  	close $out or croak $!;
+  
+  	$ret;
+  }
+  
+  sub get_commit_editor {
+  	my ($self, $log, $cb, $pool) = @_;
+  
+  	my @lock = (::compare_svn_version('1.2.0') >= 0) ? (undef, 0) : ();
+  	$self->SUPER::get_commit_editor($log, $cb, @lock, $pool);
+  }
+  
+  sub gs_do_update {
+  	my ($self, $rev_a, $rev_b, $gs, $editor) = @_;
+  	my $new = ($rev_a == $rev_b);
+  	my $path = $gs->path;
+  
+  	if ($new && -e $gs->{index}) {
+  		unlink $gs->{index} or die
+  		  "Couldn't unlink index: $gs->{index}: $!\n";
+  	}
+  	my $pool = SVN::Pool->new;
+  	$editor->set_path_strip($path);
+  	my (@pc) = split m#/#, $path;
+  	my $reporter = $self->do_update($rev_b, (@pc ? shift @pc : ''),
+  	                                1, $editor, $pool);
+  	my @lock = (::compare_svn_version('1.2.0') >= 0) ? (undef) : ();
+  
+  	# Since we can't rely on svn_ra_reparent being available, we'll
+  	# just have to do some magic with set_path to make it so
+  	# we only want a partial path.
+  	my $sp = '';
+  	my $final = join('/', @pc);
+  	while (@pc) {
+  		$reporter->set_path($sp, $rev_b, 0, @lock, $pool);
+  		$sp .= '/' if length $sp;
+  		$sp .= shift @pc;
+  	}
+  	die "BUG: '$sp' != '$final'\n" if ($sp ne $final);
+  
+  	$reporter->set_path($sp, $rev_a, $new, @lock, $pool);
+  
+  	$reporter->finish_report($pool);
+  	$pool->clear;
+  	$editor->{git_commit_ok};
+  }
+  
+  # this requires SVN 1.4.3 or later (do_switch didn't work before 1.4.3, and
+  # svn_ra_reparent didn't work before 1.4)
+  sub gs_do_switch {
+  	my ($self, $rev_a, $rev_b, $gs, $url_b, $editor) = @_;
+  	my $path = $gs->path;
+  	my $pool = SVN::Pool->new;
+  
+  	my $old_url = $self->url;
+  	my $full_url = add_path_to_url( $self->url, $path );
+  	my ($ra, $reparented);
+  
+  	if ($old_url =~ m#^svn(\+\w+)?://# ||
+  	    ($full_url =~ m#^https?://# &&
+  	     canonicalize_url($full_url) ne $full_url)) {
+  		$_[0] = undef;
+  		$self = undef;
+  		$RA = undef;
+  		$ra = Git::SVN::Ra->new($full_url);
+  		$ra_invalid = 1;
+  	} elsif ($old_url ne $full_url) {
+  		SVN::_Ra::svn_ra_reparent(
+  			$self->{session},
+  			canonicalize_url($full_url),
+  			$pool
+  		);
+  		$self->url($full_url);
+  		$reparented = 1;
+  	}
+  
+  	$ra ||= $self;
+  	$url_b = canonicalize_url($url_b);
+  	my $reporter = $ra->do_switch($rev_b, '', 1, $url_b, $editor, $pool);
+  	my @lock = (::compare_svn_version('1.2.0') >= 0) ? (undef) : ();
+  	$reporter->set_path('', $rev_a, 0, @lock, $pool);
+  	$reporter->finish_report($pool);
+  
+  	if ($reparented) {
+  		SVN::_Ra::svn_ra_reparent($self->{session}, $old_url, $pool);
+  		$self->url($old_url);
+  	}
+  
+  	$pool->clear;
+  	$editor->{git_commit_ok};
+  }
+  
+  sub longest_common_path {
+  	my ($gsv, $globs) = @_;
+  	my %common;
+  	my $common_max = scalar @$gsv;
+  
+  	foreach my $gs (@$gsv) {
+  		my @tmp = split m#/#, $gs->path;
+  		my $p = '';
+  		foreach (@tmp) {
+  			$p .= length($p) ? "/$_" : $_;
+  			$common{$p} ||= 0;
+  			$common{$p}++;
+  		}
+  	}
+  	$globs ||= [];
+  	$common_max += scalar @$globs;
+  	foreach my $glob (@$globs) {
+  		my @tmp = split m#/#, $glob->{path}->{left};
+  		my $p = '';
+  		foreach (@tmp) {
+  			$p .= length($p) ? "/$_" : $_;
+  			$common{$p} ||= 0;
+  			$common{$p}++;
+  		}
+  	}
+  
+  	my $longest_path = '';
+  	foreach (sort {length $b <=> length $a} keys %common) {
+  		if ($common{$_} == $common_max) {
+  			$longest_path = $_;
+  			last;
+  		}
+  	}
+  	$longest_path;
+  }
+  
+  sub gs_fetch_loop_common {
+  	my ($self, $base, $head, $gsv, $globs) = @_;
+  	return if ($base > $head);
+  	# Make sure the cat_blob open2 FileHandle is created before calling
+  	# SVN::Pool::new_default so that it does not incorrectly end up in the pool.
+  	$::_repository->_open_cat_blob_if_needed;
+  	my $gpool = SVN::Pool->new_default;
+  	my $ra_url = $self->url;
+  	my $reload_ra = sub {
+  		$_[0] = undef;
+  		$self = undef;
+  		$RA = undef;
+  		$gpool->clear;
+  		$self = Git::SVN::Ra->new($ra_url);
+  		$ra_invalid = undef;
+  	};
+  	my $inc = $_log_window_size;
+  	my ($min, $max) = ($base, $head < $base + $inc ? $head : $base + $inc);
+  	my $longest_path = longest_common_path($gsv, $globs);
+  	my $find_trailing_edge;
+  	while (1) {
+  		my %revs;
+  		my $err;
+  		my $err_handler = $SVN::Error::handler;
+  		$SVN::Error::handler = sub {
+  			($err) = @_;
+  			skip_unknown_revs($err);
+  		};
+  		sub _cb {
+  			my ($paths, $r, $author, $date, $log) = @_;
+  			[ $paths,
+  			  { author => $author, date => $date, log => $log } ];
+  		}
+  		$self->get_log([$longest_path], $min, $max, 0, 1, 1,
+  		               sub { $revs{$_[1]} = _cb(@_) });
+  		if ($err) {
+  			print "Checked through r$max\r";
+  		} else {
+  			$find_trailing_edge = 1;
+  		}
+  		if ($err and $find_trailing_edge) {
+  			print STDERR "Path '$longest_path' ",
+  				     "was probably deleted:\n",
+  				     $err->expanded_message,
+  				     "\nWill attempt to follow ",
+  				     "revisions r$min .. r$max ",
+  				     "committed before the deletion\n";
+  			my $hi = $max;
+  			while (--$hi >= $min) {
+  				my $ok;
+  				$self->get_log([$longest_path], $min, $hi,
+  				               0, 1, 1, sub {
+  				               $ok = $_[1];
+  				               $revs{$_[1]} = _cb(@_) });
+  				if ($ok) {
+  					print STDERR "r$min .. r$ok OK\n";
+  					last;
+  				}
+  			}
+  			$find_trailing_edge = 0;
+  		}
+  		$SVN::Error::handler = $err_handler;
+  
+  		my %exists = map { $_->path => $_ } @$gsv;
+  		foreach my $r (sort {$a <=> $b} keys %revs) {
+  			my ($paths, $logged) = @{delete $revs{$r}};
+  
+  			foreach my $gs ($self->match_globs(\%exists, $paths,
+  			                                   $globs, $r)) {
+  				if ($gs->rev_map_max >= $r) {
+  					next;
+  				}
+  				next unless $gs->match_paths($paths, $r);
+  				$gs->{logged_rev_props} = $logged;
+  				if (my $last_commit = $gs->last_commit) {
+  					$gs->assert_index_clean($last_commit);
+  				}
+  				my $log_entry = $gs->do_fetch($paths, $r);
+  				if ($log_entry) {
+  					$gs->do_git_commit($log_entry);
+  				}
+  				$Git::SVN::INDEX_FILES{$gs->{index}} = 1;
+  			}
+  			foreach my $g (@$globs) {
+  				my $k = "svn-remote.$g->{remote}." .
+  				        "$g->{t}-maxRev";
+  				Git::SVN::tmp_config($k, $r);
+  			}
+  			$reload_ra->() if $ra_invalid;
+  		}
+  		# pre-fill the .rev_db since it'll eventually get filled in
+  		# with '0' x40 if something new gets committed
+  		foreach my $gs (@$gsv) {
+  			next if $gs->rev_map_max >= $max;
+  			next if defined $gs->rev_map_get($max);
+  			$gs->rev_map_set($max, 0 x40);
+  		}
+  		foreach my $g (@$globs) {
+  			my $k = "svn-remote.$g->{remote}.$g->{t}-maxRev";
+  			Git::SVN::tmp_config($k, $max);
+  		}
+  		last if $max >= $head;
+  		$min = $max + 1;
+  		$max += $inc;
+  		$max = $head if ($max > $head);
+  
+  		$reload_ra->();
+  	}
+  	Git::SVN::gc();
+  }
+  
+  sub get_dir_globbed {
+  	my ($self, $left, $depth, $r) = @_;
+  
+  	my @x = eval { $self->get_dir($left, $r) };
+  	return unless scalar @x == 3;
+  	my $dirents = $x[0];
+  	my @finalents;
+  	foreach my $de (keys %$dirents) {
+  		next if $dirents->{$de}->{kind} != $SVN::Node::dir;
+  		if ($depth > 1) {
+  			my @args = ("$left/$de", $depth - 1, $r);
+  			foreach my $dir ($self->get_dir_globbed(@args)) {
+  				push @finalents, "$de/$dir";
+  			}
+  		} else {
+  			push @finalents, $de;
+  		}
+  	}
+  	@finalents;
+  }
+  
+  # return value: 0 -- don't ignore, 1 -- ignore
+  sub is_ref_ignored {
+  	my ($g, $p) = @_;
+  	my $refname = $g->{ref}->full_path($p);
+  	return 1 if defined($g->{ignore_refs_regex}) &&
+  	            $refname =~ m!$g->{ignore_refs_regex}!;
+  	return 0 unless defined($_ignore_refs_regex);
+  	return 1 if $refname =~ m!$_ignore_refs_regex!o;
+  	return 0;
+  }
+  
+  sub match_globs {
+  	my ($self, $exists, $paths, $globs, $r) = @_;
+  
+  	sub get_dir_check {
+  		my ($self, $exists, $g, $r) = @_;
+  
+  		my @dirs = $self->get_dir_globbed($g->{path}->{left},
+  		                                  $g->{path}->{depth},
+  		                                  $r);
+  
+  		foreach my $de (@dirs) {
+  			my $p = $g->{path}->full_path($de);
+  			next if $exists->{$p};
+  			next if (length $g->{path}->{right} &&
+  				 ($self->check_path($p, $r) !=
+  				  $SVN::Node::dir));
+  			next unless $p =~ /$g->{path}->{regex}/;
+  			$exists->{$p} = Git::SVN->init($self->url, $p, undef,
+  					 $g->{ref}->full_path($de), 1);
+  		}
+  	}
+  	foreach my $g (@$globs) {
+  		if (my $path = $paths->{"/$g->{path}->{left}"}) {
+  			if ($path->{action} =~ /^[AR]$/) {
+  				get_dir_check($self, $exists, $g, $r);
+  			}
+  		}
+  		foreach (keys %$paths) {
+  			if (/$g->{path}->{left_regex}/ &&
+  			    !/$g->{path}->{regex}/) {
+  				next if $paths->{$_}->{action} !~ /^[AR]$/;
+  				get_dir_check($self, $exists, $g, $r);
+  			}
+  			next unless /$g->{path}->{regex}/;
+  			my $p = $1;
+  			my $pathname = $g->{path}->full_path($p);
+  			next if is_ref_ignored($g, $p);
+  			next if $exists->{$pathname};
+  			next if ($self->check_path($pathname, $r) !=
+  			         $SVN::Node::dir);
+  			$exists->{$pathname} = Git::SVN->init(
+  			                      $self->url, $pathname, undef,
+  			                      $g->{ref}->full_path($p), 1);
+  		}
+  		my $c = '';
+  		foreach (split m#/#, $g->{path}->{left}) {
+  			$c .= "/$_";
+  			next unless ($paths->{$c} &&
+  			             ($paths->{$c}->{action} =~ /^[AR]$/));
+  			get_dir_check($self, $exists, $g, $r);
+  		}
+  	}
+  	values %$exists;
+  }
+  
+  sub minimize_url {
+  	my ($self) = @_;
+  	return $self->url if ($self->url eq $self->{repos_root});
+  	my $url = $self->{repos_root};
+  	my @components = split(m!/!, $self->{svn_path});
+  	my $c = '';
+  	do {
+  		$url = add_path_to_url($url, $c);
+  		eval {
+  			my $ra = (ref $self)->new($url);
+  			my $latest = $ra->get_latest_revnum;
+  			$ra->get_log("", $latest, 0, 1, 0, 1, sub {});
+  		};
+  	} while ($@ && defined($c = shift @components));
+  
+  	return canonicalize_url($url);
+  }
+  
+  sub can_do_switch {
+  	my $self = shift;
+  	unless (defined $can_do_switch) {
+  		my $pool = SVN::Pool->new;
+  		my $rep = eval {
+  			$self->do_switch(1, '', 0, $self->url,
+  			                 SVN::Delta::Editor->new, $pool);
+  		};
+  		if ($@) {
+  			$can_do_switch = 0;
+  		} else {
+  			$rep->abort_report($pool);
+  			$can_do_switch = 1;
+  		}
+  		$pool->clear;
+  	}
+  	$can_do_switch;
+  }
+  
+  sub skip_unknown_revs {
+  	my ($err) = @_;
+  	my $errno = $err->apr_err();
+  	# Maybe the branch we're tracking didn't
+  	# exist when the repo started, so it's
+  	# not an error if it doesn't, just continue
+  	#
+  	# Wonderfully consistent library, eh?
+  	# 160013 - svn:// and file://
+  	# 175002 - http(s)://
+  	# 175007 - http(s):// (this repo required authorization, too...)
+  	#   More codes may be discovered later...
+  	if ($errno == 175007 || $errno == 175002 || $errno == 160013) {
+  		my $err_key = $err->expanded_message;
+  		# revision numbers change every time, filter them out
+  		$err_key =~ s/\d+/\0/g;
+  		$err_key = "$errno\0$err_key";
+  		unless ($ignored_err{$err_key}) {
+  			warn "W: Ignoring error from SVN, path probably ",
+  			     "does not exist: ($errno): ",
+  			     $err->expanded_message,"\n";
+  			warn "W: Do not be alarmed at the above message ",
+  			     "git-svn is just searching aggressively for ",
+  			     "old history.\n",
+  			     "This may take a while on large repositories\n";
+  			$ignored_err{$err_key} = 1;
+  		}
+  		return;
+  	}
+  	die "Error from SVN, ($errno): ", $err->expanded_message,"\n";
+  }
+  
+  1;
+  __END__
+  
+  =head1 NAME
+  
+  Git::SVN::Ra - Subversion remote access functions for git-svn
+  
+  =head1 SYNOPSIS
+  
+      use Git::SVN::Ra;
+  
+      my $ra = Git::SVN::Ra->new($branchurl);
+      my ($dirents, $fetched_revnum, $props) =
+          $ra->get_dir('.', $SVN::Core::INVALID_REVNUM);
+  
+  =head1 DESCRIPTION
+  
+  This is a wrapper around the L<SVN::Ra> module for use by B<git-svn>.
+  It fills in some default parameters (such as the authentication
+  scheme), smooths over incompatibilities between libsvn versions, adds
+  caching, and implements some functions specific to B<git-svn>.
+  
+  Do not use it unless you are developing git-svn.  The interface will
+  change as git-svn evolves.
+  
+  =head1 DEPENDENCIES
+  
+  Subversion perl bindings,
+  L<Git::SVN>.
+  
+  C<Git::SVN::Ra> has not been tested using callers other than
+  B<git-svn> itself.
+  
+  =head1 SEE ALSO
+  
+  L<SVN::Ra>.
+  
+  =head1 INCOMPATIBILITIES
+  
+  None reported.
+  
+  =head1 BUGS
+  
+  None.
+GIT_SVN_RA
+
+$fatpacked{"Git/SVN/Utils.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'GIT_SVN_UTILS';
+  package Git::SVN::Utils;
+  
+  use strict;
+  use warnings;
+  
+  use SVN::Core;
+  
+  use base qw(Exporter);
+  
+  our @EXPORT_OK = qw(
+  	fatal
+  	can_compress
+  	canonicalize_path
+  	canonicalize_url
+  	join_paths
+  	add_path_to_url
+  );
+  
+  
+  =head1 NAME
+  
+  Git::SVN::Utils - utility functions used across Git::SVN
+  
+  =head1 SYNOPSIS
+  
+      use Git::SVN::Utils qw(functions to import);
+  
+  =head1 DESCRIPTION
+  
+  This module contains functions which are useful across many different
+  parts of Git::SVN.  Mostly it's a place to put utility functions
+  rather than duplicate the code or have classes grabbing at other
+  classes.
+  
+  =head1 FUNCTIONS
+  
+  All functions can be imported only on request.
+  
+  =head3 fatal
+  
+      fatal(@message);
+  
+  Display a message and exit with a fatal error code.
+  
+  =cut
+  
+  # Note: not certain why this is in use instead of die.  Probably because
+  # the exit code of die is 255?  Doesn't appear to be used consistently.
+  sub fatal (@) { print STDERR "@_\n"; exit 1 }
+  
+  
+  =head3 can_compress
+  
+      my $can_compress = can_compress;
+  
+  Returns true if Compress::Zlib is available, false otherwise.
+  
+  =cut
+  
+  my $can_compress;
+  sub can_compress {
+  	return $can_compress if defined $can_compress;
+  
+  	return $can_compress = eval { require Compress::Zlib; };
+  }
+  
+  
+  =head3 canonicalize_path
+  
+      my $canoncalized_path = canonicalize_path($path);
+  
+  Converts $path into a canonical form which is safe to pass to the SVN
+  API as a file path.
+  
+  =cut
+  
+  # Turn foo/../bar into bar
+  sub _collapse_dotdot {
+  	my $path = shift;
+  
+  	1 while $path =~ s{/[^/]+/+\.\.}{};
+  	1 while $path =~ s{[^/]+/+\.\./}{};
+  	1 while $path =~ s{[^/]+/+\.\.}{};
+  
+  	return $path;
+  }
+  
+  
+  sub canonicalize_path {
+  	my $path = shift;
+  	my $rv;
+  
+  	# The 1.7 way to do it
+  	if ( defined &SVN::_Core::svn_dirent_canonicalize ) {
+  		$path = _collapse_dotdot($path);
+  		$rv = SVN::_Core::svn_dirent_canonicalize($path);
+  	}
+  	# The 1.6 way to do it
+  	# This can return undef on subversion-perl-1.4.2-2.el5 (CentOS 5.2)
+  	elsif ( defined &SVN::_Core::svn_path_canonicalize ) {
+  		$path = _collapse_dotdot($path);
+  		$rv = SVN::_Core::svn_path_canonicalize($path);
+  	}
+  
+  	return $rv if defined $rv;
+  
+  	# No SVN API canonicalization is available, or the SVN API
+  	# didn't return a successful result, do it ourselves
+  	return _canonicalize_path_ourselves($path);
+  }
+  
+  
+  sub _canonicalize_path_ourselves {
+  	my ($path) = @_;
+  	my $dot_slash_added = 0;
+  	if (substr($path, 0, 1) ne "/") {
+  		$path = "./" . $path;
+  		$dot_slash_added = 1;
+  	}
+  	$path =~ s#/+#/#g;
+  	$path =~ s#/\.(?:/|$)#/#g;
+  	$path = _collapse_dotdot($path);
+  	$path =~ s#/$##g;
+  	$path =~ s#^\./## if $dot_slash_added;
+  	$path =~ s#^\.$##;
+  	return $path;
+  }
+  
+  
+  =head3 canonicalize_url
+  
+      my $canonicalized_url = canonicalize_url($url);
+  
+  Converts $url into a canonical form which is safe to pass to the SVN
+  API as a URL.
+  
+  =cut
+  
+  sub canonicalize_url {
+  	my $url = shift;
+  
+  	# The 1.7 way to do it
+  	if ( defined &SVN::_Core::svn_uri_canonicalize ) {
+  		return SVN::_Core::svn_uri_canonicalize($url);
+  	}
+  	# There wasn't a 1.6 way to do it, so we do it ourself.
+  	else {
+  		return _canonicalize_url_ourselves($url);
+  	}
+  }
+  
+  
+  sub _canonicalize_url_path {
+  	my ($uri_path) = @_;
+  
+  	my @parts;
+  	foreach my $part (split m{/+}, $uri_path) {
+  		$part =~ s/([^!\$%&'()*+,.\/\w:=\@_`~-]|%(?![a-fA-F0-9]{2}))/sprintf("%%%02X",ord($1))/eg;
+  		push @parts, $part;
+  	}
+  
+  	return join('/', @parts);
+  }
+  
+  sub _canonicalize_url_ourselves {
+  	my ($url) = @_;
+  	if ($url =~ m#^([^:]+)://([^/]*)(.*)$#) {
+  		my ($scheme, $domain, $uri) = ($1, $2, _canonicalize_url_path(canonicalize_path($3)));
+  		$url = "$scheme://$domain$uri";
+  	}
+  	$url;
+  }
+  
+  
+  =head3 join_paths
+  
+      my $new_path = join_paths(@paths);
+  
+  Appends @paths together into a single path.  Any empty paths are ignored.
+  
+  =cut
+  
+  sub join_paths {
+  	my @paths = @_;
+  
+  	@paths = grep { defined $_ && length $_ } @paths;
+  
+  	return '' unless @paths;
+  	return $paths[0] if @paths == 1;
+  
+  	my $new_path = shift @paths;
+  	$new_path =~ s{/+$}{};
+  
+  	my $last_path = pop @paths;
+  	$last_path =~ s{^/+}{};
+  
+  	for my $path (@paths) {
+  		$path =~ s{^/+}{};
+  		$path =~ s{/+$}{};
+  		$new_path .= "/$path";
+  	}
+  
+  	return $new_path .= "/$last_path";
+  }
+  
+  
+  =head3 add_path_to_url
+  
+      my $new_url = add_path_to_url($url, $path);
+  
+  Appends $path onto the $url.  If $path is empty, $url is returned unchanged.
+  
+  =cut
+  
+  sub add_path_to_url {
+  	my($url, $path) = @_;
+  
+  	return $url if !defined $path or !length $path;
+  
+  	# Strip trailing and leading slashes so we don't
+  	# wind up with http://x.com///path
+  	$url  =~ s{/+$}{};
+  	$path =~ s{^/+}{};
+  
+  	# If a path has a % in it, URI escape it so it's not
+  	# mistaken for a URI escape later.
+  	$path =~ s{%}{%25}g;
+  
+  	return join '/', $url, $path;
+  }
+  
+  1;
+GIT_SVN_UTILS
+
 $fatpacked{"HTTP/Config.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTTP_CONFIG';
   package HTTP::Config;
   
   use strict;
-  use URI;
-  use vars qw($VERSION);
+  use warnings;
   
-  $VERSION = "6.00";
+  our $VERSION = '6.16';
+  
+  use URI;
   
   sub new {
       my $class = shift;
@@ -3352,6 +9450,7 @@ $fatpacked{"HTTP/Config.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
    ITEM:
       for my $item (@$self) {
           for my $k (keys %spec) {
+              no warnings 'uninitialized';
               if (!exists $item->{$k} || $spec{$k} ne $item->{$k}) {
                   push(@rest, $item);
                   next ITEM;
@@ -3546,11 +9645,17 @@ $fatpacked{"HTTP/Config.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
   
   1;
   
-  __END__
+  =pod
+  
+  =encoding UTF-8
   
   =head1 NAME
   
   HTTP::Config - Configuration for request and response objects
+  
+  =head1 VERSION
+  
+  version 6.16
   
   =head1 SYNOPSIS
   
@@ -3604,7 +9709,7 @@ $fatpacked{"HTTP/Config.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
   =item $conf->remove( %spec )
   
   Removes (and returns) the entries that have matches for all the key/value pairs in %spec.
-  If %spec is empty this will match all entries; so it will empty the configuation object.
+  If %spec is empty this will match all entries; so it will empty the configuration object.
   
   =item $conf->matching( $uri, $request, $response )
   
@@ -3739,14 +9844,24 @@ $fatpacked{"HTTP/Config.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
   
   L<URI>, L<HTTP::Request>, L<HTTP::Response>
   
-  =head1 COPYRIGHT
+  =head1 AUTHOR
   
-  Copyright 2008, Gisle Aas
+  Gisle Aas <gisle@activestate.com>
   
-  This library is free software; you can redistribute it and/or
-  modify it under the same terms as Perl itself.
+  =head1 COPYRIGHT AND LICENSE
+  
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
   
   =cut
+  
+  __END__
+  
+  
+  #ABSTRACT: Configuration for request and response objects
+  
 HTTP_CONFIG
 
 $fatpacked{"HTTP/Date.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTTP_DATE';
@@ -4144,14 +10259,15 @@ $fatpacked{"HTTP/Headers.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   package HTTP::Headers;
   
   use strict;
-  use Carp ();
+  use warnings;
   
-  use vars qw($VERSION $TRANSLATE_UNDERSCORE);
-  $VERSION = "6.05";
+  our $VERSION = '6.16';
+  
+  use Carp ();
   
   # The $TRANSLATE_UNDERSCORE variable controls whether '_' can be used
   # as a replacement for '-' in header field names.
-  $TRANSLATE_UNDERSCORE = 1 unless defined $TRANSLATE_UNDERSCORE;
+  our $TRANSLATE_UNDERSCORE = 1 unless defined $TRANSLATE_UNDERSCORE;
   
   # "Good Practice" order of HTTP message headers:
   #    - General-Headers
@@ -4381,6 +10497,18 @@ $fatpacked{"HTTP/Headers.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
       }
   }
   
+  sub flatten {
+  	my($self)=@_;
+  
+  	(
+  		map {
+  			my $k = $_;
+  			map {
+  				( $k => $_ )
+  			} $self->header($_);
+  		} $self->header_field_names
+  	);
+  }
   
   sub as_string
   {
@@ -4393,6 +10521,7 @@ $fatpacked{"HTTP/Headers.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   	my $vals = $self->{$key};
   	if ( ref($vals) eq 'ARRAY' ) {
   	    for my $val (@$vals) {
+  		$val = '' if not defined $val;
   		my $field = $standard_case{$key} || $self->{'::std_case'}{$key} || $key;
   		$field =~ s/^://;
   		if ( index($val, "\n") >= 0 ) {
@@ -4402,6 +10531,7 @@ $fatpacked{"HTTP/Headers.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   	    }
   	}
   	else {
+  	    $vals = '' if not defined $vals;
   	    my $field = $standard_case{$key} || $self->{'::std_case'}{$key} || $key;
   	    $field =~ s/^://;
   	    if ( index($vals, "\n") >= 0 ) {
@@ -4593,11 +10723,17 @@ $fatpacked{"HTTP/Headers.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   
   1;
   
-  __END__
+  =pod
+  
+  =encoding UTF-8
   
   =head1 NAME
   
   HTTP::Headers - Class encapsulating HTTP Message headers
+  
+  =head1 VERSION
+  
+  version 6.16
   
   =head1 SYNOPSIS
   
@@ -4664,7 +10800,7 @@ $fatpacked{"HTTP/Headers.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   
   A multi-valued field will be returned as separate values in list
   context and will be concatenated with ", " as separator in scalar
-  context.  The HTTP spec (RFC 2616) promise that joining multiple
+  context.  The HTTP spec (RFC 2616) promises that joining multiple
   values in this way will not change the semantic of a header field, but
   in practice there are cases like old-style Netscape cookies (see
   L<HTTP::Cookies>) where "," is used as part of the syntax of a single
@@ -4754,6 +10890,10 @@ $fatpacked{"HTTP/Headers.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   Any return values of the callback routine are ignored.  The loop can
   be broken by raising an exception (C<die>), but the caller of scan()
   would have to trap the exception itself.
+  
+  =item $h->flatten()
+  
+  Returns the list of pairs of keys and values.
   
   =item $h->as_string
   
@@ -4988,12 +11128,23 @@ $fatpacked{"HTTP/Headers.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   $h->header_field_names and the $h->scan callback, but the colons do
   not show in $h->as_string.
   
-  =head1 COPYRIGHT
+  =head1 AUTHOR
   
-  Copyright 1995-2005 Gisle Aas.
+  Gisle Aas <gisle@activestate.com>
   
-  This library is free software; you can redistribute it and/or
-  modify it under the same terms as Perl itself.
+  =head1 COPYRIGHT AND LICENSE
+  
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
+  
+  =cut
+  
+  __END__
+  
+  
+  #ABSTRACT: Class encapsulating HTTP Message headers
   
 HTTP_HEADERS
 
@@ -5001,12 +11152,14 @@ $fatpacked{"HTTP/Headers/Auth.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   package HTTP::Headers::Auth;
   
   use strict;
-  use vars qw($VERSION);
-  $VERSION = "6.00";
+  use warnings;
+  
+  our $VERSION = '6.16';
   
   use HTTP::Headers;
   
-  package HTTP::Headers;
+  package
+      HTTP::Headers;
   
   BEGIN {
       # we provide a new (and better) implementations below
@@ -5096,19 +11249,48 @@ $fatpacked{"HTTP/Headers/Auth.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   sub proxy_authenticate  { shift->_authenticate("Proxy-Authenticate", @_) }
   
   1;
+  
+  __END__
+  
+  =pod
+  
+  =encoding UTF-8
+  
+  =head1 NAME
+  
+  HTTP::Headers::Auth
+  
+  =head1 VERSION
+  
+  version 6.16
+  
+  =head1 AUTHOR
+  
+  Gisle Aas <gisle@activestate.com>
+  
+  =head1 COPYRIGHT AND LICENSE
+  
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
+  
+  =cut
 HTTP_HEADERS_AUTH
 
 $fatpacked{"HTTP/Headers/ETag.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTTP_HEADERS_ETAG';
   package HTTP::Headers::ETag;
   
   use strict;
-  use vars qw($VERSION);
-  $VERSION = "6.00";
+  use warnings;
+  
+  our $VERSION = '6.16';
   
   require HTTP::Date;
   
   require HTTP::Headers;
-  package HTTP::Headers;
+  package
+      HTTP::Headers;
   
   sub _etags
   {
@@ -5193,21 +11375,46 @@ $fatpacked{"HTTP/Headers/ETag.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   }
   
   1;
+  
+  __END__
+  
+  =pod
+  
+  =encoding UTF-8
+  
+  =head1 NAME
+  
+  HTTP::Headers::ETag
+  
+  =head1 VERSION
+  
+  version 6.16
+  
+  =head1 AUTHOR
+  
+  Gisle Aas <gisle@activestate.com>
+  
+  =head1 COPYRIGHT AND LICENSE
+  
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
+  
+  =cut
 HTTP_HEADERS_ETAG
 
 $fatpacked{"HTTP/Headers/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTTP_HEADERS_UTIL';
   package HTTP::Headers::Util;
   
   use strict;
-  use vars qw($VERSION @ISA @EXPORT_OK);
+  use warnings;
   
-  $VERSION = "6.03";
+  our $VERSION = '6.16';
   
-  require Exporter;
-  @ISA=qw(Exporter);
+  use base 'Exporter';
   
-  @EXPORT_OK=qw(split_header_words _split_header_words join_header_words);
-  
+  our @EXPORT_OK=qw(split_header_words _split_header_words join_header_words);
   
   
   sub split_header_words {
@@ -5293,11 +11500,17 @@ $fatpacked{"HTTP/Headers/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   
   1;
   
-  __END__
+  =pod
+  
+  =encoding UTF-8
   
   =head1 NAME
   
   HTTP::Headers::Util - Header value parsing utility functions
+  
+  =head1 VERSION
+  
+  version 6.16
   
   =head1 SYNOPSIS
   
@@ -5313,7 +11526,6 @@ $fatpacked{"HTTP/Headers/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   The following functions are available:
   
   =over 4
-  
   
   =item split_header_words( @header_values )
   
@@ -5388,12 +11600,23 @@ $fatpacked{"HTTP/Headers/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   
   =back
   
-  =head1 COPYRIGHT
+  =head1 AUTHOR
   
-  Copyright 1997-1998, Gisle Aas
+  Gisle Aas <gisle@activestate.com>
   
-  This library is free software; you can redistribute it and/or
-  modify it under the same terms as Perl itself.
+  =head1 COPYRIGHT AND LICENSE
+  
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
+  
+  =cut
+  
+  __END__
+  
+  
+  #ABSTRACT: Header value parsing utility functions
   
 HTTP_HEADERS_UTIL
 
@@ -5401,8 +11624,9 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   package HTTP::Message;
   
   use strict;
-  use vars qw($VERSION $AUTOLOAD);
-  $VERSION = "6.06";
+  use warnings;
+  
+  our $VERSION = '6.16';
   
   require HTTP::Headers;
   require Carp;
@@ -5542,11 +11766,11 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
       my $self = $_[0];
       _utf8_downgrade($_[1]);
       if (!ref($_[1]) && ref($self->{_content}) eq "SCALAR") {
-  	${$self->{_content}} = $_[1];
+  	${$self->{_content}} = defined( $_[1] ) ? $_[1] : '';
       }
       else {
   	die "Can't set content to be a scalar reference" if ref($_[1]) eq "SCALAR";
-  	$self->{_content} = $_[1];
+  	$self->{_content} = defined( $_[1] ) ? $_[1] : '';
   	delete $self->{_content_ref};
       }
       delete $self->{_parts} unless $_[2];
@@ -5692,7 +11916,7 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   	    $h =~ s/\s+$//;
   	    for my $ce (reverse split(/\s*,\s*/, lc($h))) {
   		next unless $ce;
-  		next if $ce eq "identity";
+  		next if $ce eq "identity" || $ce eq "none";
   		if ($ce eq "gzip" || $ce eq "x-gzip") {
   		    require IO::Uncompress::Gunzip;
   		    my $output;
@@ -5759,7 +11983,7 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   		"ISO-8859-1"
   	    );
   	    if ($charset eq "none") {
-  		# leave it asis
+  		# leave it as is
   	    }
   	    elsif ($charset eq "us-ascii" || $charset eq "iso-8859-1") {
   		if ($$content_ref =~ /[^\x00-\x7F]/ && defined &utf8::upgrade) {
@@ -5829,7 +12053,7 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
       };
       eval {
           require IO::Uncompress::Bunzip2;
-          push(@enc, "x-bzip2");
+          push(@enc, "x-bzip2", "bzip2");
       };
       # we don't care about announcing the 'identity', 'base64' and
       # 'quoted-printable' stuff
@@ -5861,7 +12085,7 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   
       my $content = $self->content;
       for my $encoding (@enc) {
-  	if ($encoding eq "identity") {
+  	if ($encoding eq "identity" || $encoding eq "none") {
   	    # nothing to do
   	}
   	elsif ($encoding eq "base64") {
@@ -5882,7 +12106,7 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   		or die "Can't deflate content: $IO::Compress::Deflate::DeflateError";
   	    $content = $output;
   	}
-  	elsif ($encoding eq "x-bzip2") {
+  	elsif ($encoding eq "x-bzip2" || $encoding eq "bzip2") {
   	    require IO::Compress::Bzip2;
   	    my $output;
   	    IO::Compress::Bzip2::bzip2(\$content, \$output)
@@ -5974,6 +12198,10 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
       return $dump;
   }
   
+  # allow subclasses to override what will handle individual parts
+  sub _part_class {
+      return __PACKAGE__;
+  }
   
   sub parts {
       my $self = shift;
@@ -6002,8 +12230,10 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   sub add_part {
       my $self = shift;
       if (($self->content_type || "") !~ m,^multipart/,) {
-  	my $p = HTTP::Message->new($self->remove_content_headers,
-  				   $self->content(""));
+  	my $p = $self->_part_class->new(
+  	    $self->remove_content_headers,
+  	    $self->content(""),
+  	);
   	$self->content_type("multipart/mixed");
   	$self->{_parts} = [];
           if ($p->headers->header_field_names || $p->content ne "") {
@@ -6033,7 +12263,8 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   }
   
   
-  # delegate all other method calls the the headers object.
+  # delegate all other method calls to the headers object.
+  our $AUTOLOAD;
   sub AUTOLOAD
   {
       my $method = substr($AUTOLOAD, rindex($AUTOLOAD, '::')+2);
@@ -6073,7 +12304,7 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   	    my $str = $self->content;
   	    $str =~ s/\r?\n--\Q$b\E--.*//s;
   	    if ($str =~ s/(^|.*?\r?\n)--\Q$b\E\r?\n//s) {
-  		$self->{_parts} = [map HTTP::Message->parse($_),
+  		$self->{_parts} = [map $self->_part_class->parse($_),
   				   split(/\r?\n--\Q$b\E\r?\n/, $str)]
   	    }
   	}
@@ -6087,7 +12318,7 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   	$self->{_parts} = [$class->parse($content)];
       }
       elsif ($ct =~ m,^message/,) {
-  	$self->{_parts} = [ HTTP::Message->parse($self->content) ];
+  	$self->{_parts} = [ $self->_part_class->parse($self->content) ];
       }
   
       $self->{_parts} ||= [];
@@ -6163,12 +12394,17 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   
   1;
   
+  =pod
   
-  __END__
+  =encoding UTF-8
   
   =head1 NAME
   
   HTTP::Message - HTTP style message (base class)
+  
+  =head1 VERSION
+  
+  version 6.16
   
   =head1 SYNOPSIS
   
@@ -6224,6 +12460,9 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   The content() method sets the raw content if an argument is given.  If no
   argument is given the content is not touched.  In either case the
   original raw content is returned.
+  
+  If the C<undef> argument is given, the content is reset to its default value,
+  which is an empty string.
   
   Note that the content should be a string of bytes.  Strings in perl
   can contain characters outside the range of a byte.  The C<Encode>
@@ -6497,25 +12736,35 @@ $fatpacked{"HTTP/Message.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
       $mess->authorization_basic
       $mess->proxy_authorization_basic
   
-  =head1 COPYRIGHT
+  =head1 AUTHOR
   
-  Copyright 1995-2004 Gisle Aas.
+  Gisle Aas <gisle@activestate.com>
   
-  This library is free software; you can redistribute it and/or
-  modify it under the same terms as Perl itself.
+  =head1 COPYRIGHT AND LICENSE
+  
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
+  
+  =cut
+  
+  __END__
+  
+  
+  #ABSTRACT: HTTP style message (base class)
   
 HTTP_MESSAGE
 
 $fatpacked{"HTTP/Request.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTTP_REQUEST';
   package HTTP::Request;
   
-  require HTTP::Message;
-  @ISA = qw(HTTP::Message);
-  $VERSION = "6.00";
-  
   use strict;
+  use warnings;
   
+  our $VERSION = '6.16';
   
+  use base 'HTTP::Message';
   
   sub new
   {
@@ -6530,8 +12779,9 @@ $fatpacked{"HTTP/Request.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   sub parse
   {
       my($class, $str) = @_;
+      Carp::carp('Undefined argument to parse()') if $^W && ! defined $str;
       my $request_line;
-      if ($str =~ s/^(.*)\n//) {
+      if (defined $str && $str =~ s/^(.*)\n//) {
   	$request_line = $1;
       }
       else {
@@ -6540,10 +12790,12 @@ $fatpacked{"HTTP/Request.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
       }
   
       my $self = $class->SUPER::parse($str);
-      my($method, $uri, $protocol) = split(' ', $request_line);
-      $self->method($method) if defined($method);
-      $self->uri($uri) if defined($uri);
-      $self->protocol($protocol) if $protocol;
+      if (defined $request_line) {
+          my($method, $uri, $protocol) = split(' ', $request_line);
+          $self->method($method);
+          $self->uri($uri) if defined($uri);
+          $self->protocol($protocol) if $protocol;
+      }
       $self;
   }
   
@@ -6577,7 +12829,7 @@ $fatpacked{"HTTP/Request.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   	    Carp::croak("A URI can't be a " . ref($uri) . " reference")
   		if ref($uri) eq 'HASH' or ref($uri) eq 'ARRAY';
   	    Carp::croak("Can't use a " . ref($uri) . " object as a URI")
-  		unless $uri->can('scheme');
+  		unless $uri->can('scheme') && $uri->can('canonical');
   	    $uri = $uri->clone;
   	    unless ($HTTP::URI_CLASS eq "URI") {
   		# Argh!! Hate this... old LWP legacy!
@@ -6642,11 +12894,17 @@ $fatpacked{"HTTP/Request.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   
   1;
   
-  __END__
+  =pod
+  
+  =encoding UTF-8
   
   =head1 NAME
   
   HTTP::Request - HTTP style request message
+  
+  =head1 VERSION
+  
+  version 6.16
   
   =head1 SYNOPSIS
   
@@ -6693,7 +12951,7 @@ $fatpacked{"HTTP/Request.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   =item $r->method( $val )
   
   This is used to get/set the method attribute.  The method should be a
-  short string like "GET", "HEAD", "PUT" or "POST".
+  short string like "GET", "HEAD", "PUT", "PATCH" or "POST".
   
   =item $r->uri
   
@@ -6701,7 +12959,7 @@ $fatpacked{"HTTP/Request.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   
   This is used to get/set the uri attribute.  The $val can be a
   reference to a URI object or a plain string.  If a string is given,
-  then it should be parseable as an absolute URI.
+  then it should be parsable as an absolute URI.
   
   =item $r->header( $field )
   
@@ -6737,49 +12995,146 @@ $fatpacked{"HTTP/Request.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HT
   
   =back
   
+  =head1 EXAMPLES
+  
+  Creating requests to be sent with L<LWP::UserAgent> or others can be easy. Here
+  are a few examples.
+  
+  =head2 Simple POST
+  
+  Here, we'll create a simple POST request that could be used to send JSON data
+  to an endpoint.
+  
+      #!/usr/bin/env perl
+  
+      use strict;
+      use warnings;
+  
+      use Encode qw(encode_utf8);
+      use HTTP::Request ();
+      use JSON::MaybeXS qw(encode_json);
+  
+      my $url = 'https://www.example.com/api/user/123';
+      my $header = ['Content-Type' => 'application/json; charset=UTF-8'];
+      my $data = {foo => 'bar', baz => 'quux'};
+      my $encoded_data = encode_utf8(encode_json($data));
+  
+      my $r = HTTP::Request->new('POST', $url, $header, $encoded_data);
+      # at this point, we could send it via LWP::UserAgent
+      # my $ua = LWP::UserAgent->new();
+      # my $res = $ua->request($r);
+  
+  =head2 Batch POST Request
+  
+  Some services, like Google, allow multiple requests to be sent in one batch.
+  L<https://developers.google.com/drive/v3/web/batch> for example. Using the
+  C<add_part> method from L<HTTP::Message> makes this simple.
+  
+      #!/usr/bin/env perl
+  
+      use strict;
+      use warnings;
+  
+      use Encode qw(encode_utf8);
+      use HTTP::Request ();
+      use JSON::MaybeXS qw(encode_json);
+  
+      my $auth_token = 'auth_token';
+      my $batch_url = 'https://www.googleapis.com/batch';
+      my $url = 'https://www.googleapis.com/drive/v3/files/fileId/permissions?fields=id';
+      my $url_no_email = 'https://www.googleapis.com/drive/v3/files/fileId/permissions?fields=id&sendNotificationEmail=false';
+  
+      # generate a JSON post request for one of the batch entries
+      my $req1 = build_json_request($url, {
+          emailAddress => 'example@appsrocks.com',
+          role => "writer",
+          type => "user",
+      });
+  
+      # generate a JSON post request for one of the batch entries
+      my $req2 = build_json_request($url_no_email, {
+          domain => "appsrocks.com",
+          role => "reader",
+          type => "domain",
+      });
+  
+      # generate a multipart request to send all of the other requests
+      my $r = HTTP::Request->new('POST', $batch_url, [
+          'Accept-Encoding' => 'gzip',
+          # if we don't provide a boundary here, HTTP::Message will generate
+          # one for us. We could use UUID::uuid() here if we wanted.
+          'Content-Type' => 'multipart/mixed; boundary=END_OF_PART'
+      ]);
+  
+      # add the two POST requests to the main request
+      $r->add_part($req1, $req2);
+      # at this point, we could send it via LWP::UserAgent
+      # my $ua = LWP::UserAgent->new();
+      # my $res = $ua->request($r);
+      exit();
+  
+      sub build_json_request {
+          my ($url, $href) = @_;
+          my $header = ['Authorization' => "Bearer $auth_token", 'Content-Type' => 'application/json; charset=UTF-8'];
+          return HTTP::Request->new('POST', $url, $header, encode_utf8(encode_json($href)));
+      }
+  
   =head1 SEE ALSO
   
   L<HTTP::Headers>, L<HTTP::Message>, L<HTTP::Request::Common>,
   L<HTTP::Response>
   
-  =head1 COPYRIGHT
+  =head1 AUTHOR
   
-  Copyright 1995-2004 Gisle Aas.
+  Gisle Aas <gisle@activestate.com>
   
-  This library is free software; you can redistribute it and/or
-  modify it under the same terms as Perl itself.
+  =head1 COPYRIGHT AND LICENSE
   
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
+  
+  =cut
+  
+  __END__
+  
+  
+  #ABSTRACT: HTTP style request message
 HTTP_REQUEST
 
 $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTTP_REQUEST_COMMON';
   package HTTP::Request::Common;
   
   use strict;
-  use vars qw(@EXPORT @EXPORT_OK $VERSION $DYNAMIC_FILE_UPLOAD);
+  use warnings;
   
-  $DYNAMIC_FILE_UPLOAD ||= 0;  # make it defined (don't know why)
+  our $VERSION = '6.16';
   
-  require Exporter;
-  *import = \&Exporter::import;
-  @EXPORT =qw(GET HEAD PUT POST);
-  @EXPORT_OK = qw($DYNAMIC_FILE_UPLOAD DELETE);
+  our $DYNAMIC_FILE_UPLOAD ||= 0;  # make it defined (don't know why)
+  
+  use Exporter 5.57 'import';
+  
+  our @EXPORT =qw(GET HEAD PUT PATCH POST);
+  our @EXPORT_OK = qw($DYNAMIC_FILE_UPLOAD DELETE);
   
   require HTTP::Request;
   use Carp();
-  
-  $VERSION = "6.04";
   
   my $CRLF = "\015\012";   # "\r\n" is not portable
   
   sub GET  { _simple_req('GET',  @_); }
   sub HEAD { _simple_req('HEAD', @_); }
-  sub PUT  { _simple_req('PUT' , @_); }
   sub DELETE { _simple_req('DELETE', @_); }
+  sub PATCH { request_type_with_data('PATCH', @_); }
+  sub POST { request_type_with_data('POST', @_); }
+  sub PUT { request_type_with_data('PUT', @_); }
   
-  sub POST
+  sub request_type_with_data
   {
-      my $url = shift;
-      my $req = HTTP::Request->new(POST => $url);
+      my $type = shift;
+      my $url  = shift;
+      my $req = HTTP::Request->new($type => $url);
       my $content;
       $content = shift if @_ and ref $_[0];
       my($k, $v);
@@ -6882,10 +13237,10 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
       my @data = ref($data) eq "HASH" ? %$data : @$data;  # copy
       my $fhparts;
       my @parts;
-      my($k,$v);
-      while (($k,$v) = splice(@data, 0, 2)) {
+      while (my ($k,$v) = splice(@data, 0, 2)) {
   	if (!ref($v)) {
   	    $k =~ s/([\\\"])/\\$1/g;  # escape quotes and backslashes
+              no warnings 'uninitialized';
   	    push(@parts,
   		 qq(Content-Disposition: form-data; name="$k"$CRLF$CRLF$v));
   	}
@@ -6968,7 +13323,7 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   		    # or perhaps a file in the /proc file system where
   		    # stat may return a 0 size even though reading it
   		    # will produce data.  So we cannot make
-  		    # a Content-Length header.  
+  		    # a Content-Length header.
   		    undef $length;
   		    last;
   		}
@@ -7012,7 +13367,7 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   		}
   		if ($buflength) {
   		    defined $length && ($length -= $buflength);
-  		    return $buf 
+  		    return $buf
   	    	}
   	    }
   	};
@@ -7053,11 +13408,17 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   1;
   
-  __END__
+  =pod
+  
+  =encoding UTF-8
   
   =head1 NAME
   
   HTTP::Request::Common - Construct common HTTP::Request objects
+  
+  =head1 VERSION
+  
+  version 6.16
   
   =head1 SYNOPSIS
   
@@ -7065,13 +13426,19 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
     $ua = LWP::UserAgent->new;
     $ua->request(GET 'http://www.sn.no/');
     $ua->request(POST 'http://somewhere/foo', [foo => bar, bar => foo]);
+    $ua->request(PATCH 'http://somewhere/foo', [foo => bar, bar => foo]);
+    $ua->request(PUT 'http://somewhere/foo', [foo => bar, bar => foo]);
   
   =head1 DESCRIPTION
   
-  This module provide functions that return newly created C<HTTP::Request>
+  This module provides functions that return newly created C<HTTP::Request>
   objects.  These functions are usually more convenient to use than the
-  standard C<HTTP::Request> constructor for the most common requests.  The
-  following functions are provided:
+  standard C<HTTP::Request> constructor for the most common requests.
+  
+  Note that L<LWP::UserAgent> has several convenience methods, including
+  C<get>, C<head>, C<delete>, C<post> and C<put>.
+  
+  The following functions are provided:
   
   =over 4
   
@@ -7079,7 +13446,7 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   =item GET $url, Header => Value,...
   
-  The GET() function returns an C<HTTP::Request> object initialized with
+  The C<GET> function returns an L<HTTP::Request> object initialized with
   the "GET" method and the specified URL.  It is roughly equivalent to the
   following call
   
@@ -7091,11 +13458,11 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   but is less cluttered.  What is different is that a header named
   C<Content> will initialize the content part of the request instead of
   setting a header field.  Note that GET requests should normally not
-  have a content, so this hack makes more sense for the PUT() and POST()
-  functions described below.
+  have a content, so this hack makes more sense for the C<PUT>, C<PATCH>
+   and C<POST> functions described below.
   
-  The get(...) method of C<LWP::UserAgent> exists as a shortcut for
-  $ua->request(GET ...).
+  The C<get(...)> method of L<LWP::UserAgent> exists as a shortcut for
+  C<< $ua->request(GET ...) >>.
   
   =item HEAD $url
   
@@ -7103,29 +13470,39 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   Like GET() but the method in the request is "HEAD".
   
-  The head(...)  method of "LWP::UserAgent" exists as a shortcut for
-  $ua->request(HEAD ...).
-  
-  =item PUT $url
-  
-  =item PUT $url, Header => Value,...
-  
-  =item PUT $url, Header => Value,..., Content => $content
-  
-  Like GET() but the method in the request is "PUT".
-  
-  The content of the request can be specified using the "Content"
-  pseudo-header.  This steals a bit of the header field namespace as
-  there is no way to directly specify a header that is actually called
-  "Content".  If you really need this you must update the request
-  returned in a separate statement.
+  The C<head(...)>  method of L<LWP::UserAgent> exists as a shortcut for
+  C<< $ua->request(HEAD ...) >>.
   
   =item DELETE $url
   
   =item DELETE $url, Header => Value,...
   
-  Like GET() but the method in the request is "DELETE".  This function
+  Like C<GET> but the method in the request is C<DELETE>.  This function
   is not exported by default.
+  
+  =item PATCH $url
+  
+  =item PATCH $url, Header => Value,...
+  
+  =item PATCH $url, $form_ref, Header => Value,...
+  
+  =item PATCH $url, Header => Value,..., Content => $form_ref
+  
+  =item PATCH $url, Header => Value,..., Content => $content
+  
+  The same as C<POST> below, but the method in the request is C<PATCH>.
+  
+  =item PUT $url
+  
+  =item PUT $url, Header => Value,...
+  
+  =item PUT $url, $form_ref, Header => Value,...
+  
+  =item PUT $url, Header => Value,..., Content => $form_ref
+  
+  =item PUT $url, Header => Value,..., Content => $content
+  
+  The same as C<POST> below, but the method in the request is C<PUT>
   
   =item POST $url
   
@@ -7137,13 +13514,24 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   =item POST $url, Header => Value,..., Content => $content
   
-  This works mostly like PUT() with "POST" as the method, but this
-  function also takes a second optional array or hash reference
-  parameter $form_ref.  As for PUT() the content can also be specified
-  directly using the "Content" pseudo-header, and you may also provide
-  the $form_ref this way.
+  C<POST>, C<PATCH> and C<PUT> all work with the same parameters.
   
-  The $form_ref argument can be used to pass key/value pairs for the
+    %data = ( title => 'something', body => something else' );
+    $ua = LWP::UserAgent->new();
+    $request = HTTP::Request::Common::POST( $url, [ %data ] );
+    $response = $ua->request($request);
+  
+  They take a second optional array or hash reference
+  parameter C<$form_ref>.  The content can also be specified
+  directly using the C<Content> pseudo-header, and you may also provide
+  the C<$form_ref> this way.
+  
+  The C<Content> pseudo-header steals a bit of the header field namespace as
+  there is no way to directly specify a header that is actually called
+  "Content".  If you really need this you must update the request
+  returned in a separate statement.
+  
+  The C<$form_ref> argument can be used to pass key/value pairs for the
   form content.  By default we will initialize a request using the
   C<application/x-www-form-urlencoded> content type.  This means that
   you can emulate an HTML E<lt>form> POSTing like this:
@@ -7156,7 +13544,7 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
            perc   => '3%',
          ];
   
-  This will create an HTTP::Request object that looks like this:
+  This will create an L<HTTP::Request> object that looks like this:
   
     POST http://www.perl.org/survey.cgi
     Content-Length: 66
@@ -7170,7 +13558,7 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   The POST method also supports the C<multipart/form-data> content used
   for I<Form-based File Upload> as specified in RFC 1867.  You trigger
   this content format by specifying a content type of C<'form-data'> as
-  one of the request headers.  If one of the values in the $form_ref is
+  one of the request headers.  If one of the values in the C<$form_ref> is
   an array reference, then it is treated as a file part specification
   with the following interpretation:
   
@@ -7188,7 +13576,7 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   If a $file is provided by no C<Content-Type> header, then C<Content-Type>
   and C<Content-Encoding> will be filled in automatically with the values
-  returned by LWP::MediaTypes::guess_media_type()
+  returned by C<LWP::MediaTypes::guess_media_type()>
   
   Sending my F<~/.profile> to the survey used as example above can be
   achieved by this:
@@ -7202,7 +13590,7 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
                            init   => ["$ENV{HOME}/.profile"],
                          ]
   
-  This will create an HTTP::Request object that almost looks this (the
+  This will create an L<HTTP::Request> object that almost looks this (the
   boundary and the content of your F<~/.profile> is likely to be
   different):
   
@@ -7235,20 +13623,20 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
     --6G+f--
   
-  If you set the $DYNAMIC_FILE_UPLOAD variable (exportable) to some TRUE
+  If you set the C<$DYNAMIC_FILE_UPLOAD> variable (exportable) to some TRUE
   value, then you get back a request object with a subroutine closure as
   the content attribute.  This subroutine will read the content of any
   files on demand and return it in suitable chunks.  This allow you to
   upload arbitrary big files without using lots of memory.  You can even
   upload infinite files like F</dev/audio> if you wish; however, if
-  the file is not a plain file, there will be no Content-Length header
+  the file is not a plain file, there will be no C<Content-Length> header
   defined for the request.  Not all servers (or server
   applications) like this.  Also, if the file(s) change in size between
-  the time the Content-Length is calculated and the time that the last
+  the time the C<Content-Length> is calculated and the time that the last
   chunk is delivered, the subroutine will C<Croak>.
   
-  The post(...)  method of "LWP::UserAgent" exists as a shortcut for
-  $ua->request(POST ...).
+  The C<post(...)>  method of L<LWP::UserAgent> exists as a shortcut for
+  C<< $ua->request(POST ...) >>.
   
   =back
   
@@ -7256,28 +13644,39 @@ $fatpacked{"HTTP/Request/Common.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   L<HTTP::Request>, L<LWP::UserAgent>
   
+  Also, there are some examples in L<HTTP::Request/"EXAMPLES"> that you might
+  find useful. For example, batch requests are explained there.
   
-  =head1 COPYRIGHT
+  =head1 AUTHOR
   
-  Copyright 1997-2004, Gisle Aas
+  Gisle Aas <gisle@activestate.com>
   
-  This library is free software; you can redistribute it and/or
-  modify it under the same terms as Perl itself.
+  =head1 COPYRIGHT AND LICENSE
+  
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
   
   =cut
   
+  __END__
+  
+  
+  #ABSTRACT: Construct common HTTP::Request objects
 HTTP_REQUEST_COMMON
 
 $fatpacked{"HTTP/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTTP_RESPONSE';
   package HTTP::Response;
   
-  require HTTP::Message;
-  @ISA = qw(HTTP::Message);
-  $VERSION = "6.04";
-  
   use strict;
-  use HTTP::Status ();
+  use warnings;
   
+  our $VERSION = '6.16';
+  
+  use base 'HTTP::Message';
+  
+  use HTTP::Status ();
   
   
   sub new
@@ -7293,8 +13692,9 @@ $fatpacked{"HTTP/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'H
   sub parse
   {
       my($class, $str) = @_;
+      Carp::carp('Undefined argument to parse()') if $^W && ! defined $str;
       my $status_line;
-      if ($str =~ s/^(.*)\n//) {
+      if (defined $str && $str =~ s/^(.*)\n//) {
   	$status_line = $1;
       }
       else {
@@ -7302,17 +13702,21 @@ $fatpacked{"HTTP/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'H
   	$str = "";
       }
   
+      $status_line =~ s/\r\z// if defined $status_line;
+  
       my $self = $class->SUPER::parse($str);
-      my($protocol, $code, $message);
-      if ($status_line =~ /^\d{3} /) {
-         # Looks like a response created by HTTP::Response->new
-         ($code, $message) = split(' ', $status_line, 2);
-      } else {
-         ($protocol, $code, $message) = split(' ', $status_line, 3);
+      if (defined $status_line) {
+          my($protocol, $code, $message);
+          if ($status_line =~ /^\d{3} /) {
+             # Looks like a response created by HTTP::Response->new
+             ($code, $message) = split(' ', $status_line, 2);
+          } else {
+             ($protocol, $code, $message) = split(' ', $status_line, 3);
+          }
+          $self->protocol($protocol) if $protocol;
+          $self->code($code) if defined($code);
+          $self->message($message) if defined($message);
       }
-      $self->protocol($protocol) if $protocol;
-      $self->code($code) if defined($code);
-      $self->message($message) if defined($message);
       $self;
   }
   
@@ -7483,6 +13887,8 @@ $fatpacked{"HTTP/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'H
   sub is_success  { HTTP::Status::is_success  (shift->{'_rc'}); }
   sub is_redirect { HTTP::Status::is_redirect (shift->{'_rc'}); }
   sub is_error    { HTTP::Status::is_error    (shift->{'_rc'}); }
+  sub is_client_error { HTTP::Status::is_client_error (shift->{'_rc'}); }
+  sub is_server_error { HTTP::Status::is_server_error (shift->{'_rc'}); }
   
   
   sub error_as_HTML
@@ -7604,19 +14010,24 @@ $fatpacked{"HTTP/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'H
   
   1;
   
+  =pod
   
-  __END__
+  =encoding UTF-8
   
   =head1 NAME
   
   HTTP::Response - HTTP style response message
+  
+  =head1 VERSION
+  
+  version 6.16
   
   =head1 SYNOPSIS
   
   Response objects are returned by the request() method of the C<LWP::UserAgent>:
   
       # ...
-      $response = $ua->request($request)
+      $response = $ua->request($request);
       if ($response->is_success) {
           print $response->decoded_content;
       }
@@ -7700,7 +14111,7 @@ $fatpacked{"HTTP/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'H
   =item $r->request( $request )
   
   This is used to get/set the request attribute.  The request attribute
-  is a reference to the the request that caused this response.  It does
+  is a reference to the request that caused this response.  It does
   not have to be the same request passed to the $ua->request() method,
   because there might have been redirects and authorization retries in
   between.
@@ -7755,10 +14166,10 @@ $fatpacked{"HTTP/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'H
   
   If none of these sources provide an absolute URI, undef is returned.
   
-  When the LWP protocol modules produce the HTTP::Response object, then
-  any base URI embedded in the document (step 1) will already have
-  initialized the "Content-Base:" header. This means that this method
-  only performs the last 2 steps (the content is not always available
+  When the LWP protocol modules produce the HTTP::Response object, then any base
+  URI embedded in the document (step 1) will already have initialized the
+  "Content-Base:" header. (See L<LWP::UserAgent/parse_head>).  This means that
+  this method only performs the last 2 steps (the content is not always available
   either).
   
   =item $r->filename
@@ -7809,6 +14220,10 @@ $fatpacked{"HTTP/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'H
   =item $r->is_redirect
   
   =item $r->is_error
+  
+  =item $r->is_client_error
+  
+  =item $r->is_server_error
   
   These methods indicate if the response was informational, successful, a
   redirection, or an error.  See L<HTTP::Status> for the meaning of these.
@@ -7899,12 +14314,23 @@ $fatpacked{"HTTP/Response.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'H
   
   L<HTTP::Headers>, L<HTTP::Message>, L<HTTP::Status>, L<HTTP::Request>
   
-  =head1 COPYRIGHT
+  =head1 AUTHOR
   
-  Copyright 1995-2004 Gisle Aas.
+  Gisle Aas <gisle@activestate.com>
   
-  This library is free software; you can redistribute it and/or
-  modify it under the same terms as Perl itself.
+  =head1 COPYRIGHT AND LICENSE
+  
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
+  
+  =cut
+  
+  __END__
+  
+  
+  #ABSTRACT: HTTP style response message
   
 HTTP_RESPONSE
 
@@ -7912,80 +14338,103 @@ $fatpacked{"HTTP/Status.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
   package HTTP::Status;
   
   use strict;
+  use warnings;
+  
+  our $VERSION = '6.16';
+  
   require 5.002;   # because we use prototypes
   
-  use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
-  
-  require Exporter;
-  @ISA = qw(Exporter);
-  @EXPORT = qw(is_info is_success is_redirect is_error status_message);
-  @EXPORT_OK = qw(is_client_error is_server_error);
-  $VERSION = "6.03";
+  use base 'Exporter';
+  our @EXPORT = qw(is_info is_success is_redirect is_error status_message);
+  our @EXPORT_OK = qw(is_client_error is_server_error is_cacheable_by_default);
   
   # Note also addition of mnemonics to @EXPORT below
   
-  # Unmarked codes are from RFC 2616
-  # See also: http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+  # Unmarked codes are from RFC 7231 (2017-12-20)
+  # See also:
+  # https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
   
   my %StatusCode = (
       100 => 'Continue',
       101 => 'Switching Protocols',
-      102 => 'Processing',                      # RFC 2518 (WebDAV)
+      102 => 'Processing',                      # RFC 2518: WebDAV
+      103 => 'Early Hints',                     # RFC 8297: Indicating Hints
+  #   104 .. 199
       200 => 'OK',
       201 => 'Created',
       202 => 'Accepted',
       203 => 'Non-Authoritative Information',
       204 => 'No Content',
       205 => 'Reset Content',
-      206 => 'Partial Content',
-      207 => 'Multi-Status',                    # RFC 2518 (WebDAV)
-      208 => 'Already Reported',		      # RFC 5842
+      206 => 'Partial Content',                 # RFC 7233: Range Requests
+      207 => 'Multi-Status',                    # RFC 4918: WebDAV
+      208 => 'Already Reported',                # RFC 5842: WebDAV bindings
+  #   209 .. 225
+      226 => 'IM used',                         # RFC 3229: Delta encoding
+  #   227 .. 299
       300 => 'Multiple Choices',
       301 => 'Moved Permanently',
       302 => 'Found',
       303 => 'See Other',
-      304 => 'Not Modified',
+      304 => 'Not Modified',                    # RFC 7232: Conditional Request
       305 => 'Use Proxy',
       307 => 'Temporary Redirect',
+      308 => 'Permanent Redirect',              # RFC 7528: Permanent Redirect
+  #   309 .. 399
       400 => 'Bad Request',
-      401 => 'Unauthorized',
+      401 => 'Unauthorized',                    # RFC 7235: Authentication
       402 => 'Payment Required',
       403 => 'Forbidden',
       404 => 'Not Found',
       405 => 'Method Not Allowed',
       406 => 'Not Acceptable',
-      407 => 'Proxy Authentication Required',
+      407 => 'Proxy Authentication Required',   # RFC 7235: Authentication
       408 => 'Request Timeout',
       409 => 'Conflict',
       410 => 'Gone',
       411 => 'Length Required',
-      412 => 'Precondition Failed',
+      412 => 'Precondition Failed',             # RFC 7232: Conditional Request
       413 => 'Request Entity Too Large',
       414 => 'Request-URI Too Large',
       415 => 'Unsupported Media Type',
-      416 => 'Request Range Not Satisfiable',
+      416 => 'Request Range Not Satisfiable',   # RFC 7233: Range Requests
       417 => 'Expectation Failed',
-      418 => 'I\'m a teapot',		      # RFC 2324
-      422 => 'Unprocessable Entity',            # RFC 2518 (WebDAV)
-      423 => 'Locked',                          # RFC 2518 (WebDAV)
-      424 => 'Failed Dependency',               # RFC 2518 (WebDAV)
-      425 => 'No code',                         # WebDAV Advanced Collections
-      426 => 'Upgrade Required',                # RFC 2817
-      428 => 'Precondition Required',
-      429 => 'Too Many Requests',
-      431 => 'Request Header Fields Too Large',
-      449 => 'Retry with',                      # unofficial Microsoft
+  #   418 .. 420
+      421 => 'Misdirected Request',             # RFC 7540: HTTP/2
+      422 => 'Unprocessable Entity',            # RFC 4918: WebDAV
+      423 => 'Locked',                          # RFC 4918: WebDAV
+      424 => 'Failed Dependency',               # RFC 4918: WebDAV
+  #   425
+      426 => 'Upgrade Required',
+  #   427
+      428 => 'Precondition Required',           # RFC 6585: Additional Codes
+      429 => 'Too Many Requests',               # RFC 6585: Additional Codes
+  #   430
+      431 => 'Request Header Fields Too Large', # RFC 6585: Additional Codes
+  #   432 .. 450
+      451 => 'Unavailable For Legal Reasons',   # RFC 7724: Legal Obstacels
+  #   452 .. 499
       500 => 'Internal Server Error',
       501 => 'Not Implemented',
       502 => 'Bad Gateway',
       503 => 'Service Unavailable',
       504 => 'Gateway Timeout',
       505 => 'HTTP Version Not Supported',
-      506 => 'Variant Also Negotiates',         # RFC 2295
-      507 => 'Insufficient Storage',            # RFC 2518 (WebDAV)
-      509 => 'Bandwidth Limit Exceeded',        # unofficial
-      510 => 'Not Extended',                    # RFC 2774
-      511 => 'Network Authentication Required',
+      506 => 'Variant Also Negotiates',         # RFC 2295: Transparant Ngttn
+      507 => 'Insufficient Storage',            # RFC 4918: WebDAV
+      508 => 'Loop Detected',                   # RFC 5842: WebDAV bindings
+  #   509
+      510 => 'Not Extended',                    # RFC 2774: Extension Framework
+      511 => 'Network Authentication Required', # RFC 6585: Additional Codes
+  );
+  
+  # keep some unofficial codes that used to be in this distribution
+  %StatusCode = (
+      %StatusCode,
+      418 => 'I\'m a teapot',                   # RFC 2324: HTCPC/1.0  1-april
+      425 => 'Unordered Collection',            #           WebDAV Draft
+      449 => 'Retry with',                      #           microsoft
+      509 => 'Bandwidth Limit Exceeded',        #           Apache / cPanel
   );
   
   my $mnemonicCode = '';
@@ -8006,7 +14455,10 @@ $fatpacked{"HTTP/Status.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
   *RC_MOVED_TEMPORARILY = \&RC_FOUND;  # 302 was renamed in the standard
   push(@EXPORT, "RC_MOVED_TEMPORARILY");
   
-  %EXPORT_TAGS = (
+  *RC_NO_CODE = \&RC_UNORDERED_COLLECTION;
+  push(@EXPORT, "RC_NO_CODE");
+  
+  our %EXPORT_TAGS = (
      constants => [grep /^HTTP_/, @EXPORT_OK],
      is => [grep /^is_/, @EXPORT, @EXPORT_OK],
   );
@@ -8014,21 +14466,39 @@ $fatpacked{"HTTP/Status.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
   
   sub status_message  ($) { $StatusCode{$_[0]}; }
   
-  sub is_info         ($) { $_[0] >= 100 && $_[0] < 200; }
-  sub is_success      ($) { $_[0] >= 200 && $_[0] < 300; }
-  sub is_redirect     ($) { $_[0] >= 300 && $_[0] < 400; }
-  sub is_error        ($) { $_[0] >= 400 && $_[0] < 600; }
-  sub is_client_error ($) { $_[0] >= 400 && $_[0] < 500; }
-  sub is_server_error ($) { $_[0] >= 500 && $_[0] < 600; }
+  sub is_info                 ($) { $_[0] && $_[0] >= 100 && $_[0] < 200; }
+  sub is_success              ($) { $_[0] && $_[0] >= 200 && $_[0] < 300; }
+  sub is_redirect             ($) { $_[0] && $_[0] >= 300 && $_[0] < 400; }
+  sub is_error                ($) { $_[0] && $_[0] >= 400 && $_[0] < 600; }
+  sub is_client_error         ($) { $_[0] && $_[0] >= 400 && $_[0] < 500; }
+  sub is_server_error         ($) { $_[0] && $_[0] >= 500 && $_[0] < 600; }
+  sub is_cacheable_by_default ($) { $_[0] &&
+      (  $_[0] == 200 # OK
+      || $_[0] == 203 # Non-Authoritative Information
+      || $_[0] == 204 # No Content
+      || $_[0] == 206 # Not Acceptable
+      || $_[0] == 300 # Multiple Choices
+      || $_[0] == 301 # Moved Permanently
+      || $_[0] == 404 # Not Found
+      || $_[0] == 405 # Method Not Allowed
+      || $_[0] == 410 # Gone
+      || $_[0] == 414 # Request-URI Too Large
+      || $_[0] == 501 # Not Implemented
+      ); }
   
   1;
   
+  =pod
   
-  __END__
+  =encoding UTF-8
   
   =head1 NAME
   
   HTTP::Status - HTTP Status code processing
+  
+  =head1 VERSION
+  
+  version 6.16
   
   =head1 SYNOPSIS
   
@@ -8058,6 +14528,7 @@ $fatpacked{"HTTP/Status.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
      HTTP_CONTINUE                        (100)
      HTTP_SWITCHING_PROTOCOLS             (101)
      HTTP_PROCESSING                      (102)
+     HTTP_EARLY_HINTS                     (103)
   
      HTTP_OK                              (200)
      HTTP_CREATED                         (201)
@@ -8076,6 +14547,7 @@ $fatpacked{"HTTP/Status.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
      HTTP_NOT_MODIFIED                    (304)
      HTTP_USE_PROXY                       (305)
      HTTP_TEMPORARY_REDIRECT              (307)
+     HTTP_PERMANENT_REDIRECT              (308)
   
      HTTP_BAD_REQUEST                     (400)
      HTTP_UNAUTHORIZED                    (401)
@@ -8169,6 +14641,15 @@ $fatpacked{"HTTP/Status.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
   
   This function is B<not> exported by default.
   
+  =item is_cacheable_by_default( $code )
+  
+  Return TRUE if C<$code> indicates that a response is cacheable by default, and
+  it can be reused by a cache with heuristic expiration. All other status codes
+  are not cacheable by default. See L<RFC 7231 - HTTP/1.1 Semantics and Content, 
+  Section 6.1. Overview of Status Codes|https://tools.ietf.org/html/rfc7231#section-6.1>.
+  
+  This function is B<not> exported by default.
+  
   =back
   
   =head1 BUGS
@@ -8176,6 +14657,24 @@ $fatpacked{"HTTP/Status.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'HTT
   For legacy reasons all the C<HTTP_> constants are exported by default
   with the prefix C<RC_>.  It's recommended to use explicit imports and
   the C<:constants> tag instead of relying on this.
+  
+  =head1 AUTHOR
+  
+  Gisle Aas <gisle@activestate.com>
+  
+  =head1 COPYRIGHT AND LICENSE
+  
+  This software is copyright (c) 1994-2017 by Gisle Aas.
+  
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.
+  
+  =cut
+  
+  __END__
+  
+  
+  #ABSTRACT: HTTP Status code processing
 HTTP_STATUS
 
 $fatpacked{"JSON.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'JSON';
@@ -13650,7 +20149,7 @@ JSON_BACKPORTPP_COMPAT5006
 $fatpacked{"LWP.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'LWP';
   package LWP;
   
-  $VERSION = "6.13";
+  $VERSION = "6.08";
   sub Version { $VERSION; }
   
   require 5.008;
@@ -13755,7 +20254,7 @@ $fatpacked{"LWP.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'LWP';
   
   =over 3
   
-  =item *
+  =item
   
   The HTTP protocol is based on a request/response paradigm. A client
   establishes a connection with a server and sends a request to the
@@ -14471,7 +20970,7 @@ $fatpacked{"LWP/Authen/Ntlm.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   use strict;
   use vars qw/$VERSION/;
   
-  $VERSION = "6.13";
+  $VERSION = "6.00";
   
   use Authen::NTLM "1.02";
   use MIME::Base64 "2.12";
@@ -14654,7 +21153,7 @@ $fatpacked{"LWP/ConnCache.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'L
   use strict;
   use vars qw($VERSION $DEBUG);
   
-  $VERSION = "6.13";
+  $VERSION = "6.02";
   
   
   sub new {
@@ -15137,7 +21636,7 @@ $fatpacked{"LWP/Protocol.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'LW
   
   require LWP::MemberMixin;
   @ISA = qw(LWP::MemberMixin);
-  $VERSION = "6.13";
+  $VERSION = "6.06";
   
   use strict;
   use Carp ();
@@ -16565,7 +23064,9 @@ $fatpacked{"LWP/Protocol/http.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   
       # IPv6 literal IP address should be [bracketed] to remove
       # ambiguity between ip address and port number.
-      if ( ($host =~ /:/) && ($host !~ /^\[/) ) {
+      # Extra cautious to ensure that $host is _just_ an IPv6 address
+      # (at least as best as we can tell).
+      if ( ($host =~ /:/) && ($host =~ /^[0-9a-f:.]+$/i) ) {
         $host = "[$host]";
       }
   
@@ -16828,7 +23329,7 @@ $fatpacked{"LWP/Protocol/http.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
               my $n = $socket->syswrite($req_buf, length($req_buf));
               unless (defined $n) {
                   redo WRITE if $!{EINTR};
-                  if ($!{EWOULDBLOCK} || $!{EAGAIN}) {
+                  if ($!{EAGAIN}) {
                       select(undef, undef, undef, 0.1);
                       redo WRITE;
                   }
@@ -16898,7 +23399,7 @@ $fatpacked{"LWP/Protocol/http.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
               {
                   my $nfound = select($rbits, $wbits, undef, $sel_timeout);
                   if ($nfound < 0) {
-                      if ($!{EINTR} || $!{EWOULDBLOCK} || $!{EAGAIN}) {
+                      if ($!{EINTR} || $!{EAGAIN}) {
                           if ($time_before) {
                               $sel_timeout = $sel_timeout_before - (time - $time_before);
                               $sel_timeout = 0 if $sel_timeout < 0;
@@ -16919,7 +23420,7 @@ $fatpacked{"LWP/Protocol/http.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   		my $buf = $socket->_rbuf;
   		my $n = $socket->sysread($buf, 1024, length($buf));
                   unless (defined $n) {
-                      die "read failed: $!" unless  $!{EINTR} || $!{EWOULDBLOCK} || $!{EAGAIN};
+                      die "read failed: $!" unless  $!{EINTR} || $!{EAGAIN};
                       # if we get here the rest of the block will do nothing
                       # and we will retry the read on the next round
                   }
@@ -16950,7 +23451,7 @@ $fatpacked{"LWP/Protocol/http.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   	    if (defined($wbits) && $wbits =~ /[^\0]/) {
   		my $n = $socket->syswrite($$wbuf, length($$wbuf), $woffset);
                   unless (defined $n) {
-                      die "write failed: $!" unless $!{EINTR} || $!{EWOULDBLOCK} || $!{EAGAIN};
+                      die "write failed: $!" unless $!{EINTR} || $!{EAGAIN};
                       $n = 0;  # will retry write on the next round
                   }
                   elsif ($n == 0) {
@@ -17007,7 +23508,7 @@ $fatpacked{"LWP/Protocol/http.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   	{
   	    $n = $socket->read_entity_body($buf, $size);
               unless (defined $n) {
-                  redo READ if $!{EINTR} || $!{EWOULDBLOCK} || $!{EAGAIN} || $!{ENOTTY};
+                  redo READ if $!{EINTR} || $!{EAGAIN} || $!{ENOTTY};
                   die "read failed: $!";
               }
   	    redo READ if $n == -1;
@@ -17456,7 +23957,7 @@ $fatpacked{"LWP/RobotUA.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'LWP
   
   require LWP::UserAgent;
   @ISA = qw(LWP::UserAgent);
-  $VERSION = "6.13";
+  $VERSION = "6.06";
   
   require WWW::RobotRules;
   require HTTP::Request;
@@ -17774,7 +24275,7 @@ $fatpacked{"LWP/Simple.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'LWP_
   use HTTP::Status;
   push(@EXPORT, @HTTP::Status::EXPORT);
   
-  $VERSION = "6.13";
+  $VERSION = "6.00";
   
   sub import
   {
@@ -18021,7 +24522,7 @@ $fatpacked{"LWP/UserAgent.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'L
   
   require LWP::MemberMixin;
   @ISA = qw(LWP::MemberMixin);
-  $VERSION = "6.13";
+  $VERSION = "6.06";
   
   use HTTP::Request ();
   use HTTP::Response ();
@@ -19884,7 +26385,7 @@ $fatpacked{"Test/Builder.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TE
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN {
       if( $] < 5.008 ) {
@@ -19901,7 +26402,7 @@ $fatpacked{"Test/Builder.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TE
       warn "Test::Builder was loaded after Test2 initialization, this is not recommended."
           if Test2::API::test2_init_done() || Test2::API::test2_load_done();
   
-      if (USE_THREADS) {
+      if (USE_THREADS && ! Test2::API::test2_ipc_disabled()) {
           require Test2::IPC;
           require Test2::IPC::Driver::Files;
           Test2::IPC::Driver::Files->import;
@@ -20000,7 +26501,7 @@ $fatpacked{"Test/Builder.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TE
   
           Test2::API::test2_add_callback_exit(sub { $Test->_ending(@_) });
   
-          Test2::API::test2_ipc()->set_no_fatal(1) if USE_THREADS;
+          Test2::API::test2_ipc()->set_no_fatal(1) if Test2::API::test2_has_ipc();
       }
       return $Test;
   }
@@ -20101,6 +26602,7 @@ $fatpacked{"Test/Builder.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TE
       $meta->{Test_Results} = [];
       $meta->{subevents} = $subevents;
       $meta->{subtest_id} = $hub->id;
+      $meta->{subtest_uuid} = $hub->uuid;
       $meta->{subtest_buffered} = $parent->format ? 0 : 1;
   
       $self->_add_ts_hooks;
@@ -20181,6 +26683,7 @@ $fatpacked{"Test/Builder.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TE
           else {
               $parent->{subevents}  = $meta->{subevents};
               $parent->{subtest_id} = $meta->{subtest_id};
+              $parent->{subtest_uuid} = $meta->{subtest_uuid};
               $parent->{subtest_buffered} = $meta->{subtest_buffered};
               $parent->ok( $chub->is_passing, $meta->{Name} );
           }
@@ -20551,11 +27054,12 @@ $fatpacked{"Test/Builder.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TE
       my @attrs;
       my $subevents  = delete $self->{subevents};
       my $subtest_id = delete $self->{subtest_id};
+      my $subtest_uuid = delete $self->{subtest_uuid};
       my $subtest_buffered = delete $self->{subtest_buffered};
       my $epkg = 'Test2::Event::Ok';
       if ($subevents) {
           $epkg = 'Test2::Event::Subtest';
-          push @attrs => (subevents => $subevents, subtest_id => $subtest_id, buffered => $subtest_buffered);
+          push @attrs => (subevents => $subevents, subtest_id => $subtest_id, subtest_uuid => $subtest_uuid, buffered => $subtest_buffered);
       }
   
       my $e = bless {
@@ -22421,6 +28925,18 @@ $fatpacked{"Test/Builder.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TE
   Test::Builder is only thread-aware if threads.pm is loaded I<before>
   Test::Builder.
   
+  You can directly disable thread support with one of the following:
+  
+      $ENV{T2_NO_IPC} = 1
+  
+  or
+  
+      no Test2::IPC;
+  
+  or
+  
+      Test2::API::test2_ipc_disable()
+  
   =head1 MEMORY
   
   An informative hash, accessible via C<details()>, is stored for each
@@ -22474,7 +28990,7 @@ $fatpacked{"Test/Builder/Formatter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::Formatter::TAP; our @ISA = qw(Test2::Formatter::TAP) }
   
@@ -22567,7 +29083,7 @@ $fatpacked{"Test/Builder/Formatter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -23249,7 +29765,7 @@ $fatpacked{"Test/Builder/Module.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   require Exporter;
   our @ISA = qw(Exporter);
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   =head1 NAME
@@ -23421,7 +29937,7 @@ $fatpacked{"Test/Builder/Tester.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   package Test::Builder::Tester;
   
   use strict;
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Test::Builder;
   use Symbol;
@@ -24099,7 +30615,7 @@ $fatpacked{"Test/Builder/Tester/Color.pm"} = '#line '.(1+__LINE__).' "'.__FILE__
   package Test::Builder::Tester::Color;
   
   use strict;
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   require Test::Builder::Tester;
   
@@ -24154,7 +30670,7 @@ $fatpacked{"Test/Builder/TodoDiag.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::Event::Diag; our @ISA = qw(Test2::Event::Diag) }
   
@@ -24210,7 +30726,7 @@ $fatpacked{"Test/Builder/TodoDiag.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -24240,7 +30756,7 @@ $fatpacked{"Test/More.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST_
       return warn @_, " at $file line $line\n";
   }
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Test::Builder::Module;
   our @ISA    = qw(Test::Builder::Module);
@@ -26232,7 +32748,7 @@ $fatpacked{"Test/Simple.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
   
   use strict;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Test::Builder::Module;
   our @ISA    = qw(Test::Builder::Module);
@@ -26469,7 +32985,7 @@ $fatpacked{"Test/Tester.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
   
   use vars qw( @ISA @EXPORT );
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   @EXPORT = qw( run_tests check_tests check_test cmp_results show_space );
   @ISA = qw( Exporter );
@@ -27151,7 +33667,7 @@ $fatpacked{"Test/Tester/Capture.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   package Test::Tester::Capture;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Test::Builder;
@@ -27402,7 +33918,7 @@ $fatpacked{"Test/Tester/CaptureRunner.pm"} = '#line '.(1+__LINE__).' "'.__FILE__
   
   package Test::Tester::CaptureRunner;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Test::Tester::Capture;
@@ -27484,7 +34000,7 @@ $fatpacked{"Test/Tester/Delegate.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   
   package Test::Tester::Delegate;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Scalar::Util();
   
@@ -27530,7 +34046,7 @@ $fatpacked{"Test/use/ok.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
   package Test::use::ok;
   use 5.005;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   __END__
@@ -27598,7 +34114,7 @@ $fatpacked{"Test2.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2';
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   1;
@@ -27799,7 +34315,7 @@ $fatpacked{"Test2.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2';
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -27821,7 +34337,7 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
       $ENV{TEST2_ACTIVE} = 1;
   }
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   my $INST;
@@ -27882,7 +34398,7 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   
   use Carp qw/carp croak confess/;
   use Scalar::Util qw/blessed weaken/;
-  use Test2::Util qw/get_tid clone_io pkg_to_file/;
+  use Test2::Util qw/get_tid clone_io pkg_to_file gen_uid/;
   
   our @EXPORT_OK = qw{
       context release
@@ -27909,6 +34425,10 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
       test2_ipc_wait_disable
       test2_ipc_wait_enabled
   
+      test2_add_uuid_via
+  
+      test2_add_callback_testing_done
+  
       test2_add_callback_context_aquire
       test2_add_callback_context_acquire
       test2_add_callback_context_init
@@ -27926,6 +34446,8 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   
       test2_ipc
       test2_has_ipc
+      test2_ipc_disable
+      test2_ipc_disabled
       test2_ipc_drivers
       test2_ipc_add_driver
       test2_ipc_polling
@@ -27988,6 +34510,22 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
       $INST->no_wait;
   }
   
+  sub test2_add_callback_testing_done {
+      my $cb = shift;
+  
+      test2_add_callback_post_load(sub {
+          my $stack = test2_stack();
+          $stack->top; # Insure we have a hub
+          my ($hub) = Test2::API::test2_stack->all;
+  
+          $hub->set_active(1);
+  
+          $hub->follow_up($cb);
+      });
+  
+      return;
+  }
+  
   sub test2_add_callback_context_acquire   { $INST->add_context_acquire_callback(@_) }
   sub test2_add_callback_context_aquire    { $INST->add_context_acquire_callback(@_) }
   sub test2_add_callback_context_init      { $INST->add_context_init_callback(@_) }
@@ -28003,8 +34541,15 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   sub test2_list_post_load_callbacks       { @{$INST->post_load_callbacks} }
   sub test2_list_pre_subtest_callbacks     { @{$INST->pre_subtest_callbacks} }
   
+  sub test2_add_uuid_via {
+      $INST->set_add_uuid_via(@_) if @_;
+      $INST->add_uuid_via();
+  }
+  
   sub test2_ipc                 { $INST->ipc }
   sub test2_has_ipc             { $INST->has_ipc }
+  sub test2_ipc_disable         { $INST->ipc_disable }
+  sub test2_ipc_disabled        { $INST->ipc_disabled }
   sub test2_ipc_add_driver      { $INST->add_ipc_driver(@_) }
   sub test2_ipc_drivers         { @{$INST->ipc_drivers} }
   sub test2_ipc_polling         { $INST->ipc_polling }
@@ -28041,6 +34586,7 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   sub _context_acquire_callbacks_ref { $INST->context_acquire_callbacks }
   sub _context_init_callbacks_ref    { $INST->context_init_callbacks }
   sub _context_release_callbacks_ref { $INST->context_release_callbacks }
+  sub _add_uuid_via_ref              { \($INST->{Test2::API::Instance::ADD_UUID_VIA()}) }
   
   # Private, for use in Test2::IPC
   sub _set_ipc { $INST->set_ipc(@_) }
@@ -28088,7 +34634,7 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
       return;
   };
   
-  my $CID = 1;
+  my $UUID_VIA = _add_uuid_via_ref();
   sub context {
       # We need to grab these before anything else to ensure they are not
       # changed.
@@ -28165,13 +34711,18 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
       # hit with how often this needs to be called.
       my $trace = bless(
           {
-              frame    => [$pkg, $file, $line, $sub],
-              pid      => $$,
-              tid      => get_tid(),
-              cid      => 'C' . $CID++,
-              hid      => $hid,
-              nested   => $hub->{nested},
+              frame  => [$pkg, $file, $line, $sub],
+              pid    => $$,
+              tid    => get_tid(),
+              cid    => gen_uid(),
+              hid    => $hid,
+              nested => $hub->{nested},
               buffered => $hub->{buffered},
+  
+              $$UUID_VIA ? (
+                  huuid => $hub->{uuid},
+                  uuid  => ${$UUID_VIA}->('context'),
+              ) : (),
           },
           'Test2::EventFacet::Trace'
       );
@@ -28432,7 +34983,7 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
           }
       }
   
-      $hub->finalize($trace->snapshot(hid => $hub->hid, nested => $hub->nested, buffered => $buffered), 1)
+      $hub->finalize($trace->snapshot(huuid => $hub->uuid, hid => $hub->hid, nested => $hub->nested, buffered => $buffered), 1)
           if $ok
           && !$hub->no_ending
           && !$hub->ended;
@@ -28440,11 +34991,12 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
       my $pass = $ok && $hub->is_passing;
       my $e = $ctx->build_event(
           'Subtest',
-          pass       => $pass,
-          name       => $name,
-          subtest_id => $hub->id,
-          buffered   => $buffered,
-          subevents  => \@events,
+          pass         => $pass,
+          name         => $name,
+          subtest_id   => $hub->id,
+          subtest_uuid => $hub->uuid,
+          buffered     => $buffered,
+          subevents    => \@events,
       );
   
       my $plan_ok = $hub->check_plan;
@@ -29034,6 +35586,14 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   This will return the global L<Test2::API::Stack> instance. If this has not
   yet been initialized it will be initialized now.
   
+  =item test2_ipc_disable
+  
+  Disable IPC.
+  
+  =item $bool = test2_ipc_diabled
+  
+  Check if IPC is disabled.
+  
   =item test2_ipc_wait_enable()
   
   =item test2_ipc_wait_disable()
@@ -29111,6 +35671,22 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   means the callback will be run once, the first time a context is obtained.
   If Test2 has already finished loading then the callback will be run immediately.
   
+  =item test2_add_callback_testing_done(sub { ... })
+  
+  This adds your coderef as a follow-up to the root hub after Test2 is finished loading.
+  
+  This is essentially a helper to do the following:
+  
+      test2_add_callback_post_load(sub {
+          my $stack = test2_stack();
+          $stack->top; # Insure we have a hub
+          my ($hub) = Test2::API::test2_stack->all;
+  
+          $hub->set_active(1);
+  
+          $hub->follow_up(sub { ... }); # <-- Your coderef here
+      });
+  
   =item test2_add_callback_context_acquire(sub { ... })
   
   Add a callback that will be called every time someone tries to acquire a
@@ -29168,6 +35744,22 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   =item @list = test2_list_pre_subtest_callbacks()
   
   Returns all the pre-subtest callback references.
+  
+  =item test2_add_uuid_via(sub { ... })
+  
+  =item $sub = test2_add_uuid_via()
+  
+  This allows you to provide a UUID generator. If provided UUIDs will be attached
+  to all events, hubs, and contexts. This is useful for storing, tracking, and
+  linking these objects.
+  
+  The sub you provide should always return a unique identifier. Most things will
+  expect a proper UUID string, however nothing in Test2::API enforces this.
+  
+  The sub will receive exactly 1 argument, the type of thing being tagged
+  'context', 'hub', or 'event'. In the future additional things may be tagged, in
+  which case new strings will be passed in. These are purely informative, you can
+  (and usually should) ignore them.
   
   =back
   
@@ -29326,7 +35918,7 @@ $fatpacked{"Test2/API.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -29341,7 +35933,7 @@ $fatpacked{"Test2/API/Breakage.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Test2::Util qw/pkg_to_file/;
@@ -29507,7 +36099,7 @@ $fatpacked{"Test2/API/Breakage.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -29522,7 +36114,7 @@ $fatpacked{"Test2/API/Context.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Carp qw/confess croak/;
@@ -29539,7 +36131,7 @@ $fatpacked{"Test2/API/Context.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
           my $file = "Test2/Event/$_.pm";
           require $file unless $INC{$file};
           ( $pkg => $pkg, $_ => $pkg )
-      } qw/Ok Diag Note Plan Bail Exception Waiting Skip Subtest Pass Fail/
+      } qw/Ok Diag Note Plan Bail Exception Waiting Skip Subtest Pass Fail V2/
   );
   
   use Test2::Util::ExternalMeta qw/meta get_meta set_meta delete_meta/;
@@ -29718,6 +36310,42 @@ $fatpacked{"Test2/API/Context.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   sub alert {
       my ($self, $msg) = @_;
       $self->trace->alert($msg);
+  }
+  
+  sub send_ev2_and_release {
+      my $self = shift;
+      my $out  = $self->send_ev2(@_);
+      $self->release;
+      return $out;
+  }
+  
+  sub send_ev2 {
+      my $self = shift;
+  
+      my $e;
+      {
+          local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+          $e = Test2::Event::V2->new(
+              trace => $self->{+TRACE}->snapshot,
+              @_,
+          );
+      }
+  
+      if ($self->{+_ABORTED}) {
+          my $f = $e->facet_data;
+          ${$self->{+_ABORTED}}++ if $f->{control}->{halt} || defined($f->{control}->{terminate}) || defined($e->terminate);
+      }
+      $self->{+HUB}->send($e);
+  }
+  
+  sub build_ev2 {
+      my $self = shift;
+  
+      local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+      Test2::Event::V2->new(
+          trace => $self->{+TRACE}->snapshot,
+          @_,
+      );
   }
   
   sub send_event_and_release {
@@ -30134,6 +36762,21 @@ $fatpacked{"Test2/API/Context.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   
   =head2 EVENT PRODUCTION METHODS
   
+  B<Which one do I use?>
+  
+  The C<pass*> and C<fail*> are optimal if they meet your situation, using one of
+  them will always be the most optimal. That said they are optimal by eliminating
+  many features.
+  
+  Method such as C<ok>, and C<note> are shortcuts for generating common 1-task
+  events based on the old API, however they are forward compatible, and easy to
+  use. If these meet your needs then go ahead and use them, but please check back
+  often for alternatives that may be added.
+  
+  If you want to generate new style events, events that do many things at once,
+  then you want the C<*ev2*> methods. These let you directly specify which facets
+  you wish to use.
+  
   =over 4
   
   =item $event = $ctx->pass()
@@ -30257,7 +36900,44 @@ $fatpacked{"Test2/API/Context.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   This sends an L<Test2::Event::Bail> event. This event will completely
   terminate all testing.
   
+  =item $event = $ctx->send_ev2(%facets)
+  
+  This lets you build and send a V2 event directly from facets. The event is
+  returned after it is sent.
+  
+  This example sends a single assertion, a note (comment for stdout in
+  Test::Builder talk) and sets the plan to 1.
+  
+      my $event = $ctx->send_event(
+          plan   => {count => 1},
+          assert => {pass  => 1, details => "A passing assert"},
+          info => [{tag => 'NOTE', details => "This is a note"}],
+      );
+  
+  =item $event = $ctx->build_e2(%facets)
+  
+  This is the same as C<send_ev2()>, except it builds and returns the event
+  without sending it.
+  
+  =item $event = $ctx->send_ev2_and_release($Type, %parameters)
+  
+  This is a combination of C<send_ev2()> and C<release()>.
+  
+      sub shorthand {
+          my $ctx = context();
+          return $ctx->send_ev2_and_release(assert => {pass => 1, details => 'foo'});
+      }
+  
+      sub longform {
+          my $ctx = context();
+          my $event = $ctx->send_ev2(assert => {pass => 1, details => 'foo'});
+          $ctx->release;
+          return $event;
+      }
+  
   =item $event = $ctx->send_event($Type, %parameters)
+  
+  B<It is better to use send_ev2() in new code.>
   
   This lets you build and send an event of any type. The C<$Type> argument should
   be the event package name with C<Test2::Event::> left off, or a fully
@@ -30272,10 +36952,14 @@ $fatpacked{"Test2/API/Context.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   
   =item $event = $ctx->build_event($Type, %parameters)
   
+  B<It is better to use build_ev2() in new code.>
+  
   This is the same as C<send_event()>, except it builds and returns the event
   without sending it.
   
   =item $event = $ctx->send_event_and_release($Type, %parameters)
+  
+  B<It is better to use send_ev2_and_release() in new code.>
   
   This is a combination of C<send_event()> and C<release()>.
   
@@ -30403,7 +37087,7 @@ $fatpacked{"Test2/API/Context.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -30418,7 +37102,7 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   our @CARP_NOT = qw/Test2::API Test2::API::Instance Test2::IPC::Driver Test2::Formatter/;
@@ -30437,8 +37121,11 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
       ipc stack formatter
       contexts
   
+      add_uuid_via
+  
       -preload
   
+      ipc_disabled
       ipc_shm_size
       ipc_shm_last
       ipc_shm_id
@@ -30513,12 +37200,15 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
       delete $self->{+_PID};
       delete $self->{+_TID};
   
+      $self->{+ADD_UUID_VIA} = undef unless exists $self->{+ADD_UUID_VIA};
+  
       $self->{+CONTEXTS} = {};
   
       $self->{+FORMATTERS} = [];
   
       $self->{+FINALIZED} = undef;
       $self->{+IPC}       = undef;
+      $self->{+IPC_DISABLED} = $ENV{T2_NO_IPC} ? 1 : 0;
   
       $self->{+IPC_TIMEOUT} = DEFAULT_IPC_TIMEOUT() unless defined $self->{+IPC_TIMEOUT};
   
@@ -30533,7 +37223,9 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
       delete $self->{+_PID};
       delete $self->{+_TID};
   
-      $self->{+CONTEXTS}    = {};
+      $self->{+ADD_UUID_VIA} = undef;
+  
+      $self->{+CONTEXTS} = {};
   
       $self->{+IPC_DRIVERS} = [];
       $self->{+IPC_POLLING} = undef;
@@ -30541,8 +37233,9 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
       $self->{+FORMATTERS} = [];
       $self->{+FORMATTER}  = undef;
   
-      $self->{+FINALIZED} = undef;
-      $self->{+IPC}       = undef;
+      $self->{+FINALIZED}    = undef;
+      $self->{+IPC}          = undef;
+      $self->{+IPC_DISABLED} = $ENV{T2_NO_IPC} ? 1 : 0;
   
       $self->{+IPC_TIMEOUT} = DEFAULT_IPC_TIMEOUT() unless defined $self->{+IPC_TIMEOUT};
   
@@ -30608,6 +37301,7 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   
       # Turn on IPC if threads are on, drivers are registered, or the Test2::IPC
       # module is loaded.
+      return if $self->{+IPC_DISABLED};
       return unless USE_THREADS || $INC{'Test2/IPC.pm'} || @{$self->{+IPC_DRIVERS}};
   
       # Turn on polling by default, people expect it.
@@ -30736,6 +37430,15 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
           unless $code && $rtype eq 'CODE';
   
       push @{$self->{+EXIT_CALLBACKS}} => $code;
+  }
+  
+  sub ipc_disable {
+      my $self = shift;
+  
+      confess "Attempt to disable IPC after it has been initialized"
+          if $self->{+IPC};
+  
+      $self->{+IPC_DISABLED} = 1;
   }
   
   sub add_ipc_driver {
@@ -31230,6 +37933,14 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   
   Get the one true IPC instance.
   
+  =item $obj->ipc_disable
+  
+  Turn IPC off
+  
+  =item $bool = $obj->ipc_disabled
+  
+  Check if IPC is disabled
+  
   =item $stack = $obj->stack
   
   Get the one true hub stack.
@@ -31253,6 +37964,22 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   a warning will be generated:
   
       "Formatter $formatter loaded too late to be used as the global formatter"
+  
+  =item $obj->set_add_uuid_via(sub { ... })
+  
+  =item $sub = $obj->add_uuid_via()
+  
+  This allows you to provide a UUID generator. If provided UUIDs will be attached
+  to all events, hubs, and contexts. This is useful for storing, tracking, and
+  linking these objects.
+  
+  The sub you provide should always return a unique identifier. Most things will
+  expect a proper UUID string, however nothing in Test2::API enforces this.
+  
+  The sub will receive exactly 1 argument, the type of thing being tagged
+  'context', 'hub', or 'event'. In the future additional things may be tagged, in
+  which case new strings will be passed in. These are purely informative, you can
+  (and usually should) ignore them.
   
   =back
   
@@ -31279,7 +38006,7 @@ $fatpacked{"Test2/API/Instance.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n"
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -31294,7 +38021,7 @@ $fatpacked{"Test2/API/Stack.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Test2::Hub();
@@ -31502,7 +38229,7 @@ $fatpacked{"Test2/API/Stack.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -31517,11 +38244,14 @@ $fatpacked{"Test2/Event.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
-  use Test2::Util::HashBase qw/trace -amnesty/;
+  use Scalar::Util qw/blessed reftype/;
+  use Carp qw/croak/;
+  
+  use Test2::Util::HashBase qw/trace -amnesty uuid -_eid -hubs/;
   use Test2::Util::ExternalMeta qw/meta get_meta set_meta delete_meta/;
-  use Test2::Util qw(pkg_to_file);
+  use Test2::Util qw/pkg_to_file gen_uid/;
   
   use Test2::EventFacet::About();
   use Test2::EventFacet::Amnesty();
@@ -31533,25 +38263,53 @@ $fatpacked{"Test2/Event.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
   use Test2::EventFacet::Parent();
   use Test2::EventFacet::Plan();
   use Test2::EventFacet::Trace();
-  
-  my @FACET_TYPES = qw{
-      Test2::EventFacet::About
-      Test2::EventFacet::Amnesty
-      Test2::EventFacet::Assert
-      Test2::EventFacet::Control
-      Test2::EventFacet::Error
-      Test2::EventFacet::Info
-      Test2::EventFacet::Meta
-      Test2::EventFacet::Parent
-      Test2::EventFacet::Plan
-      Test2::EventFacet::Trace
-  };
-  
-  sub FACET_TYPES() { @FACET_TYPES }
+  use Test2::EventFacet::Hub();
   
   # Legacy tools will expect this to be loaded now
   require Test2::Util::Trace;
   
+  my %LOADED_FACETS = (
+      'about'   => 'Test2::EventFacet::About',
+      'amnesty' => 'Test2::EventFacet::Amnesty',
+      'assert'  => 'Test2::EventFacet::Assert',
+      'control' => 'Test2::EventFacet::Control',
+      'errors'  => 'Test2::EventFacet::Error',
+      'info'    => 'Test2::EventFacet::Info',
+      'meta'    => 'Test2::EventFacet::Meta',
+      'parent'  => 'Test2::EventFacet::Parent',
+      'plan'    => 'Test2::EventFacet::Plan',
+      'trace'   => 'Test2::EventFacet::Trace',
+      'hubs'    => 'Test2::EventFacet::Hub',
+  );
+  
+  sub FACET_TYPES { sort values %LOADED_FACETS }
+  
+  sub load_facet {
+      my $class = shift;
+      my ($facet) = @_;
+  
+      return $LOADED_FACETS{$facet} if exists $LOADED_FACETS{$facet};
+  
+      my @check = ($facet);
+      if ('s' eq substr($facet, -1, 1)) {
+          push @check => substr($facet, 0, -1);
+      }
+      else {
+          push @check => $facet . 's';
+      }
+  
+      my $found;
+      for my $check (@check) {
+          my $mod  = "Test2::EventFacet::" . ucfirst($facet);
+          my $file = pkg_to_file($mod);
+          next unless eval { require $file; 1 };
+          $found = $mod;
+          last;
+      }
+  
+      return undef unless $found;
+      $LOADED_FACETS{$facet} = $found;
+  }
   
   sub causes_fail      { 0 }
   sub increments_count { 0 }
@@ -31574,11 +38332,23 @@ $fatpacked{"Test2/Event.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
       my $tracea = $self->trace  or return undef;
       my $traceb = $event->trace or return undef;
   
+      my $uuida = $tracea->uuid;
+      my $uuidb = $traceb->uuid;
+      if ($uuida && $uuidb) {
+          return 1 if $uuida eq $uuidb;
+          return 0;
+      }
+  
       my $siga = $tracea->signature or return undef;
       my $sigb = $traceb->signature or return undef;
   
       return 1 if $siga eq $sigb;
       return 0;
+  }
+  
+  sub add_hub {
+      my $self = shift;
+      unshift @{$self->{+HUBS}} => @_;
   }
   
   sub add_amnesty {
@@ -31592,26 +38362,45 @@ $fatpacked{"Test2/Event.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
       }
   }
   
+  sub eid { $_[0]->{+_EID} ||= gen_uid() }
+  
   sub common_facet_data {
       my $self = shift;
   
       my %out;
   
       $out{about} = {package => ref($self) || undef};
+      if (my $uuid = $self->uuid) {
+          $out{about}->{uuid} = $uuid;
+      }
+  
+      $out{about}->{eid} = $self->{+_EID} || $self->eid;
   
       if (my $trace = $self->trace) {
           $out{trace} = { %$trace };
       }
   
+      if (my $hubs = $self->hubs) {
+          $out{hubs} = $hubs;
+      }
+  
       $out{amnesty} = [map {{ %{$_} }} @{$self->{+AMNESTY}}]
           if $self->{+AMNESTY};
   
-      my $key = Test2::Util::ExternalMeta::META_KEY();
-      if (my $hash = $self->{$key}) {
-          $out{meta} = {%$hash};
+      if (my $meta = $self->meta_facet_data) {
+          $out{meta} = $meta;
       }
   
       return \%out;
+  }
+  
+  sub meta_facet_data {
+      my $self = shift;
+  
+      my $key = Test2::Util::ExternalMeta::META_KEY();
+  
+      my $hash = $self->{$key} or return undef;
+      return {%$hash};
   }
   
   sub facet_data {
@@ -31680,39 +38469,98 @@ $fatpacked{"Test2/Event.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
   
   sub facets {
       my $self = shift;
-      my $data = $self->facet_data;
       my %out;
   
-      for my $type (FACET_TYPES()) {
-          my $key = $type->facet_key;
-          next unless $data->{$key};
+      my $data = $self->facet_data;
+      my @errors = $self->validate_facet_data($data);
+      die join "\n" => @errors if @errors;
   
-          if ($type->is_list) {
-              $out{$key} = [map { $type->new($_) } @{$data->{$key}}];
+      for my $facet (keys %$data) {
+          my $class = $self->load_facet($facet);
+          my $val = $data->{$facet};
+  
+          unless($class) {
+              $out{$facet} = $val;
+              next;
+          }
+  
+          my $is_list = reftype($val) eq 'ARRAY' ? 1 : 0;
+          if ($is_list) {
+              $out{$facet} = [map { $class->new($_) } @$val];
           }
           else {
-              $out{$key} = $type->new($data->{$key});
+              $out{$facet} = $class->new($val);
           }
       }
   
       return \%out;
   }
   
+  sub validate_facet_data {
+      my $class_or_self = shift;
+      my ($f, %params);
+  
+      $f = shift if @_ && (reftype($_[0]) || '') eq 'HASH';
+      %params = @_;
+  
+      $f ||= $class_or_self->facet_data if blessed($class_or_self);
+      croak "No facet data" unless $f;
+  
+      my @errors;
+  
+      for my $k (sort keys %$f) {
+          my $fclass = $class_or_self->load_facet($k);
+  
+          push @errors => "Could not find a facet class for facet '$k'"
+              if $params{require_facet_class} && !$fclass;
+  
+          next unless $fclass;
+  
+          my $v = $f->{$k};
+          next unless defined($v); # undef is always fine
+  
+          my $is_list = $fclass->is_list();
+          my $got_list = reftype($v) eq 'ARRAY' ? 1 : 0;
+  
+          push @errors => "Facet '$k' should be a list, but got a single item ($v)"
+              if $is_list && !$got_list;
+  
+          push @errors => "Facet '$k' should not be a list, but got a a list ($v)"
+              if $got_list && !$is_list;
+      }
+  
+      return @errors;
+  }
+  
   sub nested {
+      my $self = shift;
+  
       Carp::cluck("Use of Test2::Event->nested() is deprecated, use Test2::Event->trace->nested instead")
           if $ENV{AUTHOR_TESTING};
   
-      $_[0]->{+TRACE}->{nested};
+      if (my $hubs = $self->{+HUBS}) {
+          return $hubs->[0]->{nested} if @$hubs;
+      }
+  
+      my $trace = $self->{+TRACE} or return undef;
+      return $trace->{nested};
   }
   
   sub in_subtest {
+      my $self = shift;
+  
       Carp::cluck("Use of Test2::Event->in_subtest() is deprecated, use Test2::Event->trace->hid instead")
           if $ENV{AUTHOR_TESTING};
   
-      # Return undef if we are not nested, Legacy did not return the hid if nestign was 0.
-      return undef unless $_[0]->{+TRACE}->{nested};
+      my $hubs = $self->{+HUBS};
+      if ($hubs && @$hubs) {
+          return undef unless $hubs->[0]->{nested};
+          return $hubs->[0]->{hid}
+      }
   
-      $_[0]->{+TRACE}->{hid};
+      my $trace = $self->{+TRACE} or return undef;
+      return undef unless $trace->{nested};
+      return $trace->{hid};
   }
   
   1;
@@ -31818,6 +38666,37 @@ $fatpacked{"Test2/Event.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
   B<Note:> This is how 'TODO' is implemented under the hood. TODO is essentially
   amnesty with the 'TODO' tag. The details are the reason for the TODO.
   
+  =item $uuid = $e->uuid
+  
+  If UUID tagging is enabled (See L<Test::API>) then any event that has made its
+  way through a hub will be tagged with a UUID. A newly created event will not
+  yet be tagged in most cases.
+  
+  =item $class = $e->load_facet($name)
+  
+  This method is used to load a facet by name (or key). It will attempt to load
+  the facet class, if it succeeds it will return the class it loaded. If it fails
+  it will return C<undef>. This caches the result at the class level so that
+  future calls will be faster.
+  
+  The C<$name> variable should be the key used to access the facet in a facets
+  hashref. For instance the assertion facet has the key 'assert', the information
+  facet has the 'info' key, and the error facet has the key 'errors'. You may
+  include or omit the 's' at the end of the name, the method is smart enough to
+  try both the 's' and no-'s' forms, it will check what you provided first, and
+  if that is not found it will add or strip the 's and try again.
+  
+  =item @classes = $e->FACET_TYPES()
+  
+  =item @classes = Test2::Event->FACET_TYPES()
+  
+  This returns a list of all facets that have been loaded using the
+  C<load_facet()> method. This will not return any classes that have not been
+  loaded, or have been loaded directly without a call to C<load_facet()>.
+  
+  B<Note:> The core facet types are automatically loaded and populated in this
+  list.
+  
   =back
   
   =head2 NEW API
@@ -31840,7 +38719,42 @@ $fatpacked{"Test2/Event.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
   =item $hashref = $e->facets()
   
   This takes the hashref from C<facet_data()> and blesses each facet into the
-  proper C<Test2::EventFacet::*> subclass.
+  proper C<Test2::EventFacet::*> subclass. If no class can be found for any given
+  facet it will be passed along unchanged.
+  
+  =item @errors = $e->validate_facet_data();
+  
+  =item @errors = $e->validate_facet_data(%params);
+  
+  =item @errors = $e->validate_facet_data(\%facets, %params);
+  
+  =item @errors = Test2::Event->validate_facet_data(%params);
+  
+  =item @errors = Test2::Event->validate_facet_data(\%facets, %params);
+  
+  This method will validate facet data and return a list of errors. If no errors
+  are found this will return an empty list.
+  
+  This can be called as an object method with no arguments, in which case the
+  C<facet_data()> method will be called to get the facet data to be validated.
+  
+  When used as an object method the C<\%facet_data> argument may be omitted.
+  
+  When used as a class method the C<\%facet_data> argument is required.
+  
+  Remaining arguments will be slurped into a C<%params> hash.
+  
+  Currently only 1 parameter is defined:
+  
+  =over 4
+  
+  =item require_facet_class => $BOOL
+  
+  When set to true (default is false) this will reject any facets where a facet
+  class cannot be found. Normally facets without classes are assumed to be custom
+  and are ignored.
+  
+  =back
   
   =back
   
@@ -32096,7 +39010,7 @@ $fatpacked{"Test2/Event.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TES
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -32111,7 +39025,7 @@ $fatpacked{"Test2/Event/Bail.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -32208,7 +39122,7 @@ $fatpacked{"Test2/Event/Bail.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -32223,7 +39137,7 @@ $fatpacked{"Test2/Event/Diag.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -32310,7 +39224,7 @@ $fatpacked{"Test2/Event/Diag.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -32325,7 +39239,7 @@ $fatpacked{"Test2/Event/Encoding.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Carp qw/croak/;
   
@@ -32410,7 +39324,7 @@ $fatpacked{"Test2/Event/Encoding.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -32425,7 +39339,7 @@ $fatpacked{"Test2/Event/Exception.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -32526,7 +39440,7 @@ $fatpacked{"Test2/Event/Exception.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -32541,7 +39455,7 @@ $fatpacked{"Test2/Event/Fail.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Test2::EventFacet::Info;
   
@@ -32647,7 +39561,7 @@ $fatpacked{"Test2/Event/Fail.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -32665,7 +39579,7 @@ $fatpacked{"Test2/Event/Generic.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use Carp qw/croak/;
   use Scalar::Util qw/reftype/;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
   use Test2::Util::HashBase;
@@ -32930,7 +39844,7 @@ $fatpacked{"Test2/Event/Generic.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -32945,7 +39859,7 @@ $fatpacked{"Test2/Event/Note.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -33030,7 +39944,7 @@ $fatpacked{"Test2/Event/Note.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -33045,7 +39959,7 @@ $fatpacked{"Test2/Event/Ok.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -33195,7 +40109,7 @@ $fatpacked{"Test2/Event/Ok.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -33210,7 +40124,7 @@ $fatpacked{"Test2/Event/Pass.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Test2::EventFacet::Info;
   
@@ -33312,7 +40226,7 @@ $fatpacked{"Test2/Event/Pass.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -33327,7 +40241,7 @@ $fatpacked{"Test2/Event/Plan.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -33484,7 +40398,7 @@ $fatpacked{"Test2/Event/Plan.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -33499,7 +40413,7 @@ $fatpacked{"Test2/Event/Skip.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   BEGIN { require Test2::Event::Ok; our @ISA = qw(Test2::Event::Ok) }
@@ -33614,7 +40528,7 @@ $fatpacked{"Test2/Event/Skip.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -33629,10 +40543,10 @@ $fatpacked{"Test2/Event/Subtest.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::Event::Ok; our @ISA = qw(Test2::Event::Ok) }
-  use Test2::Util::HashBase qw{subevents buffered subtest_id};
+  use Test2::Util::HashBase qw{subevents buffered subtest_id subtest_uuid};
   
   sub init {
       my $self = shift;
@@ -33777,7 +40691,7 @@ $fatpacked{"Test2/Event/Subtest.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -33792,7 +40706,7 @@ $fatpacked{"Test2/Event/TAP/Version.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Carp qw/croak/;
   
@@ -33881,7 +40795,7 @@ $fatpacked{"Test2/Event/TAP/Version.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -33891,12 +40805,253 @@ $fatpacked{"Test2/Event/TAP/Version.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   =cut
 TEST2_EVENT_TAP_VERSION
 
+$fatpacked{"Test2/Event/V2.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2_EVENT_V2';
+  package Test2::Event::V2;
+  use strict;
+  use warnings;
+  
+  our $VERSION = '1.302136';
+  
+  use Scalar::Util qw/reftype/;
+  use Carp qw/croak/;
+  
+  BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
+  
+  use Test2::Util::Facets2Legacy qw{
+      causes_fail diagnostics global increments_count no_display sets_plan
+      subtest_id summary terminate
+  };
+  
+  use Test2::Util::HashBase qw/-about/;
+  
+  sub non_facet_keys {
+      return (
+          +UUID,
+          Test2::Util::ExternalMeta::META_KEY(),
+      );
+  }
+  
+  sub init {
+      my $self = shift;
+  
+      my $uuid;
+      if ($uuid = $self->{+UUID}) {
+          croak "uuid '$uuid' passed to constructor, but uuid '$self->{+ABOUT}->{uuid}' is already set in the 'about' facet"
+              if $self->{+ABOUT}->{uuid} && $self->{+ABOUT}->{uuid} ne $uuid;
+  
+          $self->{+ABOUT}->{uuid} = $uuid;
+      }
+      elsif ($uuid = $self->{+ABOUT}->{uuid}) {
+          $self->SUPER::set_uuid($uuid);
+      }
+  
+      # Clone the trace, make sure it is blessed
+      if (my $trace = $self->{+TRACE}) {
+          $self->{+TRACE} = Test2::EventFacet::Trace->new(%$trace);
+      }
+  }
+  
+  sub set_uuid {
+      my $self = shift;
+      my ($uuid) = @_;
+      $self->{+ABOUT}->{uuid} = $uuid;
+      $self->SUPER::set_uuid($uuid);
+  }
+  
+  sub facet_data {
+      my $self = shift;
+      my $f = { %{$self} };
+  
+      delete $f->{$_} for $self->non_facet_keys;
+  
+      my %out;
+      for my $k (keys %$f) {
+          next if substr($k, 0, 1) eq '_';
+  
+          my $data = $f->{$k};
+          my $is_list = reftype($data) eq 'ARRAY';
+          $out{$k} = $is_list ? [ map { {%{$_}} } @$data ] : {%$data};
+      }
+  
+      if (my $meta = $self->meta_facet_data) {
+          $out{meta} = {%$meta, %{$out{meta} || {}}};
+      }
+  
+      return \%out;
+  }
+  
+  1;
+  
+  __END__
+  
+  =pod
+  
+  =encoding UTF-8
+  
+  =head1 NAME
+  
+  Test2::Event::V2 - Second generation event.
+  
+  =head1 DESCRIPTION
+  
+  This is the event type that should be used instead of L<Test2::Event> or its
+  legacy subclasses.
+  
+  =head1 SYNOPSIS
+  
+  =head2 USING A CONTEXT
+  
+      use Test2::API qw/context/;
+  
+      sub my_tool {
+          my $ctx = context();
+  
+          my $event = $ctx->send_ev2(info => [{tag => 'NOTE', details => "This is a note"}]);
+  
+          $ctx->release;
+  
+          return $event;
+      }
+  
+  =head2 USING THE CONSTRUCTOR
+  
+      use Test2::Event::V2;
+  
+      my $e = Test2::Event::V2->new(
+          trace => {frame => [$PKG, $FILE, $LINE, $SUBNAME]},
+          info  => [{tag => 'NOTE', details => "This is a note"}],
+      );
+  
+  =head1 METHODS
+  
+  This class inherits from L<Test2::Event>.
+  
+  =over 4
+  
+  =item $fd = $e->facet_data()
+  
+  This will return a hashref of facet data. Each facet hash will be a shallow
+  copy of the original.
+  
+  =item $about = $e->about()
+  
+  This will return the 'about' facet hashref.
+  
+  B<NOTE:> This will return the internal hashref, not a copy.
+  
+  =item $trace = $e->trace()
+  
+  This will return the 'trace' facet, normally blessed (but this is not enforced
+  when the trace is set using C<set_trace()>.
+  
+  B<NOTE:> This will return the internal trace, not a copy.
+  
+  =back
+  
+  =head2 MUTATION
+  
+  =over 4
+  
+  =item $e->add_amnesty({...})
+  
+  Inherited from L<Test2::Event>. This can be used to add 'amnesty' facets to an
+  existing event. Each new item is added to the B<END> of the list.
+  
+  B<NOTE:> Items B<ARE> blessed when added.
+  
+  =item $e->add_hub({...})
+  
+  Inherited from L<Test2::Event>. This is used by hubs to stamp events as they
+  pass through. New items are added to the B<START> of the list.
+  
+  B<NOTE:> Items B<ARE NOT> blessed when added.
+  
+  =item $e->set_uuid($UUID)
+  
+  Inherited from L<Test2::Event>, overridden to also vivify/mutate the 'about'
+  facet.
+  
+  =item $e->set_trace($trace)
+  
+  Inherited from L<Test2::Event> which allows you to change the trace.
+  
+  B<Note:> This method does not bless/clone the trace for you. Many things will
+  expect the trace to be blessed, so you should probably do that.
+  
+  =back
+  
+  =head2 LEGACY SUPPORT METHODS
+  
+  These are all imported from L<Test2::Util::Facets2Legacy>, see that module or
+  L<Test2::Event> for documentation on what they do.
+  
+  =over 4
+  
+  =item causes_fail
+  
+  =item diagnostics
+  
+  =item global
+  
+  =item increments_count
+  
+  =item no_display
+  
+  =item sets_plan
+  
+  =item subtest_id
+  
+  =item summary
+  
+  =item terminate
+  
+  =back
+  
+  =head1 THIRD PARTY META-DATA
+  
+  This object consumes L<Test2::Util::ExternalMeta> which provides a consistent
+  way for you to attach meta-data to instances of this class. This is useful for
+  tools, plugins, and other extensions.
+  
+  =head1 SOURCE
+  
+  The source code repository for Test2 can be found at
+  F<http://github.com/Test-More/test-more/>.
+  
+  =head1 MAINTAINERS
+  
+  =over 4
+  
+  =item Chad Granum E<lt>exodist@cpan.orgE<gt>
+  
+  =back
+  
+  =head1 AUTHORS
+  
+  =over 4
+  
+  =item Chad Granum E<lt>exodist@cpan.orgE<gt>
+  
+  =back
+  
+  =head1 COPYRIGHT
+  
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+  
+  See F<http://dev.perl.org/licenses/>
+  
+  =cut
+TEST2_EVENT_V2
+
 $fatpacked{"Test2/Event/Waiting.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2_EVENT_WAITING';
   package Test2::Event::Waiting;
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -33960,7 +41115,7 @@ $fatpacked{"Test2/Event/Waiting.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -33975,7 +41130,7 @@ $fatpacked{"Test2/EventFacet.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Test2::Util::HashBase qw/-details/;
   use Carp qw/croak/;
@@ -34056,7 +41211,7 @@ $fatpacked{"Test2/EventFacet.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34071,10 +41226,10 @@ $fatpacked{"Test2/EventFacet/About.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
-  use Test2::Util::HashBase qw{ -package -no_display };
+  use Test2::Util::HashBase qw{ -package -no_display -uuid -eid };
   
   1;
   
@@ -34114,6 +41269,18 @@ $fatpacked{"Test2/EventFacet/About.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   
   True if the event should be skipped by formatters.
   
+  =item $uuid = $about->{uuid}
+  
+  =item $uuid = $about->uuid()
+  
+  Will be set to a uuid if uuid tagging was enabled.
+  
+  =item $uuid = $about->{eid}
+  
+  =item $uuid = $about->eid()
+  
+  A unique (for the test job) identifier for the event.
+  
   =back
   
   =head1 SOURCE
@@ -34139,7 +41306,7 @@ $fatpacked{"Test2/EventFacet/About.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34154,7 +41321,7 @@ $fatpacked{"Test2/EventFacet/Amnesty.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   sub is_list { 1 }
   
@@ -34233,7 +41400,7 @@ $fatpacked{"Test2/EventFacet/Amnesty.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34248,7 +41415,7 @@ $fatpacked{"Test2/EventFacet/Assert.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
   use Test2::Util::HashBase qw{ -pass -no_debug -number };
@@ -34329,7 +41496,7 @@ $fatpacked{"Test2/EventFacet/Assert.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34344,7 +41511,7 @@ $fatpacked{"Test2/EventFacet/Control.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
   use Test2::Util::HashBase qw{ -global -terminate -halt -has_callback -encoding };
@@ -34432,7 +41599,7 @@ $fatpacked{"Test2/EventFacet/Control.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34447,7 +41614,7 @@ $fatpacked{"Test2/EventFacet/Error.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   sub facet_key { 'errors' }
   sub is_list { 1 }
@@ -34528,7 +41695,7 @@ $fatpacked{"Test2/EventFacet/Error.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34538,12 +41705,124 @@ $fatpacked{"Test2/EventFacet/Error.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   =cut
 TEST2_EVENTFACET_ERROR
 
+$fatpacked{"Test2/EventFacet/Hub.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2_EVENTFACET_HUB';
+  package Test2::EventFacet::Hub;
+  use strict;
+  use warnings;
+  
+  our $VERSION = '1.302136';
+  
+  sub is_list { 1 }
+  sub facet_key { 'hubs' }
+  
+  BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
+  use Test2::Util::HashBase qw{-pid -tid -hid -nested -buffered -uuid -ipc};
+  
+  1;
+  
+  __END__
+  
+  =pod
+  
+  =encoding UTF-8
+  
+  =head1 NAME
+  
+  Test2::EventFacet::Hub - Facet for the hubs an event passes through.
+  
+  =head1 DESCRIPTION
+  
+  These are a record of the hubs an event passes through. Most recent hub is the
+  first one in the list.
+  
+  =head1 FACET FIELDS
+  
+  =over 4
+  
+  =item $string = $trace->{details}
+  
+  =item $string = $trace->details()
+  
+  The hub class or subclass
+  
+  =item $int = $trace->{pid}
+  
+  =item $int = $trace->pid()
+  
+  PID of the hub this event was sent to.
+  
+  =item $int = $trace->{tid}
+  
+  =item $int = $trace->tid()
+  
+  The thread ID of the hub the event was sent to.
+  
+  =item $hid = $trace->{hid}
+  
+  =item $hid = $trace->hid()
+  
+  The ID of the hub that the event was send to.
+  
+  =item $huuid = $trace->{huuid}
+  
+  =item $huuid = $trace->huuid()
+  
+  The UUID of the hub that the event was sent to.
+  
+  =item $int = $trace->{nested}
+  
+  =item $int = $trace->nested()
+  
+  How deeply nested the hub was.
+  
+  =item $bool = $trace->{buffered}
+  
+  =item $bool = $trace->buffered()
+  
+  True if the event was buffered and not sent to the formatter independent of a
+  parent (This should never be set when nested is C<0> or C<undef>).
+  
+  =back
+  
+  =head1 SOURCE
+  
+  The source code repository for Test2 can be found at
+  F<http://github.com/Test-More/test-more/>.
+  
+  =head1 MAINTAINERS
+  
+  =over 4
+  
+  =item Chad Granum E<lt>exodist@cpan.orgE<gt>
+  
+  =back
+  
+  =head1 AUTHORS
+  
+  =over 4
+  
+  =item Chad Granum E<lt>exodist@cpan.orgE<gt>
+  
+  =back
+  
+  =head1 COPYRIGHT
+  
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+  
+  See F<http://dev.perl.org/licenses/>
+  
+  =cut
+TEST2_EVENTFACET_HUB
+
 $fatpacked{"Test2/EventFacet/Info.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2_EVENTFACET_INFO';
   package Test2::EventFacet::Info;
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   sub is_list { 1 }
   
@@ -34633,7 +41912,7 @@ $fatpacked{"Test2/EventFacet/Info.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34648,7 +41927,7 @@ $fatpacked{"Test2/EventFacet/Meta.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
   use vars qw/$AUTOLOAD/;
@@ -34740,7 +42019,7 @@ $fatpacked{"Test2/EventFacet/Meta.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34755,7 +42034,7 @@ $fatpacked{"Test2/EventFacet/Parent.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Carp qw/confess/;
   
@@ -34841,7 +42120,7 @@ $fatpacked{"Test2/EventFacet/Parent.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34856,7 +42135,7 @@ $fatpacked{"Test2/EventFacet/Plan.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
   use Test2::Util::HashBase qw{ -count -skip -none };
@@ -34938,7 +42217,7 @@ $fatpacked{"Test2/EventFacet/Plan.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -34948,19 +42227,128 @@ $fatpacked{"Test2/EventFacet/Plan.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   =cut
 TEST2_EVENTFACET_PLAN
 
+$fatpacked{"Test2/EventFacet/Render.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2_EVENTFACET_RENDER';
+  package Test2::EventFacet::Render;
+  use strict;
+  use warnings;
+  
+  our $VERSION = '1.302136';
+  
+  sub is_list { 1 }
+  
+  BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
+  use Test2::Util::HashBase qw{ -tag -facet -mode };
+  
+  1;
+  
+  __END__
+  
+  =pod
+  
+  =encoding UTF-8
+  
+  =head1 NAME
+  
+  Test2::EventFacet::Render - Facet that dictates how to render an event.
+  
+  =head1 DESCRIPTION
+  
+  This facet is used to dictate how the event should be rendered by the standard
+  test2 rendering tools. If this facet is present then ONLY what is specified by
+  it will be rendered. It is assumed that anything important or note-worthy will
+  be present here, no other facets will be considered for rendering/display.
+  
+  This facet is a list type, you can add as many items as needed.
+  
+  =head1 FIELDS
+  
+  =over 4
+  
+  =item $string = $render->[#]->{details}
+  
+  =item $string = $render->[#]->details()
+  
+  Human readable text for display.
+  
+  =item $string = $render->[#]->{tag}
+  
+  =item $string = $render->[#]->tag()
+  
+  Tag that should prefix/identify the main text.
+  
+  =item $string = $render->[#]->{facet}
+  
+  =item $string = $render->[#]->facet()
+  
+  Optional, if the display text was generated from another facet this should
+  state what facet it was.
+  
+  =item $mode = $render->[#]->mode{}
+  
+  =item $mode = $render->[#]->mode()
+  
+  =over 4
+  
+  =item calculated
+  
+  Calculated means the facet was generated from another facet. Calculated facets
+  may be cleared and regenerated whenever the event state changes.
+  
+  =item replace
+  
+  Replace means the facet is intended to replace the normal rendering of the
+  event.
+  
+  =back
+  
+  =back
+  
+  =head1 SOURCE
+  
+  The source code repository for Test2 can be found at
+  F<http://github.com/Test-More/test-more/>.
+  
+  =head1 MAINTAINERS
+  
+  =over 4
+  
+  =item Chad Granum E<lt>exodist@cpan.orgE<gt>
+  
+  =back
+  
+  =head1 AUTHORS
+  
+  =over 4
+  
+  =item Chad Granum E<lt>exodist@cpan.orgE<gt>
+  
+  =back
+  
+  =head1 COPYRIGHT
+  
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+  
+  See F<http://dev.perl.org/licenses/>
+  
+  =cut
+TEST2_EVENTFACET_RENDER
+
 $fatpacked{"Test2/EventFacet/Trace.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2_EVENTFACET_TRACE';
   package Test2::EventFacet::Trace;
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
   
-  use Test2::Util qw/get_tid pkg_to_file/;
+  use Test2::Util qw/get_tid pkg_to_file gen_uid/;
   use Carp qw/confess/;
   
-  use Test2::Util::HashBase qw{^frame ^pid ^tid ^cid -hid -nested details -buffered};
+  use Test2::Util::HashBase qw{^frame ^pid ^tid ^cid -hid -nested details -buffered -uuid -huuid};
   
   {
       no warnings 'once';
@@ -34975,8 +42363,10 @@ $fatpacked{"Test2/EventFacet/Trace.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   
       $_[0]->{+DETAILS} = delete $_[0]->{detail} if $_[0]->{detail};
   
-      $_[0]->{+PID} = $$        unless defined $_[0]->{+PID};
-      $_[0]->{+TID} = get_tid() unless defined $_[0]->{+TID};
+      unless (defined($_[0]->{+PID}) || defined($_[0]->{+TID}) || defined($_[0]->{+CID})) {
+          $_[0]->{+PID} = $$        unless defined $_[0]->{+PID};
+          $_[0]->{+TID} = get_tid() unless defined $_[0]->{+TID};
+      }
   }
   
   sub snapshot {
@@ -35085,11 +42475,40 @@ $fatpacked{"Test2/EventFacet/Trace.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   
   The ID of the context that was used to create the event.
   
+  =item $uuid = $trace->{uuid}
+  
+  =item $uuid = $trace->uuid()
+  
+  The UUID of the context that was used to create the event. (If uuid tagging was
+  enabled)
+  
+  =back
+  
+  =head2 DISCOURAGED HUB RELATED FIELDS
+  
+  These fields were not always set properly by tools. These are B<MOSTLY>
+  deprecated by the L<Test2::EventFacet::Hub> facets. These fields are not
+  required, and may only reflect the hub that was current when the event was
+  created, which is not necessarily the same as the hub the event was sent
+  through.
+  
+  Some tools did do a good job setting these to the correct hub, but you cannot
+  always rely on that. Use the 'hubs' facet list instead.
+  
+  =over 4
+  
   =item $hid = $trace->{hid}
   
   =item $hid = $trace->hid()
   
   The ID of the hub that was current when the event was created.
+  
+  =item $huuid = $trace->{huuid}
+  
+  =item $huuid = $trace->huuid()
+  
+  The UUID of the hub that was current when the event was created. (If uuid
+  tagging was enabled).
   
   =item $int = $trace->{nested}
   
@@ -35161,9 +42580,8 @@ $fatpacked{"Test2/EventFacet/Trace.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   =item $sig = trace->signature
   
   Get a signature string that identifies this trace. This is used to check if
-  multiple events are related. The Trace includes pid, tid, file, line number,
-  and the cid which is C<'C\d+'> for traces created by a context, or C<'T\d+'>
-  for traces created by C<new()>.
+  multiple events are related. The signature includes pid, tid, file, line
+  number, and the cid.
   
   =back
   
@@ -35190,7 +42608,7 @@ $fatpacked{"Test2/EventFacet/Trace.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -35205,7 +42623,7 @@ $fatpacked{"Test2/Formatter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   my %ADDED;
@@ -35338,7 +42756,7 @@ $fatpacked{"Test2/Formatter.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -35353,7 +42771,7 @@ $fatpacked{"Test2/Formatter/TAP.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Test2::Util qw/clone_io/;
   
@@ -35828,7 +43246,7 @@ $fatpacked{"Test2/Formatter/TAP.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -35843,11 +43261,11 @@ $fatpacked{"Test2/Hub.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Carp qw/carp croak confess/;
-  use Test2::Util qw/get_tid ipc_separator/;
+  use Test2::Util qw/get_tid gen_uid/;
   
   use Scalar::Util qw/weaken/;
   use List::Util qw/first/;
@@ -35866,6 +43284,7 @@ $fatpacked{"Test2/Hub.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
       _context_init
       _context_release
   
+      uuid
       active
       count
       failed
@@ -35876,13 +43295,17 @@ $fatpacked{"Test2/Hub.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
       skip_reason
   };
   
-  my $ID_POSTFIX = 1;
+  my $UUID_VIA;
+  
   sub init {
       my $self = shift;
   
       $self->{+PID} = $$;
       $self->{+TID} = get_tid();
-      $self->{+HID} = join ipc_separator, $self->{+PID}, $self->{+TID}, $ID_POSTFIX++;
+      $self->{+HID} = gen_uid();
+  
+      $UUID_VIA ||= Test2::API::_add_uuid_via_ref();
+      $self->{+UUID} = ${$UUID_VIA}->('hub') if $$UUID_VIA;
   
       $self->{+NESTED}   = 0 unless defined $self->{+NESTED};
       $self->{+BUFFERED} = 0 unless defined $self->{+BUFFERED};
@@ -35910,7 +43333,7 @@ $fatpacked{"Test2/Hub.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   
       $self->{+PID} = $$;
       $self->{+TID} = get_tid();
-      $self->{+HID} = join ipc_separator, $self->{+PID}, $self->{+TID}, $ID_POSTFIX++;
+      $self->{+HID} = gen_uid();
   
       if (my $ipc = $self->{+IPC}) {
           $ipc->add_hub($self->{+HID});
@@ -36112,6 +43535,25 @@ $fatpacked{"Test2/Hub.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   sub send {
       my $self = shift;
       my ($e) = @_;
+  
+      $e->eid;
+  
+      $e->add_hub(
+          {
+              details => ref($self),
+  
+              buffered => $self->{+BUFFERED},
+              hid      => $self->{+HID},
+              nested   => $self->{+NESTED},
+              pid      => $self->{+PID},
+              tid      => $self->{+TID},
+              uuid     => $self->{+UUID},
+  
+              ipc => $self->{+IPC} ? 1 : 0,
+          }
+      );
+  
+      $e->set_uuid(${$UUID_VIA}->('event')) if $$UUID_VIA;
   
       if ($self->{+_PRE_FILTERS}) {
           for (@{$self->{+_PRE_FILTERS}}) {
@@ -36616,6 +44058,10 @@ $fatpacked{"Test2/Hub.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   
   Get the identifier string of the hub.
   
+  =item $uuid = $hub->uuid()
+  
+  If UUID tagging is enabled (see L<Test2::API>) then the hub will have a UUID.
+  
   =item $ipc = $hub->ipc()
   
   Get the IPC object used by the hub.
@@ -36712,7 +44158,7 @@ $fatpacked{"Test2/Hub.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -36727,7 +44173,7 @@ $fatpacked{"Test2/Hub/Interceptor.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Test2::Hub::Interceptor::Terminator();
@@ -36737,7 +44183,7 @@ $fatpacked{"Test2/Hub/Interceptor.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   
   sub init {
       my $self = shift;
-      $self->SUPER::init;
+      $self->SUPER::init();
       $self->{+NESTED} = 0;
   }
   
@@ -36803,7 +44249,7 @@ $fatpacked{"Test2/Hub/Interceptor.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -36818,7 +44264,7 @@ $fatpacked{"Test2/Hub/Interceptor/Terminator.pm"} = '#line '.(1+__LINE__).' "'._
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   1;
@@ -36857,7 +44303,7 @@ $fatpacked{"Test2/Hub/Interceptor/Terminator.pm"} = '#line '.(1+__LINE__).' "'._
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -36872,7 +44318,7 @@ $fatpacked{"Test2/Hub/Subtest.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Test2::Hub; our @ISA = qw(Test2::Hub) }
   use Test2::Util::HashBase qw/nested exit_code manual_skip_all/;
@@ -36996,7 +44442,7 @@ $fatpacked{"Test2/Hub/Subtest.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -37011,7 +44457,7 @@ $fatpacked{"Test2/IPC.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Test2::API::Instance;
@@ -37032,9 +44478,12 @@ $fatpacked{"Test2/IPC.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   our @EXPORT_OK = qw/cull/;
   BEGIN { require Exporter; our @ISA = qw(Exporter) }
   
+  sub unimport { Test2::API::test2_ipc_disable() }
+  
   sub import {
       goto &Exporter::import if test2_has_ipc || !test2_init_done();
   
+      confess "IPC is disabled" if Test2::API::test2_ipc_disabled();
       confess "Cannot add IPC in a child process (" . test2_pid() . " vs $$)" if test2_pid() != $$;
       confess "Cannot add IPC in a child thread (" . test2_tid() . " vs " . get_tid() . ")"  if test2_tid() != get_tid();
   
@@ -37105,6 +44554,11 @@ $fatpacked{"Test2/IPC.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   import this module after API initialization it will attempt to retrofit IPC
   onto the existing hubs.
   
+  =head2 DISABLING IT
+  
+  You can use C<no Test2::IPC;> to disable IPC for good. You can also use the
+  T2_NO_IPC env var.
+  
   =head1 EXPORTS
   
   All exports are optional.
@@ -37140,7 +44594,7 @@ $fatpacked{"Test2/IPC.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -37155,7 +44609,7 @@ $fatpacked{"Test2/IPC/Driver.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Carp qw/confess/;
@@ -37445,7 +44899,7 @@ $fatpacked{"Test2/IPC/Driver.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -37460,7 +44914,7 @@ $fatpacked{"Test2/IPC/Driver/Files.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   BEGIN { require Test2::IPC::Driver; our @ISA = qw(Test2::IPC::Driver) }
@@ -37728,7 +45182,7 @@ $fatpacked{"Test2/IPC/Driver/Files.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
       my $ready    = substr($file, -6, 6) eq '.ready'    || 0 and substr($file, -6, 6, "");
   
       my @parts = split ipc_separator, $file;
-      my ($global, $hid) = $parts[0] eq 'GLOBAL' ? (1, shift @parts) : (0, join ipc_separator, splice(@parts, 0, 3));
+      my ($global, $hid) = $parts[0] eq 'GLOBAL' ? (1, shift @parts) : (0, join ipc_separator, splice(@parts, 0, 4));
       my ($pid, $tid, $eid) = splice(@parts, 0, 3);
       my $type = join '::' => @parts;
   
@@ -37931,7 +45385,7 @@ $fatpacked{"Test2/IPC/Driver/Files.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -37960,7 +45414,7 @@ $fatpacked{"Test2/Tools/Tiny.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   use Test2::Hub::Interceptor();
   use Test2::Hub::Interceptor::Terminator();
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   BEGIN { require Exporter; our @ISA = qw(Exporter) }
   our @EXPORT = qw{
@@ -38369,7 +45823,7 @@ $fatpacked{"Test2/Tools/Tiny.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -38384,7 +45838,7 @@ $fatpacked{"Test2/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use POSIX();
   use Config qw/%Config/;
@@ -38410,6 +45864,8 @@ $fatpacked{"Test2/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST
       IS_WIN32
   
       ipc_separator
+  
+      gen_uid
   
       do_rename do_unlink
   
@@ -38538,6 +45994,9 @@ $fatpacked{"Test2/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST
   }
   
   sub ipc_separator() { "~" }
+  
+  my $UID = 1;
+  sub gen_uid() { join ipc_separator() => ($$, get_tid(), time, $UID++) }
   
   sub _check_for_sig_sys {
       my $sig_list = shift;
@@ -38711,6 +46170,30 @@ $fatpacked{"Test2/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST
   
   Convert a package name to a filename.
   
+  =item $string = ipc_separator()
+  
+  Get the IPC separator. Currently this is always the string C<'~'>.
+  
+  =item $string = gen_uid()
+  
+  Generate a unique id (NOT A UUID). This will typically be the process id, the
+  thread id, the time, and an incrementing integer all joined with the
+  C<ipc_separator()>.
+  
+  These ID's are unique enough for most purposes. For identical ids to be
+  generated you must have 2 processes with the same PID generate IDs at the same
+  time with the same current state of the incrementing integer. This is a
+  perfectly reasonable thing to expect to happen across multiple machines, but is
+  quite unlikely to happen on one machine.
+  
+  This can fail to be unique if a process generates an id, calls exec, and does
+  it again after the exec and it all happens in less than a second. It can also
+  happen if the systems process id's cycle in less than a second allowing 2
+  different programs that use this generator to run with the same PID in less
+  than a second. Both these cases are sufficiently unlikely. If you need
+  universally unique ids, or ids that are unique in these conditions, look at
+  L<Data::UUID>.
+  
   =item ($ok, $err) = do_rename($old_name, $new_name)
   
   Rename a file, this wraps C<rename()> in a way that makes it more reliable
@@ -38791,7 +46274,7 @@ $fatpacked{"Test2/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -38806,7 +46289,7 @@ $fatpacked{"Test2/Util/ExternalMeta.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   
   use Carp qw/croak/;
@@ -38976,7 +46459,7 @@ $fatpacked{"Test2/Util/ExternalMeta.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -38991,7 +46474,7 @@ $fatpacked{"Test2/Util/Facets2Legacy.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use Carp qw/croak confess/;
   use Scalar::Util qw/blessed/;
@@ -39007,6 +46490,7 @@ $fatpacked{"Test2/Util/Facets2Legacy.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
       subtest_id
       summary
       terminate
+      uuid
   };
   our %EXPORT_TAGS = ( ALL => \@EXPORT_OK );
   
@@ -39100,7 +46584,191 @@ $fatpacked{"Test2/Util/Facets2Legacy.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
       return $facet_data->{control}->{terminate};
   }
   
+  sub uuid {
+      my $in = shift;
+  
+      if ($CYCLE_DETECT) {
+          if (blessed($in) && $in->isa('Test2::Event')) {
+              my $meth = $in->can('uuid');
+              $meth = $in->can('SUPER::uuid') if $meth == \&uuid;
+              my $uuid = $in->$meth if $meth && $meth != \&uuid;
+              return $uuid if $uuid;
+          }
+  
+          return undef;
+      }
+  
+      my $facet_data = _get_facet_data($in);
+      return $facet_data->{about}->{uuid} if $facet_data->{about} && $facet_data->{about}->{uuid};
+  
+      return undef;
+  }
+  
   1;
+  
+  =pod
+  
+  =encoding UTF-8
+  
+  =head1 NAME
+  
+  Test2::Util::Facets2Legacy - Convert facet data to the legacy event API.
+  
+  =head1 DESCRIPTION
+  
+  This module exports several subroutines from the older event API (see
+  L<Test2::Event>). These subroutines can be used as methods on any object that
+  provides a custom C<facet_data()> method. These subroutines can also be used as
+  functions that take a facet data hashref as arguments.
+  
+  =head1 SYNOPSIS
+  
+  =head2 AS METHODS
+  
+      package My::Event;
+  
+      use Test2::Util::Facets2Legacy ':ALL';
+  
+      sub facet_data { return { ... } }
+  
+  Then to use it:
+  
+      my $e = My::Event->new(...);
+  
+      my $causes_fail = $e->causes_fail;
+      my $summary     = $e->summary;
+      ....
+  
+  =head2 AS FUNCTIONS
+  
+      use Test2::Util::Facets2Legacy ':ALL';
+  
+      my $f = {
+          assert => { ... },
+          info => [{...}, ...],
+          control => {...},
+          ...
+      };
+  
+      my $causes_fail = causes_fail($f);
+      my $summary     = summary($f);
+  
+  =head1 NOTE ON CYCLES
+  
+  When used as methods, all these subroutines call C<< $e->facet_data() >>. The
+  default C<facet_data()> method in L<Test2::Event> relies on the legacy methods
+  this module emulates in order to work. As a result of this it is very easy to
+  create infinite recursion bugs.
+  
+  These methods have cycle detection and will throw an exception early if a cycle
+  is detected. C<uuid()> is currently the only subroutine in this library that
+  has a fallback behavior when cycles are detected.
+  
+  =head1 EXPORTS
+  
+  Nothing is exported by default. You must specify which methods to import, or
+  use the ':ALL' tag.
+  
+  =over 4
+  
+  =item $bool = $e->causes_fail()
+  
+  =item $bool = causes_fail($f)
+  
+  Check if the event or facets result in a failing state.
+  
+  =item $bool = $e->diagnostics()
+  
+  =item $bool = diagnostics($f)
+  
+  Check if the event or facets contain any diagnostics information.
+  
+  =item $bool = $e->global()
+  
+  =item $bool = global($f)
+  
+  Check if the event or facets need to be globally processed.
+  
+  =item $bool = $e->increments_count()
+  
+  =item $bool = increments_count($f)
+  
+  Check if the event or facets make an assertion.
+  
+  =item $bool = $e->no_display()
+  
+  =item $bool = no_display($f)
+  
+  Check if the event or facets should be rendered or hidden.
+  
+  =item ($max, $directive, $reason) = $e->sets_plan()
+  
+  =item ($max, $directive, $reason) = sets_plan($f)
+  
+  Check if the event or facets set a plan, and return the plan details.
+  
+  =item $id = $e->subtest_id()
+  
+  =item $id = subtest_id($f)
+  
+  Get the subtest id, if any.
+  
+  =item $string = $e->summary()
+  
+  =item $string = summary($f)
+  
+  Get the summary of the event or facets hash, if any.
+  
+  =item $undef_or_int = $e->terminate()
+  
+  =item $undef_or_int = terminate($f)
+  
+  Check if the event or facets should result in process termination, if so the
+  exit code is returned (which could be 0). undef is returned if no termination
+  is requested.
+  
+  =item $uuid = $e->uuid()
+  
+  =item $uuid = uuid($f)
+  
+  Get the UUID of the facets or event.
+  
+  B<Note:> This will fall back to C<< $e->SUPER::uuid() >> if a cycle is
+  detected and an event is used as the argument.
+  
+  =back
+  
+  =head1 SOURCE
+  
+  The source code repository for Test2 can be found at
+  F<http://github.com/Test-More/test-more/>.
+  
+  =head1 MAINTAINERS
+  
+  =over 4
+  
+  =item Chad Granum E<lt>exodist@cpan.orgE<gt>
+  
+  =back
+  
+  =head1 AUTHORS
+  
+  =over 4
+  
+  =item Chad Granum E<lt>exodist@cpan.orgE<gt>
+  
+  =back
+  
+  =head1 COPYRIGHT
+  
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+  
+  See F<http://dev.perl.org/licenses/>
+  
+  =cut
 TEST2_UTIL_FACETS2LEGACY
 
 $fatpacked{"Test2/Util/HashBase.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'TEST2_UTIL_HASHBASE';
@@ -39108,7 +46776,7 @@ $fatpacked{"Test2/Util/HashBase.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   use strict;
   use warnings;
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   #################################################################
   #                                                               #
@@ -39531,7 +47199,7 @@ $fatpacked{"Test2/Util/HashBase.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n
   
   =head1 COPYRIGHT
   
-  Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -39546,7 +47214,7 @@ $fatpacked{"Test2/Util/Trace.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   require Test2::EventFacet::Trace;
   @ISA = ('Test2::EventFacet::Trace');
   
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   1;
   
@@ -39588,7 +47256,7 @@ $fatpacked{"Test2/Util/Trace.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<
   
   =head1 COPYRIGHT
   
-  Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+  Copyright 2018 Chad Granum E<lt>exodist@cpan.orgE<gt>.
   
   This program is free software; you can redistribute it and/or
   modify it under the same terms as Perl itself.
@@ -45532,7 +53200,7 @@ URI_URN_OID
 
 $fatpacked{"ok.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'OK';
   package ok;
-  our $VERSION = '1.302120';
+  our $VERSION = '1.302136';
   
   use strict;
   use Test::More ();
@@ -45581,6 +53249,836 @@ $fatpacked{"ok.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'OK';
   
   =cut
 OK
+
+$fatpacked{"private-Error.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'PRIVATE-ERROR';
+  # Error.pm
+  #
+  # Copyright (c) 1997-8 Graham Barr <gbarr@ti.com>. All rights reserved.
+  # This program is free software; you can redistribute it and/or
+  # modify it under the same terms as Perl itself.
+  #
+  # Based on my original Error.pm, and Exceptions.pm by Peter Seibel
+  # <peter@weblogic.com> and adapted by Jesse Glick <jglick@sig.bsh.com>.
+  #
+  # but modified ***significantly***
+  
+  package Error;
+  
+  use strict;
+  use vars qw($VERSION);
+  use 5.004;
+  
+  $VERSION = "0.15009";
+  
+  use overload (
+  	'""'	   =>	'stringify',
+  	'0+'	   =>	'value',
+  	'bool'     =>	sub { return 1; },
+  	'fallback' =>	1
+  );
+  
+  $Error::Depth = 0;	# Depth to pass to caller()
+  $Error::Debug = 0;	# Generate verbose stack traces
+  @Error::STACK = ();	# Clause stack for try
+  $Error::THROWN = undef;	# last error thrown, a workaround until die $ref works
+  
+  my $LAST;		# Last error created
+  my %ERROR;		# Last error associated with package
+  
+  sub throw_Error_Simple
+  {
+      my $args = shift;
+      return Error::Simple->new($args->{'text'});
+  }
+  
+  $Error::ObjectifyCallback = \&throw_Error_Simple;
+  
+  
+  # Exported subs are defined in Error::subs
+  
+  sub import {
+      shift;
+      local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+      Error::subs->import(@_);
+  }
+  
+  # I really want to use last for the name of this method, but it is a keyword
+  # which prevent the syntax  last Error
+  
+  sub prior {
+      shift; # ignore
+  
+      return $LAST unless @_;
+  
+      my $pkg = shift;
+      return exists $ERROR{$pkg} ? $ERROR{$pkg} : undef
+  	unless ref($pkg);
+  
+      my $obj = $pkg;
+      my $err = undef;
+      if($obj->isa('HASH')) {
+  	$err = $obj->{'__Error__'}
+  	    if exists $obj->{'__Error__'};
+      }
+      elsif($obj->isa('GLOB')) {
+  	$err = ${*$obj}{'__Error__'}
+  	    if exists ${*$obj}{'__Error__'};
+      }
+  
+      $err;
+  }
+  
+  sub flush {
+      shift; #ignore
+  
+      unless (@_) {
+         $LAST = undef;
+         return;
+      }
+  
+      my $pkg = shift;
+      return unless ref($pkg);
+  
+      undef $ERROR{$pkg} if defined $ERROR{$pkg};
+  }
+  
+  # Return as much information as possible about where the error
+  # happened. The -stacktrace element only exists if $Error::DEBUG
+  # was set when the error was created
+  
+  sub stacktrace {
+      my $self = shift;
+  
+      return $self->{'-stacktrace'}
+  	if exists $self->{'-stacktrace'};
+  
+      my $text = exists $self->{'-text'} ? $self->{'-text'} : "Died";
+  
+      $text .= sprintf(" at %s line %d.\n", $self->file, $self->line)
+  	unless($text =~ /\n$/s);
+  
+      $text;
+  }
+  
+  # Allow error propagation, ie
+  #
+  # $ber->encode(...) or
+  #    return Error->prior($ber)->associate($ldap);
+  
+  sub associate {
+      my $err = shift;
+      my $obj = shift;
+  
+      return unless ref($obj);
+  
+      if($obj->isa('HASH')) {
+  	$obj->{'__Error__'} = $err;
+      }
+      elsif($obj->isa('GLOB')) {
+  	${*$obj}{'__Error__'} = $err;
+      }
+      $obj = ref($obj);
+      $ERROR{ ref($obj) } = $err;
+  
+      return;
+  }
+  
+  sub new {
+      my $self = shift;
+      my($pkg,$file,$line) = caller($Error::Depth);
+  
+      my $err = bless {
+  	'-package' => $pkg,
+  	'-file'    => $file,
+  	'-line'    => $line,
+  	@_
+      }, $self;
+  
+      $err->associate($err->{'-object'})
+  	if(exists $err->{'-object'});
+  
+      # To always create a stacktrace would be very inefficient, so
+      # we only do it if $Error::Debug is set
+  
+      if($Error::Debug) {
+  	require Carp;
+  	local $Carp::CarpLevel = $Error::Depth;
+  	my $text = defined($err->{'-text'}) ? $err->{'-text'} : "Error";
+  	my $trace = Carp::longmess($text);
+  	# Remove try calls from the trace
+  	$trace =~ s/(\n\s+\S+__ANON__[^\n]+)?\n\s+eval[^\n]+\n\s+Error::subs::try[^\n]+(?=\n)//sog;
+  	$trace =~ s/(\n\s+\S+__ANON__[^\n]+)?\n\s+eval[^\n]+\n\s+Error::subs::run_clauses[^\n]+\n\s+Error::subs::try[^\n]+(?=\n)//sog;
+  	$err->{'-stacktrace'} = $trace
+      }
+  
+      $@ = $LAST = $ERROR{$pkg} = $err;
+  }
+  
+  # Throw an error. this contains some very gory code.
+  
+  sub throw {
+      my $self = shift;
+      local $Error::Depth = $Error::Depth + 1;
+  
+      # if we are not rethrow-ing then create the object to throw
+      $self = $self->new(@_) unless ref($self);
+  
+      die $Error::THROWN = $self;
+  }
+  
+  # syntactic sugar for
+  #
+  #    die with Error( ... );
+  
+  sub with {
+      my $self = shift;
+      local $Error::Depth = $Error::Depth + 1;
+  
+      $self->new(@_);
+  }
+  
+  # syntactic sugar for
+  #
+  #    record Error( ... ) and return;
+  
+  sub record {
+      my $self = shift;
+      local $Error::Depth = $Error::Depth + 1;
+  
+      $self->new(@_);
+  }
+  
+  # catch clause for
+  #
+  # try { ... } catch CLASS with { ... }
+  
+  sub catch {
+      my $pkg = shift;
+      my $code = shift;
+      my $clauses = shift || {};
+      my $catch = $clauses->{'catch'} ||= [];
+  
+      unshift @$catch,  $pkg, $code;
+  
+      $clauses;
+  }
+  
+  # Object query methods
+  
+  sub object {
+      my $self = shift;
+      exists $self->{'-object'} ? $self->{'-object'} : undef;
+  }
+  
+  sub file {
+      my $self = shift;
+      exists $self->{'-file'} ? $self->{'-file'} : undef;
+  }
+  
+  sub line {
+      my $self = shift;
+      exists $self->{'-line'} ? $self->{'-line'} : undef;
+  }
+  
+  sub text {
+      my $self = shift;
+      exists $self->{'-text'} ? $self->{'-text'} : undef;
+  }
+  
+  # overload methods
+  
+  sub stringify {
+      my $self = shift;
+      defined $self->{'-text'} ? $self->{'-text'} : "Died";
+  }
+  
+  sub value {
+      my $self = shift;
+      exists $self->{'-value'} ? $self->{'-value'} : undef;
+  }
+  
+  package Error::Simple;
+  
+  @Error::Simple::ISA = qw(Error);
+  
+  sub new {
+      my $self  = shift;
+      my $text  = "" . shift;
+      my $value = shift;
+      my(@args) = ();
+  
+      local $Error::Depth = $Error::Depth + 1;
+  
+      @args = ( -file => $1, -line => $2)
+  	if($text =~ s/\s+at\s+(\S+)\s+line\s+(\d+)(?:,\s*<[^>]*>\s+line\s+\d+)?\.?\n?$//s);
+      push(@args, '-value', 0 + $value)
+  	if defined($value);
+  
+      $self->SUPER::new(-text => $text, @args);
+  }
+  
+  sub stringify {
+      my $self = shift;
+      my $text = $self->SUPER::stringify;
+      $text .= sprintf(" at %s line %d.\n", $self->file, $self->line)
+  	unless($text =~ /\n$/s);
+      $text;
+  }
+  
+  ##########################################################################
+  ##########################################################################
+  
+  # Inspired by code from Jesse Glick <jglick@sig.bsh.com> and
+  # Peter Seibel <peter@weblogic.com>
+  
+  package Error::subs;
+  
+  use Exporter ();
+  use vars qw(@EXPORT_OK @ISA %EXPORT_TAGS);
+  
+  @EXPORT_OK   = qw(try with finally except otherwise);
+  %EXPORT_TAGS = (try => \@EXPORT_OK);
+  
+  @ISA = qw(Exporter);
+  
+  
+  sub blessed {
+  	my $item = shift;
+  	local $@; # don't kill an outer $@
+  	ref $item and eval { $item->can('can') };
+  }
+  
+  
+  sub run_clauses ($$$\@) {
+      my($clauses,$err,$wantarray,$result) = @_;
+      my $code = undef;
+  
+      $err = $Error::ObjectifyCallback->({'text' =>$err}) unless ref($err);
+  
+      CATCH: {
+  
+  	# catch
+  	my $catch;
+  	if(defined($catch = $clauses->{'catch'})) {
+  	    my $i = 0;
+  
+  	    CATCHLOOP:
+  	    for( ; $i < @$catch ; $i += 2) {
+  		my $pkg = $catch->[$i];
+  		unless(defined $pkg) {
+  		    #except
+  		    splice(@$catch,$i,2,$catch->[$i+1]->());
+  		    $i -= 2;
+  		    next CATCHLOOP;
+  		}
+  		elsif(blessed($err) && $err->isa($pkg)) {
+  		    $code = $catch->[$i+1];
+  		    while(1) {
+  			my $more = 0;
+  			local($Error::THROWN);
+  			my $ok = eval {
+  			    if($wantarray) {
+  				@{$result} = $code->($err,\$more);
+  			    }
+  			    elsif(defined($wantarray)) {
+  			        @{$result} = ();
+  				$result->[0] = $code->($err,\$more);
+  			    }
+  			    else {
+  				$code->($err,\$more);
+  			    }
+  			    1;
+  			};
+  			if( $ok ) {
+  			    next CATCHLOOP if $more;
+  			    undef $err;
+  			}
+  			else {
+  			    $err = defined($Error::THROWN)
+  				    ? $Error::THROWN : $@;
+                  $err = $Error::ObjectifyCallback->({'text' =>$err})
+                      unless ref($err);
+  			}
+  			last CATCH;
+  		    };
+  		}
+  	    }
+  	}
+  
+  	# otherwise
+  	my $owise;
+  	if(defined($owise = $clauses->{'otherwise'})) {
+  	    my $code = $clauses->{'otherwise'};
+  	    my $more = 0;
+  	    my $ok = eval {
+  		if($wantarray) {
+  		    @{$result} = $code->($err,\$more);
+  		}
+  		elsif(defined($wantarray)) {
+  		    @{$result} = ();
+  		    $result->[0] = $code->($err,\$more);
+  		}
+  		else {
+  		    $code->($err,\$more);
+  		}
+  		1;
+  	    };
+  	    if( $ok ) {
+  		undef $err;
+  	    }
+  	    else {
+  		$err = defined($Error::THROWN)
+  			? $Error::THROWN : $@;
+  
+          $err = $Error::ObjectifyCallback->({'text' =>$err})
+              unless ref($err);
+  	    }
+  	}
+      }
+      $err;
+  }
+  
+  sub try (&;$) {
+      my $try = shift;
+      my $clauses = @_ ? shift : {};
+      my $ok = 0;
+      my $err = undef;
+      my @result = ();
+  
+      unshift @Error::STACK, $clauses;
+  
+      my $wantarray = wantarray();
+  
+      do {
+  	local $Error::THROWN = undef;
+      local $@ = undef;
+  
+  	$ok = eval {
+  	    if($wantarray) {
+  		@result = $try->();
+  	    }
+  	    elsif(defined $wantarray) {
+  		$result[0] = $try->();
+  	    }
+  	    else {
+  		$try->();
+  	    }
+  	    1;
+  	};
+  
+  	$err = defined($Error::THROWN) ? $Error::THROWN : $@
+  	    unless $ok;
+      };
+  
+      shift @Error::STACK;
+  
+      $err = run_clauses($clauses,$err,wantarray,@result)
+  	unless($ok);
+  
+      $clauses->{'finally'}->()
+  	if(defined($clauses->{'finally'}));
+  
+      if (defined($err))
+      {
+          if (blessed($err) && $err->can('throw'))
+          {
+              throw $err;
+          }
+          else
+          {
+              die $err;
+          }
+      }
+  
+      wantarray ? @result : $result[0];
+  }
+  
+  # Each clause adds a sub to the list of clauses. The finally clause is
+  # always the last, and the otherwise clause is always added just before
+  # the finally clause.
+  #
+  # All clauses, except the finally clause, add a sub which takes one argument
+  # this argument will be the error being thrown. The sub will return a code ref
+  # if that clause can handle that error, otherwise undef is returned.
+  #
+  # The otherwise clause adds a sub which unconditionally returns the users
+  # code reference, this is why it is forced to be last.
+  #
+  # The catch clause is defined in Error.pm, as the syntax causes it to
+  # be called as a method
+  
+  sub with (&;$) {
+      @_
+  }
+  
+  sub finally (&) {
+      my $code = shift;
+      my $clauses = { 'finally' => $code };
+      $clauses;
+  }
+  
+  # The except clause is a block which returns a hashref or a list of
+  # key-value pairs, where the keys are the classes and the values are subs.
+  
+  sub except (&;$) {
+      my $code = shift;
+      my $clauses = shift || {};
+      my $catch = $clauses->{'catch'} ||= [];
+  
+      my $sub = sub {
+  	my $ref;
+  	my(@array) = $code->($_[0]);
+  	if(@array == 1 && ref($array[0])) {
+  	    $ref = $array[0];
+  	    $ref = [ %$ref ]
+  		if(UNIVERSAL::isa($ref,'HASH'));
+  	}
+  	else {
+  	    $ref = \@array;
+  	}
+  	@$ref
+      };
+  
+      unshift @{$catch}, undef, $sub;
+  
+      $clauses;
+  }
+  
+  sub otherwise (&;$) {
+      my $code = shift;
+      my $clauses = shift || {};
+  
+      if(exists $clauses->{'otherwise'}) {
+  	require Carp;
+  	Carp::croak("Multiple otherwise clauses");
+      }
+  
+      $clauses->{'otherwise'} = $code;
+  
+      $clauses;
+  }
+  
+  1;
+  __END__
+  
+  =head1 NAME
+  
+  Error - Error/exception handling in an OO-ish way
+  
+  =head1 SYNOPSIS
+  
+      use Error qw(:try);
+  
+      throw Error::Simple( "A simple error");
+  
+      sub xyz {
+          ...
+  	record Error::Simple("A simple error")
+  	    and return;
+      }
+  
+      unlink($file) or throw Error::Simple("$file: $!",$!);
+  
+      try {
+  	do_some_stuff();
+  	die "error!" if $condition;
+  	throw Error::Simple -text => "Oops!" if $other_condition;
+      }
+      catch Error::IO with {
+  	my $E = shift;
+  	print STDERR "File ", $E->{'-file'}, " had a problem\n";
+      }
+      except {
+  	my $E = shift;
+  	my $general_handler=sub {send_message $E->{-description}};
+  	return {
+  	    UserException1 => $general_handler,
+  	    UserException2 => $general_handler
+  	};
+      }
+      otherwise {
+  	print STDERR "Well I don't know what to say\n";
+      }
+      finally {
+  	close_the_garage_door_already(); # Should be reliable
+      }; # Don't forget the trailing ; or you might be surprised
+  
+  =head1 DESCRIPTION
+  
+  The C<Error> package provides two interfaces. Firstly C<Error> provides
+  a procedural interface to exception handling. Secondly C<Error> is a
+  base class for errors/exceptions that can either be thrown, for
+  subsequent catch, or can simply be recorded.
+  
+  Errors in the class C<Error> should not be thrown directly, but the
+  user should throw errors from a sub-class of C<Error>.
+  
+  =head1 PROCEDURAL INTERFACE
+  
+  C<Error> exports subroutines to perform exception handling. These will
+  be exported if the C<:try> tag is used in the C<use> line.
+  
+  =over 4
+  
+  =item try BLOCK CLAUSES
+  
+  C<try> is the main subroutine called by the user. All other subroutines
+  exported are clauses to the try subroutine.
+  
+  The BLOCK will be evaluated and, if no error is throw, try will return
+  the result of the block.
+  
+  C<CLAUSES> are the subroutines below, which describe what to do in the
+  event of an error being thrown within BLOCK.
+  
+  =item catch CLASS with BLOCK
+  
+  This clauses will cause all errors that satisfy C<$err-E<gt>isa(CLASS)>
+  to be caught and handled by evaluating C<BLOCK>.
+  
+  C<BLOCK> will be passed two arguments. The first will be the error
+  being thrown. The second is a reference to a scalar variable. If this
+  variable is set by the catch block then, on return from the catch
+  block, try will continue processing as if the catch block was never
+  found.
+  
+  To propagate the error the catch block may call C<$err-E<gt>throw>
+  
+  If the scalar reference by the second argument is not set, and the
+  error is not thrown. Then the current try block will return with the
+  result from the catch block.
+  
+  =item except BLOCK
+  
+  When C<try> is looking for a handler, if an except clause is found
+  C<BLOCK> is evaluated. The return value from this block should be a
+  HASHREF or a list of key-value pairs, where the keys are class names
+  and the values are CODE references for the handler of errors of that
+  type.
+  
+  =item otherwise BLOCK
+  
+  Catch any error by executing the code in C<BLOCK>
+  
+  When evaluated C<BLOCK> will be passed one argument, which will be the
+  error being processed.
+  
+  Only one otherwise block may be specified per try block
+  
+  =item finally BLOCK
+  
+  Execute the code in C<BLOCK> either after the code in the try block has
+  successfully completed, or if the try block throws an error then
+  C<BLOCK> will be executed after the handler has completed.
+  
+  If the handler throws an error then the error will be caught, the
+  finally block will be executed and the error will be re-thrown.
+  
+  Only one finally block may be specified per try block
+  
+  =back
+  
+  =head1 CLASS INTERFACE
+  
+  =head2 CONSTRUCTORS
+  
+  The C<Error> object is implemented as a HASH. This HASH is initialized
+  with the arguments that are passed to its constructor. The elements
+  that are used by, or are retrievable by the C<Error> class are listed
+  below, other classes may add to these.
+  
+  	-file
+  	-line
+  	-text
+  	-value
+  	-object
+  
+  If C<-file> or C<-line> are not specified in the constructor arguments
+  then these will be initialized with the file name and line number where
+  the constructor was called from.
+  
+  If the error is associated with an object then the object should be
+  passed as the C<-object> argument. This will allow the C<Error> package
+  to associate the error with the object.
+  
+  The C<Error> package remembers the last error created, and also the
+  last error associated with a package. This could either be the last
+  error created by a sub in that package, or the last error which passed
+  an object blessed into that package as the C<-object> argument.
+  
+  =over 4
+  
+  =item throw ( [ ARGS ] )
+  
+  Create a new C<Error> object and throw an error, which will be caught
+  by a surrounding C<try> block, if there is one. Otherwise it will cause
+  the program to exit.
+  
+  C<throw> may also be called on an existing error to re-throw it.
+  
+  =item with ( [ ARGS ] )
+  
+  Create a new C<Error> object and returns it. This is defined for
+  syntactic sugar, eg
+  
+      die with Some::Error ( ... );
+  
+  =item record ( [ ARGS ] )
+  
+  Create a new C<Error> object and returns it. This is defined for
+  syntactic sugar, eg
+  
+      record Some::Error ( ... )
+  	and return;
+  
+  =back
+  
+  =head2 STATIC METHODS
+  
+  =over 4
+  
+  =item prior ( [ PACKAGE ] )
+  
+  Return the last error created, or the last error associated with
+  C<PACKAGE>
+  
+  =item flush ( [ PACKAGE ] )
+  
+  Flush the last error created, or the last error associated with
+  C<PACKAGE>.It is necessary to clear the error stack before exiting the
+  package or uncaught errors generated using C<record> will be reported.
+  
+       $Error->flush;
+  
+  =cut
+  
+  =back
+  
+  =head2 OBJECT METHODS
+  
+  =over 4
+  
+  =item stacktrace
+  
+  If the variable C<$Error::Debug> was non-zero when the error was
+  created, then C<stacktrace> returns a string created by calling
+  C<Carp::longmess>. If the variable was zero the C<stacktrace> returns
+  the text of the error appended with the filename and line number of
+  where the error was created, providing the text does not end with a
+  newline.
+  
+  =item object
+  
+  The object this error was associated with
+  
+  =item file
+  
+  The file where the constructor of this error was called from
+  
+  =item line
+  
+  The line where the constructor of this error was called from
+  
+  =item text
+  
+  The text of the error
+  
+  =back
+  
+  =head2 OVERLOAD METHODS
+  
+  =over 4
+  
+  =item stringify
+  
+  A method that converts the object into a string. This method may simply
+  return the same as the C<text> method, or it may append more
+  information. For example the file name and line number.
+  
+  By default this method returns the C<-text> argument that was passed to
+  the constructor, or the string C<"Died"> if none was given.
+  
+  =item value
+  
+  A method that will return a value that can be associated with the
+  error. For example if an error was created due to the failure of a
+  system call, then this may return the numeric value of C<$!> at the
+  time.
+  
+  By default this method returns the C<-value> argument that was passed
+  to the constructor.
+  
+  =back
+  
+  =head1 PRE-DEFINED ERROR CLASSES
+  
+  =over 4
+  
+  =item Error::Simple
+  
+  This class can be used to hold simple error strings and values. Its
+  constructor takes two arguments. The first is a text value, the second
+  is a numeric value. These values are what will be returned by the
+  overload methods.
+  
+  If the text value ends with C<at file line 1> as $@ strings do, then
+  this information will be used to set the C<-file> and C<-line> arguments
+  of the error object.
+  
+  This class is used internally if an eval'd block die's with an error
+  that is a plain string. (Unless C<$Error::ObjectifyCallback> is modified)
+  
+  =back
+  
+  =head1 $Error::ObjectifyCallback
+  
+  This variable holds a reference to a subroutine that converts errors that
+  are plain strings to objects. It is used by Error.pm to convert textual
+  errors to objects, and can be overridden by the user.
+  
+  It accepts a single argument which is a hash reference to named parameters.
+  Currently the only named parameter passed is C<'text'> which is the text
+  of the error, but others may be available in the future.
+  
+  For example the following code will cause Error.pm to throw objects of the
+  class MyError::Bar by default:
+  
+      sub throw_MyError_Bar
+      {
+          my $args = shift;
+          my $err = MyError::Bar->new();
+          $err->{'MyBarText'} = $args->{'text'};
+          return $err;
+      }
+  
+      {
+          local $Error::ObjectifyCallback = \&throw_MyError_Bar;
+  
+          # Error handling here.
+      }
+  
+  =head1 KNOWN BUGS
+  
+  None, but that does not mean there are not any.
+  
+  =head1 AUTHORS
+  
+  Graham Barr <gbarr@pobox.com>
+  
+  The code that inspired me to write this was originally written by
+  Peter Seibel <peter@weblogic.com> and adapted by Jesse Glick
+  <jglick@sig.bsh.com>.
+  
+  =head1 MAINTAINER
+  
+  Shlomi Fish <shlomif@iglu.org.il>
+  
+  =head1 PAST MAINTAINERS
+  
+  Arun Kumar U <u_arunkumar@yahoo.com>
+  
+  =cut
+PRIVATE-ERROR
 
 $fatpacked{"x86_64-linux/JSON/XS.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'X86_64-LINUX_JSON_XS';
   =head1 NAME
@@ -47266,7 +55764,7 @@ $fatpacked{"x86_64-linux/List/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
     all any first min max minstr maxstr none notall product reduce sum sum0 shuffle uniq uniqnum uniqstr
     pairs unpairs pairkeys pairvalues pairmap pairgrep pairfirst
   );
-  our $VERSION    = "1.49";
+  our $VERSION    = "1.47";
   our $XS_VERSION = $VERSION;
   $VERSION    = eval $VERSION;
   
@@ -47367,7 +55865,7 @@ $fatpacked{"x86_64-linux/List/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   
   The above example code blocks also suggest how to use C<reduce> to build a
   more efficient combined version of one of these basic functions and a C<map>
-  block. For example, to find the total length of all the strings in a list,
+  block. For example, to find the total length of the all the strings in a list,
   we could use
   
       $total = sum map { length } @strings;
@@ -47400,9 +55898,6 @@ $fatpacked{"x86_64-linux/List/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
           # at least one string has more than 10 characters
       }
   
-  Note: Due to XS issues the block passed may be able to access the outer @_
-  directly. This is not intentional and will break under debugger.
-  
   =head2 all
   
       my $bool = all { BLOCK } @list;
@@ -47413,9 +55908,6 @@ $fatpacked{"x86_64-linux/List/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   make the C<BLOCK> return true. If any element returns false, then it returns
   false. If the C<BLOCK> never returns false or the C<@list> was empty then it
   returns true.
-  
-  Note: Due to XS issues the block passed may be able to access the outer @_
-  directly. This is not intentional and will break under debugger.
   
   =head2 none
   
@@ -47430,9 +55922,6 @@ $fatpacked{"x86_64-linux/List/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\
   Similar to L</any> and L</all>, but with the return sense inverted. C<none>
   returns true only if no value in the C<@list> causes the C<BLOCK> to return
   true, and C<notall> returns true only if not all of the values do.
-  
-  Note: Due to XS issues the block passed may be able to access the outer @_
-  directly. This is not intentional and will break under debugger.
   
   =head2 first
   
@@ -47901,7 +56390,7 @@ $fatpacked{"x86_64-linux/List/Util/XS.pm"} = '#line '.(1+__LINE__).' "'.__FILE__
   use warnings;
   use List::Util;
   
-  our $VERSION = "1.49";       # FIXUP
+  our $VERSION = "1.47";       # FIXUP
   $VERSION = eval $VERSION;    # FIXUP
   
   1;
@@ -48051,7 +56540,7 @@ $fatpacked{"x86_64-linux/Scalar/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
     dualvar isdual isvstring looks_like_number openhandle readonly set_prototype
     tainted
   );
-  our $VERSION    = "1.49";
+  our $VERSION    = "1.47";
   $VERSION   = eval $VERSION;
   
   require List::Util; # List::Util loads the XS
@@ -48394,1147 +56883,6 @@ $fatpacked{"x86_64-linux/Scalar/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__.
   =cut
 X86_64-LINUX_SCALAR_UTIL
 
-$fatpacked{"x86_64-linux/Socket.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'X86_64-LINUX_SOCKET';
-  package Socket;
-  
-  use strict;
-  { use 5.006001; }
-  
-  our $VERSION = '2.029';
-  
-  =head1 NAME
-  
-  C<Socket> - networking constants and support functions
-  
-  =head1 SYNOPSIS
-  
-  C<Socket> a low-level module used by, among other things, the L<IO::Socket>
-  family of modules. The following examples demonstrate some low-level uses but
-  a practical program would likely use the higher-level API provided by
-  C<IO::Socket> or similar instead.
-  
-   use Socket qw(PF_INET SOCK_STREAM pack_sockaddr_in inet_aton);
-  
-   socket(my $socket, PF_INET, SOCK_STREAM, 0)
-       or die "socket: $!";
-  
-   my $port = getservbyname "echo", "tcp";
-   connect($socket, pack_sockaddr_in($port, inet_aton("localhost")))
-       or die "connect: $!";
-  
-   print $socket "Hello, world!\n";
-   print <$socket>;
-  
-  See also the L</EXAMPLES> section.
-  
-  =head1 DESCRIPTION
-  
-  This module provides a variety of constants, structure manipulators and other
-  functions related to socket-based networking. The values and functions
-  provided are useful when used in conjunction with Perl core functions such as
-  socket(), setsockopt() and bind(). It also provides several other support
-  functions, mostly for dealing with conversions of network addresses between
-  human-readable and native binary forms, and for hostname resolver operations.
-  
-  Some constants and functions are exported by default by this module; but for
-  backward-compatibility any recently-added symbols are not exported by default
-  and must be requested explicitly. When an import list is provided to the
-  C<use Socket> line, the default exports are not automatically imported. It is
-  therefore best practice to always to explicitly list all the symbols required.
-  
-  Also, some common socket "newline" constants are provided: the constants
-  C<CR>, C<LF>, and C<CRLF>, as well as C<$CR>, C<$LF>, and C<$CRLF>, which map
-  to C<\015>, C<\012>, and C<\015\012>. If you do not want to use the literal
-  characters in your programs, then use the constants provided here. They are
-  not exported by default, but can be imported individually, and with the
-  C<:crlf> export tag:
-  
-   use Socket qw(:DEFAULT :crlf);
-  
-   $sock->print("GET / HTTP/1.0$CRLF");
-  
-  The entire getaddrinfo() subsystem can be exported using the tag C<:addrinfo>;
-  this exports the getaddrinfo() and getnameinfo() functions, and all the
-  C<AI_*>, C<NI_*>, C<NIx_*> and C<EAI_*> constants.
-  
-  =cut
-  
-  =head1 CONSTANTS
-  
-  In each of the following groups, there may be many more constants provided
-  than just the ones given as examples in the section heading. If the heading
-  ends C<...> then this means there are likely more; the exact constants
-  provided will depend on the OS and headers found at compile-time.
-  
-  =cut
-  
-  =head2 PF_INET, PF_INET6, PF_UNIX, ...
-  
-  Protocol family constants to use as the first argument to socket() or the
-  value of the C<SO_DOMAIN> or C<SO_FAMILY> socket option.
-  
-  =head2 AF_INET, AF_INET6, AF_UNIX, ...
-  
-  Address family constants used by the socket address structures, to pass to
-  such functions as inet_pton() or getaddrinfo(), or are returned by such
-  functions as sockaddr_family().
-  
-  =head2 SOCK_STREAM, SOCK_DGRAM, SOCK_RAW, ...
-  
-  Socket type constants to use as the second argument to socket(), or the value
-  of the C<SO_TYPE> socket option.
-  
-  =head2 SOCK_NONBLOCK. SOCK_CLOEXEC
-  
-  Linux-specific shortcuts to specify the C<O_NONBLOCK> and C<FD_CLOEXEC> flags
-  during a C<socket(2)> call.
-  
-   socket( my $sockh, PF_INET, SOCK_DGRAM|SOCK_NONBLOCK, 0 )
-  
-  =head2 SOL_SOCKET
-  
-  Socket option level constant for setsockopt() and getsockopt().
-  
-  =head2 SO_ACCEPTCONN, SO_BROADCAST, SO_ERROR, ...
-  
-  Socket option name constants for setsockopt() and getsockopt() at the
-  C<SOL_SOCKET> level.
-  
-  =head2 IP_OPTIONS, IP_TOS, IP_TTL, ...
-  
-  Socket option name constants for IPv4 socket options at the C<IPPROTO_IP>
-  level.
-  
-  =head2 IP_PMTUDISC_WANT, IP_PMTUDISC_DONT, ...
-  
-  Socket option value contants for C<IP_MTU_DISCOVER> socket option.
-  
-  =head2 IPTOS_LOWDELAY, IPTOS_THROUGHPUT, IPTOS_RELIABILITY, ...
-  
-  Socket option value constants for C<IP_TOS> socket option.
-  
-  =head2 MSG_BCAST, MSG_OOB, MSG_TRUNC, ...
-  
-  Message flag constants for send() and recv().
-  
-  =head2 SHUT_RD, SHUT_RDWR, SHUT_WR
-  
-  Direction constants for shutdown().
-  
-  =head2 INADDR_ANY, INADDR_BROADCAST, INADDR_LOOPBACK, INADDR_NONE
-  
-  Constants giving the special C<AF_INET> addresses for wildcard, broadcast,
-  local loopback, and invalid addresses.
-  
-  Normally equivalent to inet_aton('0.0.0.0'), inet_aton('255.255.255.255'),
-  inet_aton('localhost') and inet_aton('255.255.255.255') respectively.
-  
-  =head2 IPPROTO_IP, IPPROTO_IPV6, IPPROTO_TCP, ...
-  
-  IP protocol constants to use as the third argument to socket(), the level
-  argument to getsockopt() or setsockopt(), or the value of the C<SO_PROTOCOL>
-  socket option.
-  
-  =head2 TCP_CORK, TCP_KEEPALIVE, TCP_NODELAY, ...
-  
-  Socket option name constants for TCP socket options at the C<IPPROTO_TCP>
-  level.
-  
-  =head2 IN6ADDR_ANY, IN6ADDR_LOOPBACK
-  
-  Constants giving the special C<AF_INET6> addresses for wildcard and local
-  loopback.
-  
-  Normally equivalent to inet_pton(AF_INET6, "::") and
-  inet_pton(AF_INET6, "::1") respectively.
-  
-  =head2 IPV6_ADD_MEMBERSHIP, IPV6_MTU, IPV6_V6ONLY, ...
-  
-  Socket option name constants for IPv6 socket options at the C<IPPROTO_IPV6>
-  level.
-  
-  =cut
-  
-  # Still undocumented: SCM_*, SOMAXCONN, IOV_MAX, UIO_MAXIOV
-  
-  =head1 STRUCTURE MANIPULATORS
-  
-  The following functions convert between lists of Perl values and packed binary
-  strings representing structures.
-  
-  =cut
-  
-  =head2 $family = sockaddr_family $sockaddr
-  
-  Takes a packed socket address (as returned by pack_sockaddr_in(),
-  pack_sockaddr_un() or the perl builtin functions getsockname() and
-  getpeername()). Returns the address family tag. This will be one of the
-  C<AF_*> constants, such as C<AF_INET> for a C<sockaddr_in> addresses or
-  C<AF_UNIX> for a C<sockaddr_un>. It can be used to figure out what unpack to
-  use for a sockaddr of unknown type.
-  
-  =head2 $sockaddr = pack_sockaddr_in $port, $ip_address
-  
-  Takes two arguments, a port number and an opaque string (as returned by
-  inet_aton(), or a v-string). Returns the C<sockaddr_in> structure with those
-  arguments packed in and C<AF_INET> filled in. For Internet domain sockets,
-  this structure is normally what you need for the arguments in bind(),
-  connect(), and send().
-  
-  An undefined $port argument is taken as zero; an undefined $ip_address is
-  considered a fatal error.
-  
-  =head2 ($port, $ip_address) = unpack_sockaddr_in $sockaddr
-  
-  Takes a C<sockaddr_in> structure (as returned by pack_sockaddr_in(),
-  getpeername() or recv()). Returns a list of two elements: the port and an
-  opaque string representing the IP address (you can use inet_ntoa() to convert
-  the address to the four-dotted numeric format). Will croak if the structure
-  does not represent an C<AF_INET> address.
-  
-  In scalar context will return just the IP address.
-  
-  =head2 $sockaddr = sockaddr_in $port, $ip_address
-  
-  =head2 ($port, $ip_address) = sockaddr_in $sockaddr
-  
-  A wrapper of pack_sockaddr_in() or unpack_sockaddr_in(). In list context,
-  unpacks its argument and returns a list consisting of the port and IP address.
-  In scalar context, packs its port and IP address arguments as a C<sockaddr_in>
-  and returns it.
-  
-  Provided largely for legacy compatibility; it is better to use
-  pack_sockaddr_in() or unpack_sockaddr_in() explicitly.
-  
-  =head2 $sockaddr = pack_sockaddr_in6 $port, $ip6_address, [$scope_id, [$flowinfo]]
-  
-  Takes two to four arguments, a port number, an opaque string (as returned by
-  inet_pton()), optionally a scope ID number, and optionally a flow label
-  number. Returns the C<sockaddr_in6> structure with those arguments packed in
-  and C<AF_INET6> filled in. IPv6 equivalent of pack_sockaddr_in().
-  
-  An undefined $port argument is taken as zero; an undefined $ip6_address is
-  considered a fatal error.
-  
-  =head2 ($port, $ip6_address, $scope_id, $flowinfo) = unpack_sockaddr_in6 $sockaddr
-  
-  Takes a C<sockaddr_in6> structure. Returns a list of four elements: the port
-  number, an opaque string representing the IPv6 address, the scope ID, and the
-  flow label. (You can use inet_ntop() to convert the address to the usual
-  string format). Will croak if the structure does not represent an C<AF_INET6>
-  address.
-  
-  In scalar context will return just the IP address.
-  
-  =head2 $sockaddr = sockaddr_in6 $port, $ip6_address, [$scope_id, [$flowinfo]]
-  
-  =head2 ($port, $ip6_address, $scope_id, $flowinfo) = sockaddr_in6 $sockaddr
-  
-  A wrapper of pack_sockaddr_in6() or unpack_sockaddr_in6(). In list context,
-  unpacks its argument according to unpack_sockaddr_in6(). In scalar context,
-  packs its arguments according to pack_sockaddr_in6().
-  
-  Provided largely for legacy compatibility; it is better to use
-  pack_sockaddr_in6() or unpack_sockaddr_in6() explicitly.
-  
-  =head2 $sockaddr = pack_sockaddr_un $path
-  
-  Takes one argument, a pathname. Returns the C<sockaddr_un> structure with that
-  path packed in with C<AF_UNIX> filled in. For C<PF_UNIX> sockets, this
-  structure is normally what you need for the arguments in bind(), connect(),
-  and send().
-  
-  =head2 ($path) = unpack_sockaddr_un $sockaddr
-  
-  Takes a C<sockaddr_un> structure (as returned by pack_sockaddr_un(),
-  getpeername() or recv()). Returns a list of one element: the pathname. Will
-  croak if the structure does not represent an C<AF_UNIX> address.
-  
-  =head2 $sockaddr = sockaddr_un $path
-  
-  =head2 ($path) = sockaddr_un $sockaddr
-  
-  A wrapper of pack_sockaddr_un() or unpack_sockaddr_un(). In a list context,
-  unpacks its argument and returns a list consisting of the pathname. In a
-  scalar context, packs its pathname as a C<sockaddr_un> and returns it.
-  
-  Provided largely for legacy compatibility; it is better to use
-  pack_sockaddr_un() or unpack_sockaddr_un() explicitly.
-  
-  These are only supported if your system has E<lt>F<sys/un.h>E<gt>.
-  
-  =head2 $ip_mreq = pack_ip_mreq $multiaddr, $interface
-  
-  Takes an IPv4 multicast address and optionally an interface address (or
-  C<INADDR_ANY>). Returns the C<ip_mreq> structure with those arguments packed
-  in. Suitable for use with the C<IP_ADD_MEMBERSHIP> and C<IP_DROP_MEMBERSHIP>
-  sockopts.
-  
-  =head2 ($multiaddr, $interface) = unpack_ip_mreq $ip_mreq
-  
-  Takes an C<ip_mreq> structure. Returns a list of two elements; the IPv4
-  multicast address and interface address.
-  
-  =head2 $ip_mreq_source = pack_ip_mreq_source $multiaddr, $source, $interface
-  
-  Takes an IPv4 multicast address, source address, and optionally an interface
-  address (or C<INADDR_ANY>). Returns the C<ip_mreq_source> structure with those
-  arguments packed in. Suitable for use with the C<IP_ADD_SOURCE_MEMBERSHIP>
-  and C<IP_DROP_SOURCE_MEMBERSHIP> sockopts.
-  
-  =head2 ($multiaddr, $source, $interface) = unpack_ip_mreq_source $ip_mreq
-  
-  Takes an C<ip_mreq_source> structure. Returns a list of three elements; the
-  IPv4 multicast address, source address and interface address.
-  
-  =head2 $ipv6_mreq = pack_ipv6_mreq $multiaddr6, $ifindex
-  
-  Takes an IPv6 multicast address and an interface number. Returns the
-  C<ipv6_mreq> structure with those arguments packed in. Suitable for use with
-  the C<IPV6_ADD_MEMBERSHIP> and C<IPV6_DROP_MEMBERSHIP> sockopts.
-  
-  =head2 ($multiaddr6, $ifindex) = unpack_ipv6_mreq $ipv6_mreq
-  
-  Takes an C<ipv6_mreq> structure. Returns a list of two elements; the IPv6
-  address and an interface number.
-  
-  =cut
-  
-  =head1 FUNCTIONS
-  
-  =cut
-  
-  =head2 $ip_address = inet_aton $string
-  
-  Takes a string giving the name of a host, or a textual representation of an IP
-  address and translates that to an packed binary address structure suitable to
-  pass to pack_sockaddr_in(). If passed a hostname that cannot be resolved,
-  returns C<undef>. For multi-homed hosts (hosts with more than one address),
-  the first address found is returned.
-  
-  For portability do not assume that the result of inet_aton() is 32 bits wide,
-  in other words, that it would contain only the IPv4 address in network order.
-  
-  This IPv4-only function is provided largely for legacy reasons. Newly-written
-  code should use getaddrinfo() or inet_pton() instead for IPv6 support.
-  
-  =head2 $string = inet_ntoa $ip_address
-  
-  Takes a packed binary address structure such as returned by
-  unpack_sockaddr_in() (or a v-string representing the four octets of the IPv4
-  address in network order) and translates it into a string of the form
-  C<d.d.d.d> where the C<d>s are numbers less than 256 (the normal
-  human-readable four dotted number notation for Internet addresses).
-  
-  This IPv4-only function is provided largely for legacy reasons. Newly-written
-  code should use getnameinfo() or inet_ntop() instead for IPv6 support.
-  
-  =head2 $address = inet_pton $family, $string
-  
-  Takes an address family (such as C<AF_INET> or C<AF_INET6>) and a string
-  containing a textual representation of an address in that family and
-  translates that to an packed binary address structure.
-  
-  See also getaddrinfo() for a more powerful and flexible function to look up
-  socket addresses given hostnames or textual addresses.
-  
-  =head2 $string = inet_ntop $family, $address
-  
-  Takes an address family and a packed binary address structure and translates
-  it into a human-readable textual representation of the address; typically in
-  C<d.d.d.d> form for C<AF_INET> or C<hhhh:hhhh::hhhh> form for C<AF_INET6>.
-  
-  See also getnameinfo() for a more powerful and flexible function to turn
-  socket addresses into human-readable textual representations.
-  
-  =head2 ($err, @result) = getaddrinfo $host, $service, [$hints]
-  
-  Given both a hostname and service name, this function attempts to resolve the
-  host name into a list of network addresses, and the service name into a
-  protocol and port number, and then returns a list of address structures
-  suitable to connect() to it.
-  
-  Given just a host name, this function attempts to resolve it to a list of
-  network addresses, and then returns a list of address structures giving these
-  addresses.
-  
-  Given just a service name, this function attempts to resolve it to a protocol
-  and port number, and then returns a list of address structures that represent
-  it suitable to bind() to. This use should be combined with the C<AI_PASSIVE>
-  flag; see below.
-  
-  Given neither name, it generates an error.
-  
-  If present, $hints should be a reference to a hash, where the following keys
-  are recognised:
-  
-  =over 4
-  
-  =item flags => INT
-  
-  A bitfield containing C<AI_*> constants; see below.
-  
-  =item family => INT
-  
-  Restrict to only generating addresses in this address family
-  
-  =item socktype => INT
-  
-  Restrict to only generating addresses of this socket type
-  
-  =item protocol => INT
-  
-  Restrict to only generating addresses for this protocol
-  
-  =back
-  
-  The return value will be a list; the first value being an error indication,
-  followed by a list of address structures (if no error occurred).
-  
-  The error value will be a dualvar; comparable to the C<EAI_*> error constants,
-  or printable as a human-readable error message string. If no error occurred it
-  will be zero numerically and an empty string.
-  
-  Each value in the results list will be a hash reference containing the following
-  fields:
-  
-  =over 4
-  
-  =item family => INT
-  
-  The address family (e.g. C<AF_INET>)
-  
-  =item socktype => INT
-  
-  The socket type (e.g. C<SOCK_STREAM>)
-  
-  =item protocol => INT
-  
-  The protocol (e.g. C<IPPROTO_TCP>)
-  
-  =item addr => STRING
-  
-  The address in a packed string (such as would be returned by
-  pack_sockaddr_in())
-  
-  =item canonname => STRING
-  
-  The canonical name for the host if the C<AI_CANONNAME> flag was provided, or
-  C<undef> otherwise. This field will only be present on the first returned
-  address.
-  
-  =back
-  
-  The following flag constants are recognised in the $hints hash. Other flag
-  constants may exist as provided by the OS.
-  
-  =over 4
-  
-  =item AI_PASSIVE
-  
-  Indicates that this resolution is for a local bind() for a passive (i.e.
-  listening) socket, rather than an active (i.e. connecting) socket.
-  
-  =item AI_CANONNAME
-  
-  Indicates that the caller wishes the canonical hostname (C<canonname>) field
-  of the result to be filled in.
-  
-  =item AI_NUMERICHOST
-  
-  Indicates that the caller will pass a numeric address, rather than a hostname,
-  and that getaddrinfo() must not perform a resolve operation on this name. This
-  flag will prevent a possibly-slow network lookup operation, and instead return
-  an error if a hostname is passed.
-  
-  =back
-  
-  =head2 ($err, $hostname, $servicename) = getnameinfo $sockaddr, [$flags, [$xflags]]
-  
-  Given a packed socket address (such as from getsockname(), getpeername(), or
-  returned by getaddrinfo() in a C<addr> field), returns the hostname and
-  symbolic service name it represents. $flags may be a bitmask of C<NI_*>
-  constants, or defaults to 0 if unspecified.
-  
-  The return value will be a list; the first value being an error condition,
-  followed by the hostname and service name.
-  
-  The error value will be a dualvar; comparable to the C<EAI_*> error constants,
-  or printable as a human-readable error message string. The host and service
-  names will be plain strings.
-  
-  The following flag constants are recognised as $flags. Other flag constants may
-  exist as provided by the OS.
-  
-  =over 4
-  
-  =item NI_NUMERICHOST
-  
-  Requests that a human-readable string representation of the numeric address be
-  returned directly, rather than performing a name resolve operation that may
-  convert it into a hostname. This will also avoid potentially-blocking network
-  IO.
-  
-  =item NI_NUMERICSERV
-  
-  Requests that the port number be returned directly as a number representation
-  rather than performing a name resolve operation that may convert it into a
-  service name.
-  
-  =item NI_NAMEREQD
-  
-  If a name resolve operation fails to provide a name, then this flag will cause
-  getnameinfo() to indicate an error, rather than returning the numeric
-  representation as a human-readable string.
-  
-  =item NI_DGRAM
-  
-  Indicates that the socket address relates to a C<SOCK_DGRAM> socket, for the
-  services whose name differs between TCP and UDP protocols.
-  
-  =back
-  
-  The following constants may be supplied as $xflags.
-  
-  =over 4
-  
-  =item NIx_NOHOST
-  
-  Indicates that the caller is not interested in the hostname of the result, so
-  it does not have to be converted. C<undef> will be returned as the hostname.
-  
-  =item NIx_NOSERV
-  
-  Indicates that the caller is not interested in the service name of the result,
-  so it does not have to be converted. C<undef> will be returned as the service
-  name.
-  
-  =back
-  
-  =head1 getaddrinfo() / getnameinfo() ERROR CONSTANTS
-  
-  The following constants may be returned by getaddrinfo() or getnameinfo().
-  Others may be provided by the OS.
-  
-  =over 4
-  
-  =item EAI_AGAIN
-  
-  A temporary failure occurred during name resolution. The operation may be
-  successful if it is retried later.
-  
-  =item EAI_BADFLAGS
-  
-  The value of the C<flags> hint to getaddrinfo(), or the $flags parameter to
-  getnameinfo() contains unrecognised flags.
-  
-  =item EAI_FAMILY
-  
-  The C<family> hint to getaddrinfo(), or the family of the socket address
-  passed to getnameinfo() is not supported.
-  
-  =item EAI_NODATA
-  
-  The host name supplied to getaddrinfo() did not provide any usable address
-  data.
-  
-  =item EAI_NONAME
-  
-  The host name supplied to getaddrinfo() does not exist, or the address
-  supplied to getnameinfo() is not associated with a host name and the
-  C<NI_NAMEREQD> flag was supplied.
-  
-  =item EAI_SERVICE
-  
-  The service name supplied to getaddrinfo() is not available for the socket
-  type given in the $hints.
-  
-  =back
-  
-  =cut
-  
-  =head1 EXAMPLES
-  
-  =head2 Lookup for connect()
-  
-  The getaddrinfo() function converts a hostname and a service name into a list
-  of structures, each containing a potential way to connect() to the named
-  service on the named host.
-  
-   use IO::Socket;
-   use Socket qw(SOCK_STREAM getaddrinfo);
-  
-   my %hints = (socktype => SOCK_STREAM);
-   my ($err, @res) = getaddrinfo("localhost", "echo", \%hints);
-   die "Cannot getaddrinfo - $err" if $err;
-  
-   my $sock;
-  
-   foreach my $ai (@res) {
-       my $candidate = IO::Socket->new();
-  
-       $candidate->socket($ai->{family}, $ai->{socktype}, $ai->{protocol})
-           or next;
-  
-       $candidate->connect($ai->{addr})
-           or next;
-  
-       $sock = $candidate;
-       last;
-   }
-  
-   die "Cannot connect to localhost:echo" unless $sock;
-  
-   $sock->print("Hello, world!\n");
-   print <$sock>;
-  
-  Because a list of potential candidates is returned, the C<while> loop tries
-  each in turn until it finds one that succeeds both the socket() and connect()
-  calls.
-  
-  This function performs the work of the legacy functions gethostbyname(),
-  getservbyname(), inet_aton() and pack_sockaddr_in().
-  
-  In practice this logic is better performed by L<IO::Socket::IP>.
-  
-  =head2 Making a human-readable string out of an address
-  
-  The getnameinfo() function converts a socket address, such as returned by
-  getsockname() or getpeername(), into a pair of human-readable strings
-  representing the address and service name.
-  
-   use IO::Socket::IP;
-   use Socket qw(getnameinfo);
-  
-   my $server = IO::Socket::IP->new(LocalPort => 12345, Listen => 1) or
-       die "Cannot listen - $@";
-  
-   my $socket = $server->accept or die "accept: $!";
-  
-   my ($err, $hostname, $servicename) = getnameinfo($socket->peername);
-   die "Cannot getnameinfo - $err" if $err;
-  
-   print "The peer is connected from $hostname\n";
-  
-  Since in this example only the hostname was used, the redundant conversion of
-  the port number into a service name may be omitted by passing the
-  C<NIx_NOSERV> flag.
-  
-   use Socket qw(getnameinfo NIx_NOSERV);
-  
-   my ($err, $hostname) = getnameinfo($socket->peername, 0, NIx_NOSERV);
-  
-  This function performs the work of the legacy functions unpack_sockaddr_in(),
-  inet_ntoa(), gethostbyaddr() and getservbyport().
-  
-  In practice this logic is better performed by L<IO::Socket::IP>.
-  
-  =head2 Resolving hostnames into IP addresses
-  
-  To turn a hostname into a human-readable plain IP address use getaddrinfo()
-  to turn the hostname into a list of socket structures, then getnameinfo() on
-  each one to make it a readable IP address again.
-  
-   use Socket qw(:addrinfo SOCK_RAW);
-  
-   my ($err, @res) = getaddrinfo($hostname, "", {socktype => SOCK_RAW});
-   die "Cannot getaddrinfo - $err" if $err;
-  
-   while( my $ai = shift @res ) {
-       my ($err, $ipaddr) = getnameinfo($ai->{addr}, NI_NUMERICHOST, NIx_NOSERV);
-       die "Cannot getnameinfo - $err" if $err;
-  
-       print "$ipaddr\n";
-   }
-  
-  The C<socktype> hint to getaddrinfo() filters the results to only include one
-  socket type and protocol. Without this most OSes return three combinations,
-  for C<SOCK_STREAM>, C<SOCK_DGRAM> and C<SOCK_RAW>, resulting in triplicate
-  output of addresses. The C<NI_NUMERICHOST> flag to getnameinfo() causes it to
-  return a string-formatted plain IP address, rather than reverse resolving it
-  back into a hostname.
-  
-  This combination performs the work of the legacy functions gethostbyname()
-  and inet_ntoa().
-  
-  =head2 Accessing socket options
-  
-  The many C<SO_*> and other constants provide the socket option names for
-  getsockopt() and setsockopt().
-  
-   use IO::Socket::INET;
-   use Socket qw(SOL_SOCKET SO_RCVBUF IPPROTO_IP IP_TTL);
-  
-   my $socket = IO::Socket::INET->new(LocalPort => 0, Proto => 'udp')
-       or die "Cannot create socket: $@";
-  
-   $socket->setsockopt(SOL_SOCKET, SO_RCVBUF, 64*1024) or
-       die "setsockopt: $!";
-  
-   print "Receive buffer is ", $socket->getsockopt(SOL_SOCKET, SO_RCVBUF),
-       " bytes\n";
-  
-   print "IP TTL is ", $socket->getsockopt(IPPROTO_IP, IP_TTL), "\n";
-  
-  As a convenience, L<IO::Socket>'s setsockopt() method will convert a number
-  into a packed byte buffer, and getsockopt() will unpack a byte buffer of the
-  correct size back into a number.
-  
-  =cut
-  
-  =head1 AUTHOR
-  
-  This module was originally maintained in Perl core by the Perl 5 Porters.
-  
-  It was extracted to dual-life on CPAN at version 1.95 by
-  Paul Evans <leonerd@leonerd.org.uk>
-  
-  =cut
-  
-  use Carp;
-  use warnings::register;
-  
-  require Exporter;
-  require XSLoader;
-  our @ISA = qw(Exporter);
-  
-  # <@Nicholas> you can't change @EXPORT without breaking the implicit API
-  # Please put any new constants in @EXPORT_OK!
-  
-  # List re-ordered to match documentation above. Try to keep the ordering
-  # consistent so it's easier to see which ones are or aren't documented.
-  our @EXPORT = qw(
-  	PF_802 PF_AAL PF_APPLETALK PF_CCITT PF_CHAOS PF_CTF PF_DATAKIT
-  	PF_DECnet PF_DLI PF_ECMA PF_GOSIP PF_HYLINK PF_IMPLINK PF_INET PF_INET6
-  	PF_ISO PF_KEY PF_LAST PF_LAT PF_LINK PF_MAX PF_NBS PF_NIT PF_NS PF_OSI
-  	PF_OSINET PF_PUP PF_ROUTE PF_SNA PF_UNIX PF_UNSPEC PF_USER PF_WAN
-  	PF_X25
-  
-  	AF_802 AF_AAL AF_APPLETALK AF_CCITT AF_CHAOS AF_CTF AF_DATAKIT
-  	AF_DECnet AF_DLI AF_ECMA AF_GOSIP AF_HYLINK AF_IMPLINK AF_INET AF_INET6
-  	AF_ISO AF_KEY AF_LAST AF_LAT AF_LINK AF_MAX AF_NBS AF_NIT AF_NS AF_OSI
-  	AF_OSINET AF_PUP AF_ROUTE AF_SNA AF_UNIX AF_UNSPEC AF_USER AF_WAN
-  	AF_X25
-  
-  	SOCK_DGRAM SOCK_RAW SOCK_RDM SOCK_SEQPACKET SOCK_STREAM
-  
-  	SOL_SOCKET
-  
-  	SO_ACCEPTCONN SO_ATTACH_FILTER SO_BACKLOG SO_BROADCAST SO_CHAMELEON
-  	SO_DEBUG SO_DETACH_FILTER SO_DGRAM_ERRIND SO_DOMAIN SO_DONTLINGER
-  	SO_DONTROUTE SO_ERROR SO_FAMILY SO_KEEPALIVE SO_LINGER SO_OOBINLINE
-  	SO_PASSCRED SO_PASSIFNAME SO_PEERCRED SO_PROTOCOL SO_PROTOTYPE
-  	SO_RCVBUF SO_RCVLOWAT SO_RCVTIMEO SO_REUSEADDR SO_REUSEPORT
-  	SO_SECURITY_AUTHENTICATION SO_SECURITY_ENCRYPTION_NETWORK
-  	SO_SECURITY_ENCRYPTION_TRANSPORT SO_SNDBUF SO_SNDLOWAT SO_SNDTIMEO
-  	SO_STATE SO_TYPE SO_USELOOPBACK SO_XOPEN SO_XSE
-  
-  	IP_HDRINCL IP_OPTIONS IP_RECVOPTS IP_RECVRETOPTS IP_RETOPTS IP_TOS
-  	IP_TTL
-  
-  	MSG_BCAST MSG_BTAG MSG_CTLFLAGS MSG_CTLIGNORE MSG_CTRUNC MSG_DONTROUTE
-  	MSG_DONTWAIT MSG_EOF MSG_EOR MSG_ERRQUEUE MSG_ETAG MSG_FASTOPEN MSG_FIN
-  	MSG_MAXIOVLEN MSG_MCAST MSG_NOSIGNAL MSG_OOB MSG_PEEK MSG_PROXY MSG_RST
-  	MSG_SYN MSG_TRUNC MSG_URG MSG_WAITALL MSG_WIRE
-  
-  	SHUT_RD SHUT_RDWR SHUT_WR
-  
-  	INADDR_ANY INADDR_BROADCAST INADDR_LOOPBACK INADDR_NONE
-  
-  	SCM_CONNECT SCM_CREDENTIALS SCM_CREDS SCM_RIGHTS SCM_TIMESTAMP
-  
-  	SOMAXCONN
-  
-  	IOV_MAX
-  	UIO_MAXIOV
-  
-  	sockaddr_family
-  	pack_sockaddr_in  unpack_sockaddr_in  sockaddr_in
-  	pack_sockaddr_in6 unpack_sockaddr_in6 sockaddr_in6
-  	pack_sockaddr_un  unpack_sockaddr_un  sockaddr_un 
-  
-  	inet_aton inet_ntoa
-  );
-  
-  # List re-ordered to match documentation above. Try to keep the ordering
-  # consistent so it's easier to see which ones are or aren't documented.
-  our @EXPORT_OK = qw(
-  	CR LF CRLF $CR $LF $CRLF
-  
-  	SOCK_NONBLOCK SOCK_CLOEXEC
-  
-  	IP_ADD_MEMBERSHIP IP_ADD_SOURCE_MEMBERSHIP IP_BIND_ADDRESS_NO_PORT
-  	IP_DROP_MEMBERSHIP IP_DROP_SOURCE_MEMBERSHIP IP_FREEBIND
-  	IP_MULTICAST_ALL IP_MULTICAST_IF IP_MULTICAST_LOOP IP_MULTICAST_TTL
-  	IP_MTU IP_MTU_DISCOVER IP_NODEFRAG IP_RECVERR IP_TRANSPARENT
-  
-  	IPPROTO_IP IPPROTO_IPV6 IPPROTO_RAW IPPROTO_ICMP IPPROTO_IGMP
-  	IPPROTO_TCP IPPROTO_UDP IPPROTO_GRE IPPROTO_ESP IPPROTO_AH
-  	IPPROTO_ICMPV6 IPPROTO_SCTP
-  
-  	IP_PMTUDISC_DO IP_PMTUDISC_DONT IP_PMTUDISC_PROBE IP_PMTUDISC_WANT
-  
-  	IPTOS_LOWDELAY IPTOS_THROUGHPUT IPTOS_RELIABILITY IPTOS_MINCOST
-  
-  	TCP_CONGESTION TCP_CONNECTIONTIMEOUT TCP_CORK TCP_DEFER_ACCEPT
-  	TCP_FASTOPEN TCP_INFO TCP_INIT_CWND TCP_KEEPALIVE TCP_KEEPCNT
-  	TCP_KEEPIDLE TCP_KEEPINTVL TCP_LINGER2 TCP_MAXRT TCP_MAXSEG
-  	TCP_MD5SIG TCP_NODELAY TCP_NOOPT TCP_NOPUSH TCP_QUICKACK
-  	TCP_SACK_ENABLE TCP_STDURG TCP_SYNCNT TCP_USER_TIMEOUT
-  	TCP_WINDOW_CLAMP
-  
-  	IN6ADDR_ANY IN6ADDR_LOOPBACK
-  
-  	IPV6_ADDRFROM IPV6_ADD_MEMBERSHIP IPV6_DROP_MEMBERSHIP IPV6_JOIN_GROUP
-  	IPV6_LEAVE_GROUP IPV6_MTU IPV6_MTU_DISCOVER IPV6_MULTICAST_HOPS
-  	IPV6_MULTICAST_IF IPV6_MULTICAST_LOOP IPV6_RECVERR IPV6_ROUTER_ALERT
-  	IPV6_UNICAST_HOPS IPV6_V6ONLY
-  
-  	SO_LOCK_FILTER SO_RCVBUFFORCE SO_SNDBUFFORCE
-  
-  	pack_ip_mreq unpack_ip_mreq pack_ip_mreq_source unpack_ip_mreq_source
-  
-  	pack_ipv6_mreq unpack_ipv6_mreq
-  
-  	inet_pton inet_ntop
-  
-  	getaddrinfo getnameinfo
-  
-  	AI_ADDRCONFIG AI_ALL AI_CANONIDN AI_CANONNAME AI_IDN
-  	AI_IDN_ALLOW_UNASSIGNED AI_IDN_USE_STD3_ASCII_RULES AI_NUMERICHOST
-  	AI_NUMERICSERV AI_PASSIVE AI_V4MAPPED
-  
-  	NI_DGRAM NI_IDN NI_IDN_ALLOW_UNASSIGNED NI_IDN_USE_STD3_ASCII_RULES
-  	NI_NAMEREQD NI_NOFQDN NI_NUMERICHOST NI_NUMERICSERV
-  
-  	NIx_NOHOST NIx_NOSERV
-  
-  	EAI_ADDRFAMILY EAI_AGAIN EAI_BADFLAGS EAI_BADHINTS EAI_FAIL EAI_FAMILY
-  	EAI_NODATA EAI_NONAME EAI_PROTOCOL EAI_SERVICE EAI_SOCKTYPE EAI_SYSTEM
-  );
-  
-  our %EXPORT_TAGS = (
-      crlf     => [qw(CR LF CRLF $CR $LF $CRLF)],
-      addrinfo => [qw(getaddrinfo getnameinfo), grep m/^(?:AI|NI|NIx|EAI)_/, @EXPORT_OK],
-      all      => [@EXPORT, @EXPORT_OK],
-  );
-  
-  BEGIN {
-      sub CR   () {"\015"}
-      sub LF   () {"\012"}
-      sub CRLF () {"\015\012"}
-  
-      # These are not gni() constants; they're extensions for the perl API
-      # The definitions in Socket.pm and Socket.xs must match
-      sub NIx_NOHOST() {1 << 0}
-      sub NIx_NOSERV() {1 << 1}
-  }
-  
-  *CR   = \CR();
-  *LF   = \LF();
-  *CRLF = \CRLF();
-  
-  sub sockaddr_in {
-      if (@_ == 6 && !wantarray) { # perl5.001m compat; use this && die
-  	my($af, $port, @quad) = @_;
-  	warnings::warn "6-ARG sockaddr_in call is deprecated" 
-  	    if warnings::enabled();
-  	pack_sockaddr_in($port, inet_aton(join('.', @quad)));
-      } elsif (wantarray) {
-  	croak "usage:   (port,iaddr) = sockaddr_in(sin_sv)" unless @_ == 1;
-          unpack_sockaddr_in(@_);
-      } else {
-  	croak "usage:   sin_sv = sockaddr_in(port,iaddr))" unless @_ == 2;
-          pack_sockaddr_in(@_);
-      }
-  }
-  
-  sub sockaddr_in6 {
-      if (wantarray) {
-  	croak "usage:   (port,in6addr,scope_id,flowinfo) = sockaddr_in6(sin6_sv)" unless @_ == 1;
-  	unpack_sockaddr_in6(@_);
-      }
-      else {
-  	croak "usage:   sin6_sv = sockaddr_in6(port,in6addr,[scope_id,[flowinfo]])" unless @_ >= 2 and @_ <= 4;
-  	pack_sockaddr_in6(@_);
-      }
-  }
-  
-  sub sockaddr_un {
-      if (wantarray) {
-  	croak "usage:   (filename) = sockaddr_un(sun_sv)" unless @_ == 1;
-          unpack_sockaddr_un(@_);
-      } else {
-  	croak "usage:   sun_sv = sockaddr_un(filename)" unless @_ == 1;
-          pack_sockaddr_un(@_);
-      }
-  }
-  
-  XSLoader::load(__PACKAGE__, $VERSION);
-  
-  my %errstr;
-  
-  if( defined &getaddrinfo ) {
-      # These are not part of the API, nothing uses them, and deleting them
-      # reduces the size of %Socket:: by about 12K
-      delete $Socket::{fake_getaddrinfo};
-      delete $Socket::{fake_getnameinfo};
-  } else {
-      require Scalar::Util;
-  
-      *getaddrinfo = \&fake_getaddrinfo;
-      *getnameinfo = \&fake_getnameinfo;
-  
-      # These numbers borrowed from GNU libc's implementation, but since
-      # they're only used by our emulation, it doesn't matter if the real
-      # platform's values differ
-      my %constants = (
-  	AI_PASSIVE     => 1,
-  	AI_CANONNAME   => 2,
-  	AI_NUMERICHOST => 4,
-  	AI_V4MAPPED    => 8,
-  	AI_ALL         => 16,
-  	AI_ADDRCONFIG  => 32,
-  	# RFC 2553 doesn't define this but Linux does - lets be nice and
-  	# provide it since we can
-  	AI_NUMERICSERV => 1024,
-  
-  	EAI_BADFLAGS   => -1,
-  	EAI_NONAME     => -2,
-  	EAI_NODATA     => -5,
-  	EAI_FAMILY     => -6,
-  	EAI_SERVICE    => -8,
-  
-  	NI_NUMERICHOST => 1,
-  	NI_NUMERICSERV => 2,
-  	NI_NOFQDN      => 4,
-  	NI_NAMEREQD    => 8,
-  	NI_DGRAM       => 16,
-  
-  	# Constants we don't support. Export them, but croak if anyone tries to
-  	# use them
-  	AI_IDN                      => 64,
-  	AI_CANONIDN                 => 128,
-  	AI_IDN_ALLOW_UNASSIGNED     => 256,
-  	AI_IDN_USE_STD3_ASCII_RULES => 512,
-  	NI_IDN                      => 32,
-  	NI_IDN_ALLOW_UNASSIGNED     => 64,
-  	NI_IDN_USE_STD3_ASCII_RULES => 128,
-  
-  	# Error constants we'll never return, so it doesn't matter what value
-  	# these have, nor that we don't provide strings for them
-  	EAI_SYSTEM   => -11,
-  	EAI_BADHINTS => -1000,
-  	EAI_PROTOCOL => -1001
-      );
-  
-      foreach my $name ( keys %constants ) {
-  	my $value = $constants{$name};
-  
-  	no strict 'refs';
-  	defined &$name or *$name = sub () { $value };
-      }
-  
-      %errstr = (
-  	# These strings from RFC 2553
-  	EAI_BADFLAGS()   => "invalid value for ai_flags",
-  	EAI_NONAME()     => "nodename nor servname provided, or not known",
-  	EAI_NODATA()     => "no address associated with nodename",
-  	EAI_FAMILY()     => "ai_family not supported",
-  	EAI_SERVICE()    => "servname not supported for ai_socktype",
-      );
-  }
-  
-  # The following functions are used if the system does not have a
-  # getaddrinfo(3) function in libc; and are used to emulate it for the AF_INET
-  # family
-  
-  # Borrowed from Regexp::Common::net
-  my $REGEXP_IPv4_DECIMAL = qr/25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}/;
-  my $REGEXP_IPv4_DOTTEDQUAD = qr/$REGEXP_IPv4_DECIMAL\.$REGEXP_IPv4_DECIMAL\.$REGEXP_IPv4_DECIMAL\.$REGEXP_IPv4_DECIMAL/;
-  
-  sub fake_makeerr
-  {
-      my ( $errno ) = @_;
-      my $errstr = $errno == 0 ? "" : ( $errstr{$errno} || $errno );
-      return Scalar::Util::dualvar( $errno, $errstr );
-  }
-  
-  sub fake_getaddrinfo
-  {
-      my ( $node, $service, $hints ) = @_;
-  
-      $node = "" unless defined $node;
-  
-      $service = "" unless defined $service;
-  
-      my ( $family, $socktype, $protocol, $flags ) = @$hints{qw( family socktype protocol flags )};
-  
-      $family ||= Socket::AF_INET(); # 0 == AF_UNSPEC, which we want too
-      $family == Socket::AF_INET() or return fake_makeerr( EAI_FAMILY() );
-  
-      $socktype ||= 0;
-  
-      $protocol ||= 0;
-  
-      $flags ||= 0;
-  
-      my $flag_passive     = $flags & AI_PASSIVE();     $flags &= ~AI_PASSIVE();
-      my $flag_canonname   = $flags & AI_CANONNAME();   $flags &= ~AI_CANONNAME();
-      my $flag_numerichost = $flags & AI_NUMERICHOST(); $flags &= ~AI_NUMERICHOST();
-      my $flag_numericserv = $flags & AI_NUMERICSERV(); $flags &= ~AI_NUMERICSERV();
-  
-      # These constants don't apply to AF_INET-only lookups, so we might as well
-      # just ignore them. For AI_ADDRCONFIG we just presume the host has ability
-      # to talk AF_INET. If not we'd have to return no addresses at all. :)
-      $flags &= ~(AI_V4MAPPED()|AI_ALL()|AI_ADDRCONFIG());
-  
-      $flags & (AI_IDN()|AI_CANONIDN()|AI_IDN_ALLOW_UNASSIGNED()|AI_IDN_USE_STD3_ASCII_RULES()) and
-  	croak "Socket::getaddrinfo() does not support IDN";
-  
-      $flags == 0 or return fake_makeerr( EAI_BADFLAGS() );
-  
-      $node eq "" and $service eq "" and return fake_makeerr( EAI_NONAME() );
-  
-      my $canonname;
-      my @addrs;
-      if( $node ne "" ) {
-  	return fake_makeerr( EAI_NONAME() ) if( $flag_numerichost and $node !~ m/^$REGEXP_IPv4_DOTTEDQUAD$/ );
-  	( $canonname, undef, undef, undef, @addrs ) = gethostbyname( $node );
-  	defined $canonname or return fake_makeerr( EAI_NONAME() );
-  
-  	undef $canonname unless $flag_canonname;
-      }
-      else {
-  	$addrs[0] = $flag_passive ? Socket::inet_aton( "0.0.0.0" )
-  				  : Socket::inet_aton( "127.0.0.1" );
-      }
-  
-      my @ports; # Actually ARRAYrefs of [ socktype, protocol, port ]
-      my $protname = "";
-      if( $protocol ) {
-  	$protname = eval { getprotobynumber( $protocol ) };
-      }
-  
-      if( $service ne "" and $service !~ m/^\d+$/ ) {
-  	return fake_makeerr( EAI_NONAME() ) if( $flag_numericserv );
-  	getservbyname( $service, $protname ) or return fake_makeerr( EAI_SERVICE() );
-      }
-  
-      foreach my $this_socktype ( Socket::SOCK_STREAM(), Socket::SOCK_DGRAM(), Socket::SOCK_RAW() ) {
-  	next if $socktype and $this_socktype != $socktype;
-  
-  	my $this_protname = "raw";
-  	$this_socktype == Socket::SOCK_STREAM() and $this_protname = "tcp";
-  	$this_socktype == Socket::SOCK_DGRAM()  and $this_protname = "udp";
-  
-  	next if $protname and $this_protname ne $protname;
-  
-  	my $port;
-  	if( $service ne "" ) {
-  	    if( $service =~ m/^\d+$/ ) {
-  		$port = "$service";
-  	    }
-  	    else {
-  		( undef, undef, $port, $this_protname ) = getservbyname( $service, $this_protname );
-  		next unless defined $port;
-  	    }
-  	}
-  	else {
-  	    $port = 0;
-  	}
-  
-  	push @ports, [ $this_socktype, eval { scalar getprotobyname( $this_protname ) } || 0, $port ];
-      }
-  
-      my @ret;
-      foreach my $addr ( @addrs ) {
-  	foreach my $portspec ( @ports ) {
-  	    my ( $socktype, $protocol, $port ) = @$portspec;
-  	    push @ret, {
-  		family    => $family,
-  		socktype  => $socktype,
-  		protocol  => $protocol,
-  		addr      => Socket::pack_sockaddr_in( $port, $addr ),
-  		canonname => undef,
-  	    };
-  	}
-      }
-  
-      # Only supply canonname for the first result
-      if( defined $canonname ) {
-  	$ret[0]->{canonname} = $canonname;
-      }
-  
-      return ( fake_makeerr( 0 ), @ret );
-  }
-  
-  sub fake_getnameinfo
-  {
-      my ( $addr, $flags, $xflags ) = @_;
-  
-      my ( $port, $inetaddr );
-      eval { ( $port, $inetaddr ) = Socket::unpack_sockaddr_in( $addr ) }
-  	or return fake_makeerr( EAI_FAMILY() );
-  
-      my $family = Socket::AF_INET();
-  
-      $flags ||= 0;
-  
-      my $flag_numerichost = $flags & NI_NUMERICHOST(); $flags &= ~NI_NUMERICHOST();
-      my $flag_numericserv = $flags & NI_NUMERICSERV(); $flags &= ~NI_NUMERICSERV();
-      my $flag_nofqdn      = $flags & NI_NOFQDN();      $flags &= ~NI_NOFQDN();
-      my $flag_namereqd    = $flags & NI_NAMEREQD();    $flags &= ~NI_NAMEREQD();
-      my $flag_dgram       = $flags & NI_DGRAM()   ;    $flags &= ~NI_DGRAM();
-  
-      $flags & (NI_IDN()|NI_IDN_ALLOW_UNASSIGNED()|NI_IDN_USE_STD3_ASCII_RULES()) and
-  	croak "Socket::getnameinfo() does not support IDN";
-  
-      $flags == 0 or return fake_makeerr( EAI_BADFLAGS() );
-  
-      $xflags ||= 0;
-  
-      my $node;
-      if( $xflags & NIx_NOHOST ) {
-  	$node = undef;
-      }
-      elsif( $flag_numerichost ) {
-  	$node = Socket::inet_ntoa( $inetaddr );
-      }
-      else {
-  	$node = gethostbyaddr( $inetaddr, $family );
-  	if( !defined $node ) {
-  	    return fake_makeerr( EAI_NONAME() ) if $flag_namereqd;
-  	    $node = Socket::inet_ntoa( $inetaddr );
-  	}
-  	elsif( $flag_nofqdn ) {
-  	    my ( $shortname ) = split m/\./, $node;
-  	    my ( $fqdn ) = gethostbyname $shortname;
-  	    $node = $shortname if defined $fqdn and $fqdn eq $node;
-  	}
-      }
-  
-      my $service;
-      if( $xflags & NIx_NOSERV ) {
-  	$service = undef;
-      }
-      elsif( $flag_numericserv ) {
-  	$service = "$port";
-      }
-      else {
-  	my $protname = $flag_dgram ? "udp" : "";
-  	$service = getservbyport( $port, $protname );
-  	if( !defined $service ) {
-  	    $service = "$port";
-  	}
-      }
-  
-      return ( fake_makeerr( 0 ), $node, $service );
-  }
-  
-  1;
-X86_64-LINUX_SOCKET
-
 $fatpacked{"x86_64-linux/Sub/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'X86_64-LINUX_SUB_UTIL';
   # Copyright (c) 2014 Paul Evans <leonerd@leonerd.org.uk>. All rights reserved.
   # This program is free software; you can redistribute it and/or
@@ -49553,7 +56901,7 @@ $fatpacked{"x86_64-linux/Sub/Util.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"
     subname set_subname
   );
   
-  our $VERSION    = "1.49";
+  our $VERSION    = "1.47";
   $VERSION   = eval $VERSION;
   
   require List::Util; # as it has the XS
@@ -49702,7 +57050,7 @@ $fatpacked{"x86_64-linux/common/sense.pm"} = '#line '.(1+__LINE__).' "'.__FILE__
      ${^WARNING_BITS} ^= ${^WARNING_BITS} ^ "\x0c\x3f\x33\x00\x0f\xf0\x0f\xc0\xf0\xfc\x33\x00\x00\x00\xc0";
      # use strict, use utf8; use feature;
      $^H |= 0x1c820fc0;
-     @^H{qw(feature_evalbytes feature___SUB__ feature_unicode feature_state feature_switch feature_say feature_fc)} = (1) x 7;
+     @^H{qw(feature_say feature_fc feature___SUB__ feature_evalbytes feature_switch feature_unicode feature_state)} = (1) x 7;
   }
   
   1
@@ -49846,7 +57194,6 @@ EOC
     if ( $registry =~ /hub.docker.com/ ) {
       my $dockerfile = get "$registry/dockerfile";
       ok( $dockerfile, "Se descarga correctamente el URL del Dockerfile $registry/dockerfile" );
-      ok( $dockerfile =~ /Dockerfile/, "La página $registry/dockerfile es un Dockerfile efectivamente");
     } elsif ( $registry =~ /github.com/ ) {
       my $dockerfile = get $registry;
       ok( $dockerfile, "Se descarga correctamente el URL $registry" );
