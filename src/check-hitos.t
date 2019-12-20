@@ -92,7 +92,7 @@ EOC
     isnt( grep( /Dockerfile/, @repo_files), 0, "Dockerfile presente" );
     # Comprobaciones sobre el Dockerfile
     my $dockerfile_content =   read_text( "$repo_dir/Dockerfile");
-    ok( $dockerfile_content !~ /COPY \./, "Se deben copiar sólo los ficheros necesarios para la construcción" );
+    ok( $dockerfile_content !~ /COPY \.\s+/, "Se deben copiar sólo los ficheros necesarios para la construcción" );
 
     # Comprobación del registry
     my ($registry) = ($README =~ m{(?:Contenedor:)\s+(\S+)\s+});
