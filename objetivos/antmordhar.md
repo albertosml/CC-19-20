@@ -44,3 +44,11 @@
 - [X] Documentación de los archivos usados
 - [X] Tests significativos y/o avance del proyecto en sí más allá de lo básico.
 - [X] Ejercicios tema 3 [EjerciciosTema 3](https://github.com/antmordhar/EjerciciosCC/blob/master/Hito3/EjerciciosHito3.md)
+
+## Objetivos del Hito 4
+
+- [X] Crear el resto de servicios
+- [X] Agregar la base de datos
+- [X] Realizar una conexión rest entre los servicios.
+- [X] Comunicar los servicios en contenedores docker.
+- [X] Hacer la Documentación [Documentación](https://github.com/antmordhar/ProyectoCC/blob/master/README.md)
