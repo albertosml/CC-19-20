@@ -70,25 +70,57 @@
 
 ## Objetivos Semana 6
 
+[Enlace a los ejercicios del tema Desarrollo basado en pruebas](https://github.com/toniMR/CC-Ejercicios/blob/master/contenedores.md)
+
 - [X] Entender las arquitecturas de software en la nube de uso en la actualidad.
 - [X] Comprender el papel fundamental de la infraestructura virtual en este proceso.
 - [X] Entender en qué consisten los servicios web y cómo desplegarlos en la nube
 - [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
 - [X] Entender problemas en el hito 1.
 - [X] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
-- [ ] Instalar las herramientas de línea de órdenes de las herramientas cloud.
-- [ ] Hacerse con alguna cuenta gratuita o bonificada de cloud.
+- [X] Instalar las herramientas de línea de órdenes de las herramientas cloud.
+- [X] Hacerse con alguna cuenta gratuita o bonificada de cloud.
 - [X] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
 
 ## Objetivos Semana 7
 
-- [ ] Entender las arquitecturas de software en la nube de uso en la actualidad.
-- [ ] Comprender el papel fundamental de la infraestructura virtual en este proceso.
-- [ ] Entender en qué consiste los servicios web y cómo desplegarlos en la nube
-- [ ] Comprender el tipo de aplicaciones que se despliegan en la nube.
-- [ ] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
-- [ ] Darse de alta en servicios PaaS como zeit.co y Heroku.
-- [ ] Conocer las diferentes ofertas de PaaS en la nube.
-- [ ] Instalar las herramientas de línea de órdenes de las herramientas cloud.
-- [ ] Hacerse con alguna cuenta gratuita o bonificada de cloud.
-- [ ] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
+- [X] Entender las arquitecturas de software en la nube de uso en la actualidad.
+- [X] Comprender el papel fundamental de la infraestructura virtual en este proceso.
+- [X] Entender en qué consiste los servicios web y cómo desplegarlos en la nube
+- [X] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [X] Tener manejo básico de los lenguajes usados en herramientas de provisionamiento, Python y Ruby.
+- [X] Darse de alta en servicios PaaS como zeit.co y Heroku.
+- [X] Conocer las diferentes ofertas de PaaS en la nube.
+- [X] Instalar las herramientas de línea de órdenes de las herramientas cloud.
+- [X] Hacerse con alguna cuenta gratuita o bonificada de cloud.
+- [X] Aprender la mínimo de los lenguajes necesarios para trabajar en la nube: Perl, Python y Ruby.
+
+## Objetivos Semana 8
+
+- [X] Entender la configuración de infraestructura virtual desde contenedores.
+- [X] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
+
+## Objetivos Semana 9
+
+- [X] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
+
+## Objetivos Semana 10
+
+- [X] Repasar conceptos de microservicios.
+- [X] Repasar conecptos de contenedores.
+
+## Objetivos Semana 11
+
+- [ ] Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas virtuales.
+- [ ] Conocer diferentes lugares donde haya imágenes de sistemas operativos listas para usar.
+- [ ] Instalar y configurar diferentes sistemas de provisionamiento.
+- [ ] Entender los conceptos de los sistemas de máquinas virtuales y cómo configurarlos desde línea de órdenes.
+- [ ] Entender las nociones básicas de seguridad.
+
+## Objetivos Semana 12
+
+- [ ] Entender los recursos para automatización de actividades en la nube.
+- [ ] Entender el concepto de infraestructura definida por software.
+- [ ] Entender el concepto de sistema completo y cómo arrancarlo.
+- [ ] Resumen de los errores vistos en el seminario la semana anterior.
+- [ ] Tener listas instalaciones que funcionen de ansible (u otro sistema de medición de prestaciones), vagrant, herramienta de línea de órdenes de Azure o Google.
