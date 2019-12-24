@@ -96,3 +96,17 @@
 - [x] Comprender y programar la construcción automática del contenedor en *Docker Hub* y *Heroku*.
 - [x] Subir de nuevo el hito 3.
 - [x] Hacer los ejercicios de contenedores.
+
+## Objetivos del hito 4.
+
+[Repositorio de ejercicios.](https://github.com/lidiasm/EjerciciosCC.git).
+
+#### Undécima semana.
+
+- [x] Comprender el funcionamiento y el modo de uso de *ab*.
+- [x] Comprender la importancia de realizar *benchmarks* de calidad.
+- [x] Comprender la configuración que se debe de establecer en el servidor para realizar las mediciones.
+
+#### Duodécima semana.
+
+- [x] Comenzar a trabajar sobre el hito 4 y entregarlo.
