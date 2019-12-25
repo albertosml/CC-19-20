@@ -40,7 +40,6 @@
 
 ## Objetivos del hito 3
 
-[Ejercicios microservicios](https://github.com/mati3/Ejercicios-CC/blob/master/Microservicios.md)
 [Ejercicios contenedores](https://github.com/mati3/Ejercicios-CC/blob/master/Contenedores_y_como_usarlos.md)
 
 - [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
@@ -55,3 +54,16 @@
 - [x] Subir el contenedor a un registro.
 - [x] Desplegar el microservicio usando Heroku.
 - [x] Avanzar en el segundo microservicio.
+
+## Objetivos del hito 4
+
+[Ejercicios microservicios](https://github.com/mati3/Ejercicios-CC/blob/master/Microservicios.md)
+
+- [x] Limpiar Readme y poner enlaces.
+- [x] Levantar mi segundo microservicio.
+- [X] Desacoplar el modelo del sistema real.
+- [x] Usar una base de datos para mi segundo microservicio.
+- [x] Automatizar el despliegue del microservicio.
+- [x] Generar los test correspondientes al microservicio.
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+- [x] Extender el nivel de prestaciones de los microservicios, de forma que sean capaces de alcanzar un nivel aproximado de 1000 peticiones por segundo.
