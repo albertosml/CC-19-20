@@ -55,3 +55,10 @@
 - [X] Entender la configuración de infraestructura virtual desde contenedores.
 - [X] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
 - [X] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
+
+# Objetivos Hito 4
+[Enlace al repositorio de mis ejercicios](https://github.com/ibe16/CC-19-20-Ejercicios)
+
+- [X] Extender los microservicios con el almacenamiento de datos que se haya elegido para ellos.
+- [X] Extender el nivel de prestaciones de los microservicios, de forma que sean capaces de alcanzar un nivel aproximado de 1000 peticiones por segundo.
+- [X] Corregir los errores del hito anterior
