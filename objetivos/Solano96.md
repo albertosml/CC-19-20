@@ -45,6 +45,8 @@ Enlace a los [ejercicios del tema 2](https://github.com/Solano96/CC-Exercises/bl
 
 ## Objetivos del hito 3
 
+Enlace a los [ejercicios de contenedores](https://github.com/Solano96/CC-Exercises/blob/master/Contenedores.md) de Cloud Computing.
+
 - [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
 - [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
 - [x] Comprender el tipo de aplicaciones que se despliegan en la nube.
