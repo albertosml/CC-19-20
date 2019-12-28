@@ -122,3 +122,19 @@
 **Otros objetivos**
 
 * [x] Revisar errores frecuentes en la entrega retrasada
+
+### Semana 11, 9 de Diciembre
+
+**Objetivos a cubrir esta semana**
+* [x] Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas virtuales.
+* [x] Conocer diferentes lugares donde haya imágenes de sistemas operativos listas para usar. [hub.docker.com](https://hub.docker.com/)
+* [] Instalar y configurar diferentes sistemas de provisionamiento.
+* [x] Entender los conceptos de los sistemas de máquinas virtuales y cómo configurarlos desde línea de órdenes.
+* [x] Entender las nociones básicas de seguridad.
+ 
+**Otros objetivos**
+* [x] Entender los errores de la entrega del hito 3.
+* [x] Instalarse los diferentes clientes de líneas de órdenes de los sistemas en la nube a los que se tenga acceso.
+
+
+
