@@ -54,3 +54,17 @@ Otros objetivos
 - [x] Darse de alta en CircleCI para llevar a cabo integración/despliegue continuo.
 - [x] Familiarizarse con marcos de pruebas (como pytest) para el lenguaje en el que se esté desarrollando la aplicación.
 - [x] Terminar el hito 2.
+
+## Objetivos hito 3
+
+- [ ] Realizar los ejercicios del tema 3. [Ejercicios tema 3](https://github.com/NSInductus/CC_Ejercicios/blob/master/microservicios.md)
+- [x] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
+- [x] Repasar criterios para notas en primera y segunda corrección, así como criterios para evaluar originalidad.
+- [x] Instalación de la herramienta postman.
+- [x] Repasar conceptos referentes a la API REST.
+- [x] Darme de alta en DockerHub y en Heroku, así como linkar mis nuevas cuentas con la cuenta de GitHub.
+- [x] Familiarizarme con DockerHub, así como con las imágenes.
+- [x] Repasar conceptos de microservicio y contenedor.
+- [x] Dejar una versión mínima del README, de tal forma que se centre en los contenidos del hito actual.
+- [x] Entender las nociones básicas de seguridad.
+- [x] Terminar el hito 3.
