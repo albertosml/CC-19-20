@@ -42,3 +42,15 @@ Enlace a los [ejercicios del tema 2](https://github.com/Solano96/CC-Exercises/bl
 - [x] Entender qué son los sistemas de integración continua y cómo usarlos.
 - [x] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
 - [x] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
+
+## Objetivos del hito 3
+
+- [x] Entender la arquitectura en capas de los microservicios usados en despliegues modernos.
+- [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
+- [x] Comprender el tipo de aplicaciones que se despliegan en la nube.
+- [x] Entender el papel de los contenedores en la infraestructura virtual.
+- [x] Comprender los procesos de definición de contenedores.
+- [x] Alta en Docker Hub, así como instalación de las herramientas de Docker.
+- [x] Entender la configuración de infraestructura virtual desde contenedores.
+- [x] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
+- [x] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
