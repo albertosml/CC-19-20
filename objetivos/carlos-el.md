@@ -91,3 +91,11 @@ Vernos las caras.
 - [x] Revisar errores frecuentes en la entrega retrasada
 - [x] Dejar en el directorio principal sólo herramientas de construcción y ficheros de configuración.
 - [x] Investigar sobre herramientas medidas numéricas de prestaciones como Taurus y [como usarlas](https://www.blazemeter.com/blog/how-execute-load-test-using-taurus-docker-image/) de manera correcta.
+- [x] Aprender a usar Taurus de manera adecuada enviando [distintos tipos de peticiones](https://gettaurus.org/docs/JMeter/#HTTP-Requests).
+
+- [ ] Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas virtuales.
+- [x] Conocer diferentes lugares donde haya imágenes de sistemas operativos listas para usar.
+- [ ] Instalar y configurar diferentes sistemas de provisionamiento.
+- [x] Entender los conceptos de los sistemas de máquinas virtuales y cómo configurarlos desde línea de órdenes.
+- [x] Entender las nociones básicas de seguridad.
+
