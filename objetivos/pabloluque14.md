@@ -3,7 +3,7 @@
 El repositorio de los ejercicios para la asignatura Cloud Computing es: [este](https://github.com/pabloluque14/CC_Ejercicios).
 
 ## Hito 0
-
+- [] Realizar ejercicios del tema 1 [enlace](https://github.com/pabloluque14/CC_Ejercicios/blob/master/ejercicios_tema1.md).
 - [x] Entender la metodología docente, de evaluación y de interacción de la asignatura.
 - [x] Darse de alta y comprender el funcionamiento básico de git y GitHub y el grupo de Telegram de la asignatura; conocer y entender el resto de los recursos de la asignatura.
 - [x] Entender el concepto de software libre y su aplicación práctica en clase.
@@ -29,6 +29,7 @@ El repositorio de los ejercicios para la asignatura Cloud Computing es: [este](h
 - [x] Entender que las arquitecturas basadas en microservicios necesitan servicios adicionales como Logs, Configuración Remota y Almacen de datos.
 
 ## Hito 1
+- [] Realizar ejercicios del tema 2 [enlace](https://github.com/pabloluque14/CC_Ejercicios/blob/master/ejercicios_tema2.md)..
 - [x] Entender concepto infraestructura como código.
 - [x] Entender concepto infraestructura virtual.
 - [x] Entender las claves del desarrollo basado en pruebas.
@@ -36,6 +37,7 @@ El repositorio de los ejercicios para la asignatura Cloud Computing es: [este](h
 - [x] Entregar el hito 1.
 
 ## Hito 2
+- [] Realizar ejercicios del tema 3 [enlace](https://github.com/pabloluque14/CC_Ejercicios/blob/master/ejercicios_tema3.md)..
 - [x] Comprender el TDD.
 - [x] Darse de alta en plataformas que permitan llevar a cabo integración/despliegue continuo.
 - [x] Familiarizarse con marcos de pruebas para el lenguaje en el que se esté desarrollando la aplicación.
