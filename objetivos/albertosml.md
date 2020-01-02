@@ -51,3 +51,13 @@ proyecto.
 - [x] Configurar una REST API para ambos microservicios.
 - [x] Empaquetar los microservicios para su despliegue en la nube.
 - [x] Aprender a usar [Heroku](https://www.heroku.com/) y [DockerHub](https://hub.docker.com/).
+
+### Hito 4
+
+- [x] Entender el concepto de SLA (service level agreement)
+- [x] Entender que es un nivel aceptable de prestaciones
+- [x] Diseñar un almacen de datos eficiente, que ayude a atender más peticiones por segundo
+- [x] Aprender buenas prácticas sobre el uso de conexiones de datos.
+- [x] Fomentar el uso de la caché a todos los niveles
+- [x] Separar la generacion de los datos y su servicio
+- [x] Testear las prestaciones
