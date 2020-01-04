@@ -144,3 +144,22 @@
 - [x] El uso de .dockerignore no excusa que copiéis solo lo necesario.
 - [x] Liberar lo no necesario
 - [x] Material adicional, colocar en un directorio aparte.
+
+## Undécima semana
+
+- [x] Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas virtuales.
+- [x] Conocer diferentes lugares donde haya imágenes de sistemas operativos listas para usar.
+- [x] Instalar y configurar diferentes sistemas de provisionamiento.
+- [x] Entender las nociones básicas de seguridad.
+- [x] Entender los conceptos de los sistemas de máquinas virtuales y cómo configurarlos desde línea de órdenes.
+
+- [x] Comprender la configuración que se debe de establecer en el servidor para realizar las mediciones.
+
+## Duodecima semana
+
+- [x] Entender los recursos para automatización de actividades en la nube
+- [x] Entender el concepto de infraestructura definida por software.
+- [x] Entender el concepto de sistema completo y cómo arrancarlo.
+- [x] Comenzar a trabajar sobre el hito 4 y entregarlo.
+
+- [ ] [Ejercicios ](https://github.com/natalia2911/Ejercicios-CloudComputing/)
