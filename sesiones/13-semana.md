@@ -12,6 +12,10 @@ dudas sobre la entrega de los hitos 4 y 5 y otros hitos que queden pendientes.
 
 1. (Jueves 9 de enero) Entender los errores del hito 4.
    1. Las llamadas en un API REST no son subrutinas o funciones, son métodos de un objeto que tiene que estar explícitamente referido en la ruta. No se hace newObjeto, se hace PUT objeto, no se hace searchObjeto sino objeto/search. Todas las rutas son métodos de un objeto principal que se representa mediante la raíz de una ruta. Eso permite que, se creen métodos específicos por ruta, o incluso que desde un API gateway se usen diferentes servicios para diferentes rutas.
+   2. En este hito se trataba de hacer mejoras para conseguir el grado de prestaciones adecuado.
+	   1. Se debe mantener el diseño de la clase, usando si acaso inyección de dependencias (lo que se puntúa). No se puede "tirar la clase" y acceder directamente a la BD (entre otras cosas no va a haber mucha mejora).
+	   2. Se debería enlazar el issue o commits que se hayan usado para esos cambios, de forma que se vea que se han hecho efectivamente. Si no, se ve sólo el resultado final.
+	   3. Se olvida totalmente el hito antrior, donde se probaban diferentes imágenes base. Nadie usa diferentes imágenes base para mejorar las prestaciones.
 
 
 ## Material para esta semana
