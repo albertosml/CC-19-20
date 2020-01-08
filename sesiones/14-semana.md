@@ -14,3 +14,6 @@
 
 ## Material para esta semana
 
+Si es necesario, se repasa el
+[tema sobre aprovisionamiento](http://jj.github.io/CC/documentos/temas/Provision.html) y entrega el 
+[quinto hito](http://jj.github.io/CC/documentos/proyecto/5.Provisionamiento)  o su revisión.
