@@ -1,5 +1,6 @@
 # Décimo cuarta semana, comienza el 20 de enero.
 
+Última semana del curso.
 
 ## Objetivos de la asignatura
 
@@ -9,9 +10,7 @@
 ## Objetivos adicionales
 
 1. Análisis post-mortem del último hito.
+2. Decidir fecha de presentación del proyecto (sólo a los que hayan entregado todos los hitos).
 
 ## Material para esta semana
 
-## Siguiente semana
-
-[Semana 15](15-semana.md)

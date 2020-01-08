@@ -5,13 +5,14 @@ dudas sobre la entrega de los hitos 4 y 5 y otros hitos que queden pendientes.
 
 ## Objetivos de la asignatura
 
-1. Entender la medición de prestaciones
+1. Entender los conceptos medición de prestaciones
 2. Entender los conceptos detrás del provisionamiento de una máquina virtual o contenedor.
+3. Entender las diferentes fases de despliegue de una aplicación.
 
 ## Objetivos adicionales
 
 1. Recomendaciones:
-   1. [Script para taurus de carlos-el](https://github.com/carlos-el/EventPost-CCProject/blob/master/tests/performance/performance_testing.yml).
+   1. [Script para Taurus de carlos-el](https://github.com/carlos-el/EventPost-CCProject/blob/master/tests/performance/performance_testing.yml).
    2. [Inyección de dependencias de alvarillo89](https://github.com/alvarillo89/UGR-CC-Project/blob/master/docs/mongo.md).
 1. (Jueves 9 de enero) Entender los errores del hito 4.
    1. Las llamadas en un API REST no son subrutinas o funciones, son métodos de un objeto que tiene que estar explícitamente referido en la ruta. No se hace newObjeto, se hace PUT objeto, no se hace searchObjeto sino objeto/search. Todas las rutas son métodos de un objeto principal que se representa mediante la raíz de una ruta. Eso permite que, se creen métodos específicos por ruta, o incluso que desde un API gateway se usen diferentes servicios para diferentes rutas. 
@@ -22,7 +23,8 @@ dudas sobre la entrega de los hitos 4 y 5 y otros hitos que queden pendientes.
 	   3. Se olvida totalmente el hito antrior, donde se probaban diferentes imágenes base. Nadie usa diferentes imágenes base para mejorar las prestaciones.
 	   4. Dependiendo del escenario, usar una caché es más bien trampa. Si simplemente haces peticiones a los URLs que ya están en la caché, realmente no estás mejorando nada "en el mundo real". Tu escenario debe incluir una cantidad aceptable de peticiones que no estén en la caché.
    3. (Casi) nadie configura acceso a datos con inversión de dependencias.
-   
+3. Probar diferentes sistemas de aprovisionamiento, especialmente Ansible y Chef. 
+
 ## Material para esta semana
 
 Se terminan los objetivos
