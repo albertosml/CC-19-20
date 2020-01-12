@@ -67,4 +67,14 @@
 
 * [x] Dejar en el README del proyecto sólo información de la entrega hito 4.
 * [x] Aplicar herramientas de medición de prestaciones como Taurus [Ejecución inicial:](https://github.com/rodrigo-orellana/Ejercicios_CC/blob/master/taurus.md).  
+
+# Objetivos del hito 5  
+
+* [x] Entender el concepto de orquestación de máquinas virtuales.  
+* [x] Entender el concepto de despliegue.  
+* [x] Conocer los sistemas de gestión de la configuración, provisionamiento y monitorización más usados hoy en día.  
+* [x] Aprender lenguajes de configuración usados en infraestructuras virtuales.  
+* [x] Decidir qué infraestructura va a usar la aplicación que eventualmente desplegaremos.  
+
+
 ***
