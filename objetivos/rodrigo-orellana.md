@@ -70,7 +70,7 @@
 
 # Objetivos del hito 5  
 
-* [x] Entender el concepto de orquestación de máquinas virtuales.  
+* [x] Entender el concepto de orquestación de máquinas virtuales. [Ejercicios:](https://github.com/rodrigo-orellana/Ejercicios_CC/blob/master/provision.md).  
 * [x] Entender el concepto de despliegue.  
 * [x] Conocer los sistemas de gestión de la configuración, provisionamiento y monitorización más usados hoy en día.  
 * [x] Aprender lenguajes de configuración usados en infraestructuras virtuales.  
