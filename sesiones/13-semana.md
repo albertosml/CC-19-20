@@ -23,15 +23,16 @@ dudas sobre la entrega de los hitos 4 y 5 y otros hitos que queden pendientes.
 	   3. Se olvida totalmente el hito antrior, donde se probaban diferentes imágenes base. Nadie usa diferentes imágenes base para mejorar las prestaciones.
 	   4. Dependiendo del escenario, usar una caché es más bien trampa. Si simplemente haces peticiones a los URLs que ya están en la caché, realmente no estás mejorando nada "en el mundo real". Tu escenario debe incluir una cantidad aceptable de peticiones que no estén en la caché.
    3. (Casi) nadie configura acceso a datos con inversión de dependencias.
-3. Probar diferentes sistemas de aprovisionamiento, especialmente Ansible y Chef. 
+3. Probar diferentes sistemas de aprovisionamiento, especialmente Ansible y Chef.
+4. Entender la *galaxia* de Ansible y en qué nos puede ayudar.
 
 ## Material para esta semana
 
 Se terminan los objetivos
 del
 [tema sobre aprovisionamiento](http://jj.github.io/CC/documentos/temas/Provision.html) y 
-se va preparando la entrega del 
-[quinto hito](http://jj.github.io/CC/documentos/proyecto/5.Provisionamiento) el **19 de enero**.
+se va preparando la entrega del [hito final](http://jj.github.io/CC/documentos/proyecto/5.Provisionamiento) el próximo domingo **19 de enero**.
+
 
 ## Siguiente semana
 

@@ -4,16 +4,14 @@
 
 ## Objetivos de la asignatura
 
-* Entender el concepto de orquestación de máquinas virtuales
-* Entender el concepto de despliegue.
+* Enviar los hitos que queden por enviar.
 
 ## Objetivos adicionales
 
-1. Análisis post-mortem del último hito.
-2. Decidir fecha de presentación del proyecto (sólo a los que hayan entregado todos los hitos).
+1. Análisis post-mortem del último hito, si da tiempo.
 
-## Material para esta semana
 
-Si es necesario, se repasa el
-[tema sobre aprovisionamiento](http://jj.github.io/CC/documentos/temas/Provision.html) y entrega el 
-[quinto hito](http://jj.github.io/CC/documentos/proyecto/5.Provisionamiento)  o su revisión.
+## Consideraciones adicionales
+
+Los que hayan entregado el último hito podrán hacer una presentación, para conseguir crédito adicional, el día que se haya planteado el examen. La fecha última de entrega de todos los hitos para la convocatoria ordinaria será una semana antes de la fecha que aparezca en el calendario para el examen.
+
