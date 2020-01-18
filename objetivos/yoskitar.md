@@ -197,3 +197,35 @@
    - [X] [No dar medidas numéricas de prestaciones](https://github.com/yoskitar/Cloud-Computing-CC/issues/53).
    - [X] [El uso de `.dockerignore` no excusa que copiéis solo lo necesario](https://github.com/yoskitar/Cloud-Computing-CC/issues/54).
 	- [X] [Dejar en el directorio principal sólo herramientas de construcción y ficheros de configuración](https://github.com/yoskitar/Cloud-Computing-CC/issues/57).
+
+## Objetivos del hito 4
+
+### Semana 10
+- [X] Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas
+  virtuales.
+
+- [X] Conocer diferentes lugares donde haya imágenes de sistemas operativos listas para usar.
+
+- [] Instalar y configurar diferentes sistemas de provisionamiento.
+
+- [] Entender los conceptos de los sistemas de máquinas virtuales y cómo configurarlos desde línea de órdenes.
+- [] Entender las nociones básicas de seguridad.
+
+### Semana 11
+
+- [X] Entender los recursos para automatización de actividades en la nube.
+- [X] Entender el concepto de infraestructura definida por software.
+- [ ] Entender el concepto de sistema completo y cómo arrancarlo.
+
+## Otros objetivos del hito 4
+
+- [X] Entender los errores de la entrega del hito 3.
+   - [X] El README.md es del proyecto que estáis haciendo, con enlaces adicionales (y precisos) para corregir. Por favor, entenderlo así.
+   - [X] No quiero ni un loquesea login más, por favor.
+   - [X] [Hacer benchmarks cuantitativos está bien, hacerlos bien y de forma precisa está mejor.](https://github.com/yoskitar/Cloud-Computing-CC/issues/67)
+	   - [X] No basta bajarse un URL n veces, sino que hay que seguir una secuencia de POST/GET delete simultánea de varios clientes a la vez. 
+	 - [X] Si los resultados son sorprendentes, hay que revisar el proyecto. 
+	 - [X] No sé de donde habéis sacado lo de 10 y 1000, pero debéis entender lo que hacéis. Por ejemplo, si tenéis sólo una copia del servidor, no debéis lanzar 10 peticiones a la vez porque lo sobrecargáis. Usad un número de peticiones simultáneas y servidores similares.
+	 - [X] [Prácticamente nadie crea usuarios dentro del contenedor. Aunque no es imprescincible, es una buena práctica que conviene seguir.](https://github.com/yoskitar/Cloud-Computing-CC/blob/master/Dockerfile)
+	- [X] Los commits deben siempre, salvo en casos excepcionales, referirse a un issue. Los issues no están para cerrarlos y pasar el test. 
+- [ ] Instalarse los diferentes clientes de líneas de órdenes de los sistemas en la nube a los que se tenga acceso.
