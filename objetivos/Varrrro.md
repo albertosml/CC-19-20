@@ -63,3 +63,12 @@
 - [X] Entender la configuración de infraestructura virtual desde contenedores.
 - [X] Comprender cómo esta configuración forma parte de arquitecturas nativas en la nube.
 - [X] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
+
+# Hito 4
+
+[Ejercicios del tema 4](https://github.com/Varrrro/EjerciciosCC-19-20/blob/master/Ejercicios_Tema4.md)
+
+- [X] Entender los conceptos de medición de prestaciones.
+- [X] Entender el concepto de sistema completo y cómo arrancarlo.
+- [X] Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas virtuales.
+- [X] Conocer diferentes lugares donde haya imágenes de sistemas operativos listas para usar.
