@@ -56,7 +56,9 @@ Repositorio de ejercicios: [Ejercicios CC](https://github.com/iMiguel10/Ejercici
 - [x] [Teminar la implementación de los microservicios.](https://github.com/iMiguel10/Proyecto-CC/tree/master/src)
 - [x] [Mejorar las prestaciones del servicio web.](https://github.com/iMiguel10/Proyecto-CC/blob/master/doc/prestaciones.md)
 ---
-<!--
-# Objetivos hito 5
 
--->
+# Objetivos hito 5
+- [x] Entender los conceptos detrás del provisionamiento de una máquina virtual o contenedor.
+- [x] Entender las diferentes fases de despliegue de una aplicación.
+- [] Probar diferentes sistemas de aprovisionamiento, especialmente Ansible y Chef.
+- [x] [Entender la galaxia de Ansible y en qué nos puede ayudar.](https://github.com/iMiguel10/Proyecto-CC/blob/master/provision/create_db.yml)
