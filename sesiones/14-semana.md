@@ -6,8 +6,12 @@
 
 * Enviar los hitos que queden por enviar.
 
+
 ## Objetivos adicionales
 
+1. Rellenar las encuestas finales de evaluación.
+1. Errores comunes en el hito 3
+   1. Ciclos POST-GET-DELETE.
 1. Análisis post-mortem del último hito, si da tiempo.
 
 
