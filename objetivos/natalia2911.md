@@ -162,4 +162,11 @@
 - [x] Entender el concepto de sistema completo y cómo arrancarlo.
 - [x] Comenzar a trabajar sobre el hito 4 y entregarlo.
 
-- [ ] [Ejercicios ](https://github.com/natalia2911/Ejercicios-CloudComputing/)
+## Décimo tercera semana
+
+- [x] Entender los conceptos medición de prestaciones
+- [x] Entender los conceptos detrás del provisionamiento de una máquina virtual o contenedor.
+- [x] Entender las diferentes fases de despliegue de una aplicación.
+- [x] Arreglar errores sobre la inyección de dependencias y diferenciación por capas.
+
+- [ ] [Ejercicios ](https://github.com/natalia2911/Ejercicios-CloudComputing/) 
