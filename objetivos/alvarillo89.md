@@ -122,7 +122,7 @@
 - [X] Entender los recursos para automatización de actividades en la nube
 - [X] Entender el concepto de infraestructura definida por software.
 - [X] Entender el concepto de sistema completo y cómo arrancarlo.
-- [ ] Tener listas instalaciones que funcionen de ansible (u otro sistema de medición de prestaciones), vagrant, herramienta de línea de órdenes de Azure o Google.
+- [X] Tener listas instalaciones que funcionen de ansible (u otro sistema de medición de prestaciones), vagrant, herramienta de línea de órdenes de Azure o Google.
 
 #### Objetivos del Hito 4:
 
@@ -130,3 +130,36 @@
 - [X] Extender el nivel de prestaciones de los microservicios, de forma que sean capaces de alcanzar un nivel aproximado de 1000 peticiones por segundo.
 - [X] Entender el concepto de SLA, service level agreement.
 - [X] Entender qué es un nivel aceptable de prestaciones.
+
+# Hito 5
+
+[Enlace al repositorio de ejercicios.](https://github.com/alvarillo89/UGR-CC-Ejercicios)
+
+#### Décimo tercera semana:
+
+- [X] Entender los conceptos medición de prestaciones
+- [X] Entender los conceptos detrás del provisionamiento de una máquina virtual o contenedor.
+- [X] Entender las diferentes fases de despliegue de una aplicación.
+- [X] Probar Ansible.
+- [X] Entender la galaxia de Ansible y en qué nos puede ayudar.
+
+#### Décimo cuarta semana:
+
+- [X] Entender los errores comunes del hito de medición de prestaciones: ciclo POST, GET, DELETE.
+
+#### Objetivos del tema de provisionamiento:
+
+- [X] Diseñar, construir y analizar las prestaciones de un centro de procesamiento de datos virtual.
+- [X] Documentar y mantener una plataforma virtual.
+- [X] Realizar tareas de administración en infraestructura virtual.
+- [X] Aprender lenguajes de configuración usados en infraestructuras virtuales.
+- [X] Saber cómo aplicarlos en un caso determinado.
+- [X] Conocer los sistemas de gestión de la configuración, provisionamiento y monitorización más usados hoy en día.
+
+#### Objetivos del hito 5:
+
+- [X] Entender cómo se especifica la infraestructura mediante código que, a su vez, debe estar estructurado.
+- [X] Disponer de una máquina virtual correctamente configurada.
+- [X] Decidir qué infraestructura va a usar la aplicación que eventualmente desplegaremos, desde las características que va a tener la máquina virtual, al sistema operativo y el lenguaje incluyendo la versión.
+- [X] Crear un sistema de recetas en el sistema de provisionamiento elegido y provisionarlo.
+- [X] Implementar completamente el segundo microservicio descrito en los primeros hitos de la asignatura.
