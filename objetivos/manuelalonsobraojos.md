@@ -136,5 +136,33 @@
 * [x] Entender los errores de la entrega del hito 3.
 * [x] Instalarse los diferentes clientes de líneas de órdenes de los sistemas en la nube a los que se tenga acceso.
 
+### Semana 12, 16 de Diciembre
 
+**Objetivos a cubrir esta semana**
+* [x] Entender los recursos para automatización de actividades en la nube
+* [x] Entender el concepto de infraestructura definida por software.
+* [x] Entender el concepto de sistema completo y cómo arrancarlo.
 
+**Objetivos adicionales**
+* [x] Tener listas instalaciones que funcionen de ansible (u otro sistema de medición de prestaciones), vagrant, herramienta de línea de órdenes de Azure o Google.
+
+### Semana 13, 8-13 de Enero
+
+**Objetivos a cubrir esta semana**
+* [x] Entender los conceptos medición de prestaciones
+* [x] Entender los conceptos detrás del provisionamiento de una máquina virtual o contenedor. [Conceptos](https://www.redhat.com/es/topics/virtualization/what-is-virtualization-management)
+* [x] Entender las diferentes fases de despliegue de una aplicación.
+
+**Objetivos adicionales**
+* [x] Probar diferentes sistemas de aprovisionamiento, especialmente Ansible.
+* [x] Entender los errores del hito 4.
+
+### Semana 14, 20 de Enero
+
+**Objetivos a cubrir esta semana**
+* [x] Enviar los hitos que queden por enviar.
+
+**Objetivos adicionales**
+* [] Rellenar las encuestas finales de evaluación.
+* [x] Errores comunes en el hito 3 Ciclos POST-GET-DELETE.
+* [] Análisis post-mortem del último hito, si da tiempo.
