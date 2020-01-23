@@ -110,3 +110,21 @@
 #### Duodécima semana.
 
 - [x] Comenzar a trabajar sobre el hito 4 y entregarlo.
+
+## Objetivos del hito 5.
+
+[Fichero con los ejercicios de provisionamiento de máquinas virtuales.](https://github.com/lidiasm/EjerciciosCC/blob/master/Ejercicios_ProvisionamientoVirtual.md)
+
+#### Décimo tercera semana.
+
+- [x] Entender los conceptos medición de prestaciones.
+- [x] Entender los conceptos detrás del provisionamiento de una máquina virtual o contenedor.
+- [x] Entender las diferentes fases de despliegue de una aplicación.
+- [x] Entender la galaxia de Ansible y en qué nos puede ayudar.
+- [x] Comenzar a trabajar sobre el hito 5.
+- [x] Obtener una cuenta de estudiante en Azure.
+
+#### Décimo cuarta semana.
+
+- [x] Entregar el hito 5.
+- [x] Hacer los ejercicios del tema de provisionamiento de máquinas virtuales.
