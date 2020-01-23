@@ -67,3 +67,16 @@
 - [x] Generar los test correspondientes al microservicio.
 - [x] Comprender el paper fundamental de la infraestructura virtual en este proceso.
 - [x] Extender el nivel de prestaciones de los microservicios, de forma que sean capaces de alcanzar un nivel aproximado de 1000 peticiones por segundo.
+
+
+## Objetivos del hito 5
+
+[Ejercicios microservicios](https://github.com/mati3/Ejercicios-CC/blob/master/Microservicios.md)
+
+- [x] Elegir donde vamos a hacer el despliegue del  proyecto.
+- [x] Hacer despliegue en local con VirtualBox.
+- [X] Hacer despliegue en la nube de Azure.
+- [x] Elegir maquina remota donde desplegar.
+- [x] Hacer provisión con ansible.
+- [x] Desplegar con Fabric.
+- [x] Automatizar todo en un script.
