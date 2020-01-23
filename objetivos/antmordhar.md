@@ -52,3 +52,10 @@
 - [X] Realizar una conexión rest entre los servicios.
 - [X] Comunicar los servicios en contenedores docker.
 - [X] Hacer la Documentación [Documentación](https://github.com/antmordhar/ProyectoCC/blob/master/README.md)
+
+## Objetivos del Hito 5
+
+- [X] Crear la maquina virtual
+- [X] Aprovisionar la maquina virtual
+- [X] Hacer los tests de carga
+- [X] Hacer la Documentación [Documentación](https://github.com/antmordhar/ProyectoCC/blob/master/README.md)
