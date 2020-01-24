@@ -111,16 +111,21 @@
 
 ## Objetivos Semana 11
 
-- [ ] Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas virtuales.
-- [ ] Conocer diferentes lugares donde haya imágenes de sistemas operativos listas para usar.
+- [X] Tener listos diferentes sistemas cloud donde se puedan desplegar máquinas virtuales.
+  - [X] [Azure](https://azure.microsoft.com/es-es/free/)
+  - [X] [Google Cloud](https://cloud.google.com/ )
+- [X] Conocer diferentes lugares donde haya imágenes de sistemas operativos listas para usar.
 - [ ] Instalar y configurar diferentes sistemas de provisionamiento.
 - [ ] Entender los conceptos de los sistemas de máquinas virtuales y cómo configurarlos desde línea de órdenes.
-- [ ] Entender las nociones básicas de seguridad.
+- [X] Entender las nociones básicas de seguridad.
 
 ## Objetivos Semana 12
 
-- [ ] Entender los recursos para automatización de actividades en la nube.
+- [X] Entender los recursos para automatización de actividades en la nube.
 - [ ] Entender el concepto de infraestructura definida por software.
 - [ ] Entender el concepto de sistema completo y cómo arrancarlo.
-- [ ] Resumen de los errores vistos en el seminario la semana anterior.
 - [ ] Tener listas instalaciones que funcionen de ansible (u otro sistema de medición de prestaciones), vagrant, herramienta de línea de órdenes de Azure o Google.
+
+## Objetivos Semana 13
+
+- [X] Entender los conceptos medición de prestaciones
