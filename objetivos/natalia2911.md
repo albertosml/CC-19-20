@@ -169,4 +169,12 @@
 - [x] Entender las diferentes fases de despliegue de una aplicación.
 - [x] Arreglar errores sobre la inyección de dependencias y diferenciación por capas.
 
+
+## Décimo cuarta semana
+
+- [x] Entregar hito 5
+- [x] Documentar y mantener una plataforma virtual.
+- [x] Entender tema de provisionamiento y despliegue.
+- [x] Entender cómo se especifica la infraestructura mediante código.
+
 - [ ] [Ejercicios ](https://github.com/natalia2911/Ejercicios-CloudComputing/) 
