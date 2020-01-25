@@ -176,5 +176,4 @@
 - [x] Documentar y mantener una plataforma virtual.
 - [x] Entender tema de provisionamiento y despliegue.
 - [x] Entender cómo se especifica la infraestructura mediante código.
-
-- [ ] [Ejercicios ](https://github.com/natalia2911/Ejercicios-CloudComputing/) 
+- [x] [Ejercicios de la asignatura](https://github.com/natalia2911/Ejercicios-CloudComputing/) 
