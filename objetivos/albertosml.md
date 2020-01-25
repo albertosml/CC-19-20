@@ -61,3 +61,11 @@ proyecto.
 - [x] Fomentar el uso de la caché a todos los niveles
 - [x] Separar la generacion de los datos y su servicio
 - [x] Testear las prestaciones
+
+### Hito 5
+
+- [x] Desplegar una aplicación en la nube con una instancia de máquina virtual.
+- [x] Aprender a elegir el sistema operativo adecuado para nuestra aplicación.
+- [x] Preparar la instancia con la infraestructura necesaria.
+- [x] Aprender a usar la herramienta Ansible.
+- [x] Saber crear ficheros de provisionamiento.
