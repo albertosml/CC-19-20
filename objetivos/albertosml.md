@@ -69,3 +69,4 @@ proyecto.
 - [x] Preparar la instancia con la infraestructura necesaria.
 - [x] Aprender a usar la herramienta Ansible.
 - [x] Saber crear ficheros de provisionamiento.
+- [x] Aprender a usar [Azure](https://azure.microsoft.com/en-us/)
