@@ -45,7 +45,7 @@ Las historias de usuario se pueden ver en el [fichero de documentación de histo
 
 ## Objetivos hito 2
 
-- [ ] Realizar los ejercicios del tema 2. [Ejercicios tema 2](https://github.com/NSInductus/CC_Ejercicios/blob/master/desarrollo_basado_en_pruebas.md)
+- [x] Realizar la mayoría de los ejercicios del tema 2. [Ejercicios tema 2](https://github.com/NSInductus/CC_Ejercicios/blob/master/desarrollo_basado_en_pruebas.md)
 - [x] Entender los conceptos de desarrollo basado en test y otros conceptos de calidad del software.
 - [x] Entender el concepto de herramientas de construcción y su importancia en la infraestructura virtual.
 - [x] Entender qué son los sistemas de integración continua y cómo usarlos.
@@ -57,7 +57,7 @@ Otros objetivos
 
 ## Objetivos hito 3
 
-- [ ] Realizar los ejercicios del tema 3. [Ejercicios tema 3](https://github.com/NSInductus/CC_Ejercicios/blob/master/microservicios.md)
+- [x] Realizar la mayoría de los ejercicios del tema 3. [Ejercicios tema 3](https://github.com/NSInductus/CC_Ejercicios/blob/master/microservicios.md)
 - [x] Entender el ecosistema de contenedores y diferentes alternativas a todas las aplicaciones.
 - [x] Repasar criterios para notas en primera y segunda corrección, así como criterios para evaluar originalidad.
 - [x] Instalación de la herramienta postman.
@@ -68,3 +68,14 @@ Otros objetivos
 - [x] Dejar una versión mínima del README, de tal forma que se centre en los contenidos del hito actual.
 - [x] Entender las nociones básicas de seguridad.
 - [x] Terminar el hito 3.
+
+
+## Objetivos hito 4
+
+- [x] Realizar la mayoría de los ejercicios del tema 4. [Ejercicios tema 4](https://github.com/NSInductus/CC_Ejercicios/blob/master/usando_contenedores.md)
+- [x] Aprender a utilizar Taurus.
+- [x] Aprender a utilizar MongoDB así como su versión remota MongoAtlas.
+- [x] Usar correctamente un data_manager.
+- [x] Comprender para que sirve la medición de prestaciones y como se utiliza.
+- [x] Realizar una leve modificación de la arquitectura de mi sistema.
+- [x] Terminar el hito 4.
