@@ -61,3 +61,12 @@ proyecto.
 - [x] Fomentar el uso de la caché a todos los niveles
 - [x] Separar la generacion de los datos y su servicio
 - [x] Testear las prestaciones
+
+### Hito 5
+
+- [x] Desplegar una aplicación en la nube con una instancia de máquina virtual (https://github.com/albertosml/PersonalWorkerAgenda/blob/master/provisionamiento/ansible_hosts).
+- [x] Aprender a elegir el sistema operativo adecuado para nuestra aplicación (https://github.com/albertosml/PersonalWorkerAgenda/blob/master/README.md).
+- [x] Preparar la instancia con la infraestructura necesaria (https://github.com/albertosml/PersonalWorkerAgenda/blob/master/provisionamiento/creacion_maquina_virtual.yml).
+- [x] Aprender a usar la herramienta Ansible (https://github.com/albertosml/PersonalWorkerAgenda/blob/master/provisionamiento/ansible.cfg).
+- [x] Saber crear ficheros de provisionamiento (https://github.com/albertosml/PersonalWorkerAgenda/blob/master/provisionamiento/receta.yml).
+- [x] Aprender a usar [Azure](https://azure.microsoft.com/en-us/)
